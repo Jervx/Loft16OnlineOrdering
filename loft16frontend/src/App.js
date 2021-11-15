@@ -7,7 +7,6 @@ function App() {
     <Suspense fallback={(<p>Loading</p>)}>
       <AppRoutes />
     </Suspense>
-  );
-}
-
+  )
+  }
 export default App;
