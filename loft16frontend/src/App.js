@@ -1,14 +1,12 @@
 import './App.css';
+import { Suspense } from 'react';
+import AppRoutes from "../src/Routes/Routers"
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Hello From Loft16
-        </p>
-      </header>
-    </div>
+    <Suspense fallback={(<p>Loading</p>)}>
+      <AppRoutes />
+    </Suspense>
   );
 }
 
