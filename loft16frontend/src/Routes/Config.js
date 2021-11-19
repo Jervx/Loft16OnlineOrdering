@@ -1,41 +1,23 @@
 import { lazy } from 'react'
-// Landing page 
-const Login = lazy(() => import("../Pages/Public/Login"))
-const Home = lazy(() => import("../Pages/Public/Home"))
-const Signup = lazy(() => import("../Pages/Public/Signup"))
-const NotFound = lazy(() => import("../Pages/Public/NotFound"))
-const Product_View = lazy(() => import("../Pages/Public/Product_View"))
-const Products = lazy(() => import("../Pages/Public/Products"))
+// Pages
+const Signin = lazy(() => import("../Pages/Public/Signin"))
+const PublicContainer = lazy(() => import("../Pages/Public/PublicContianer"))
+const AdminContianer = lazy(() => import("../Pages/Admin/AdminContainer"))
 
-
-// Portfolio Page 
+// App Routes 
 const ROUTERS = [
     {
-        path: "/login",
-        component: Login,
+        path: "/signin",
+        component: Signin,
     },
     {
-        path: "/",
-        component: Home,
+        path: "/home/*",
+        component: PublicContainer,
     },
     {
-        path: "/signup",
-        component: Signup,
-    },
-    {
-        path: "/productview",
-        component: Product_View,
-    },
-    {
-        path: "/products",
-        component: Products,
-    },
-    {
-        path: "/notfound",
-        component: NotFound,
+        path: "/admin",
+        component: AdminContianer,
     }
 ]
 
-export default {
-    ROUTERS
-}
+export default ROUTERS

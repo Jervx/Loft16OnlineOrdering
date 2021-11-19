@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import { Windmill } from '@windmill/react-ui'
+import loft16Theme from './Theme/loft16Theme';
 
 ReactDOM.render(
   // <React.StrictMode>
   //   <App />
   // </React.StrictMode>,
   // document.getElementById('root')
-  <Windmill>
+  <Windmill theme={loft16Theme}>
     <App />
   </Windmill>,
   document.getElementById('root')
