@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Button, Label, Input } from "@windmill/react-ui";
 
 import {  BsFillLockFill } from "react-icons/bs";
 import { MdAlternateEmail } from 'react-icons/md'
 
 const Singin = () => {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -63,31 +64,20 @@ const Singin = () => {
                 Log in
               </Button>
 
-              {/* <hr className="my-8" />
-
-              <Button block layout="outline">
-                <BsGithub className="w-4 h-4 mr-2" aria-hidden="true" />
-                Github
-              </Button>
-              <Button className="mt-4" block layout="outline">
-                <BsTwitter className="w-4 h-4 mr-2" aria-hidden="true" />
-                Twitter
-              </Button> */}
-
-              <p className="mt-4">
+<p className="mt-4">
                 <Link
                   className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
-                  to="/recover_account"
+                  to="/auth/recover_account"
                 >
-                  Forgot your password?
+                  Recover Account
                 </Link>
               </p>
               <p className="mt-1">
                 <Link
                   className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
-                  to="/signup"
+                  to="/auth/signup"
                 >
-                  Create account
+                  Sign In
                 </Link>
               </p>
             </div>
@@ -98,4 +88,4 @@ const Singin = () => {
   );
 };
 
-export default Singin;
+export default withRouter(Singin);

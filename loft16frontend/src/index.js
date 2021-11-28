@@ -5,14 +5,15 @@ import App from './App';
 import { Windmill } from '@windmill/react-ui'
 import loft16Theme from './Theme/loft16Theme';
 
+import {Provider} from 'react-redux'
+import store from "./app/store"
+
 ReactDOM.render(
-  // <React.StrictMode>
-  //   <App />
-  // </React.StrictMode>,
-  // document.getElementById('root')
-  <Windmill theme={loft16Theme}>
-    <App />
-  </Windmill>,
+  <Provider store={store}>
+    <Windmill dark={false} theme={loft16Theme}>
+        <App />
+    </Windmill>
+  </Provider>,
   document.getElementById('root')
 );
 

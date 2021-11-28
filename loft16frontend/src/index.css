@@ -2,14 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter&family=Pacifico&display=swap');
 
 .pacifico{
     font-family: 'Pacifico', 'cursive'
 }
 
+.font-inter{
+    font-family: 'Inter', sans-serif;
+}
+
 .defTextCOlorGreen{
-    color: #2A9E9A
+    color : #2A9E9A
+}
+
+.defText-Col-2{
+    color : #1D1D41
 }
 
 .defBackground{
@@ -20,6 +28,6 @@
     background-color: #19807c
 }
 
-.header{
+.HHeader{
     box-shadow: 0px 4px 22px rgba(183, 183, 183, 0.25);
 }
