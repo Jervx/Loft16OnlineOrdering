@@ -10,7 +10,7 @@ const Loader = () => {
   return (
     <>
       {loaderState.state && (
-        <div class="pt-4 flex justify-center items-center space-x-1 text-sm text-green-600">
+        <div className="pt-4 flex justify-center items-center space-x-1 text-sm text-green-600">
           <AiOutlineLoading3Quarters className="w-4 h-4  animate-spin " />
           <div>{loaderState.message}</div>
         </div>

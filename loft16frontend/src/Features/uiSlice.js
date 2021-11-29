@@ -73,7 +73,10 @@ export const uiSlice = createSlice({
       }
     },
     closeAlertModal : (state)=>{
-      state.alertModal.state = false
+      state.alertModal = {
+        ...state.alertModal,
+        state : false
+      }
     }
   },
 })

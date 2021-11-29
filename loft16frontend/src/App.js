@@ -15,13 +15,11 @@ import Informative from './Components/Modal/Informative';
 import InputModal from "./Components/Modal/InputModal"
 
 function App() {
-  console.log("APP")
-
   return (
     <Suspense fallback={(<p>Loading</p>)}>
+      <Router>
       <Informative />
       <InputModal />
-      <Router>
         <Switch>
           <Route path="/auth" component={AuthContainer} />
           <Route path="/admin" component={AdminContainer} />

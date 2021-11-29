@@ -11,7 +11,6 @@ import Signup from "../Auth/Signup";
 import NotFound from "../NotFound";
 
 const AuthContainer = () => {
-  console.log("AUTH")
   return (
     <div>
         <Switch>

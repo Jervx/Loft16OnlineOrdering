@@ -4,8 +4,6 @@ import appReducer from "../Features/appSlice"
 import uiReducer from "../Features/uiSlice"
 import authReducer from '../Features/authSlice'
 
-console.log(userReducer)
-
 export default configureStore({
   reducer: {
     user:userReducer,
@@ -14,13 +12,13 @@ export default configureStore({
     auth : authReducer
   },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-      serializableCheck: {
+      serializableCheck: false //{
         // Ignore these action types
-        ignoredActions: ['UI/openLoader','UI/closeAlertModal', 'UI/closeLoader'],
+        //ignoredActions: [userReducer, appReducer, uiReducer, authReducer],
         // Ignore these field paths in all actions
-        //ignoredActionPaths: [ 'payload.component.$$typeof','payload.component.type','ui.inputModal.onAccept'],
+        //ignoredActionPaths: [ 'ui.notifier.onAccept'],
         // Ignore these paths in the state
-        //ignoredPaths: ['ui.notifier.onAccept','ui.inputModal.component.type','ui.inputModal.onAccep','ui.inputModal.component.$$typeof'],
-      },
+        //ignoredPaths: ['ui.notifier.onAccept'],
+      //},
     })
 })

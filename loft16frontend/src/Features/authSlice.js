@@ -13,7 +13,7 @@ export const authSlice = createSlice({
     finalRegistration : (state, action) => {
       state.registration = {
           ...state.registration,
-          code : action.payload.code
+          confirmation_code : action.payload.confirmation_code
       }
     }
   },

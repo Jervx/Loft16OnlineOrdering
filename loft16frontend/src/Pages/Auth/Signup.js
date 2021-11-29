@@ -41,14 +41,7 @@ const Signup = () => {
   const [passVis, setPassVis] = useState(false);
   const [passVis2, setPassVis2] = useState(false);
 
-  const completeRegister = async () => {
-    alert("Saved all details");
-
-    // const res = await api.post("/signup",{
-    //   name,user_name,email_address, password
-    // })
-  };
-
+  //validate the form inputs
   const validate = () => {
     if (name === "") {
       setValidMsg("Name is empty!");
@@ -91,6 +84,7 @@ const Signup = () => {
     return true;
   };
 
+  //Partial Registration
   const submitPartialRegistration = () => {
     dispatch(openLoader({ state: true, message: "please wait.." }));
 
@@ -121,29 +115,44 @@ const Signup = () => {
           openInputModal({
             title: "Verification Code",
             component: <RegistrationConfirm />,
-            onAccept: completeRegister,
+            onAccept: () => {},
             acceptBtnText: "Finish",
             cancelBtnText: "Cancel",
           })
         );
       })
-      .catch((err) => {
-        console.log(err.data)
+      .catch((error) => {
         dispatch(closeLoader());
-        dispatch(openAlertModal({
-          component : (<></>),
-          data : err.data
-        }))
+        if (error.response) {
+          //request was made but theres a response status code
+          dispatch(openAlertModal({
+            component : (<></>),
+            data : error.response.data
+          }))
+        
+        } else if (error.request) {
+          // The request was made but no response was received
+          dispatch(openAlertModal({
+            component : (<></>),
+            data : {
+              err: 500,
+              description: "Sorry, but we can't reach the server",
+              solution : "Please try again later"
+            }
+          }))
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
       });
+        
   };
 
-  const togglePassVis = () => {
-    setPassVis(!passVis);
-  };
+  //Toggle password Visibility
+  const togglePassVis = () => { setPassVis(!passVis); };
 
-  const togglePassVis2 = () => {
-    setPassVis2(!passVis2);
-  };
+  //Toggle retype pass Visibility2
+  const togglePassVis2 = () => { setPassVis2(!passVis2); };
 
   return (
     <div className="flex items-center min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
@@ -175,7 +184,7 @@ const Signup = () => {
                   </div>
                 </Label>
                 <Label>
-                  <span>Username</span>
+                  <span>Username*</span>
                   <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
                     <div className="absolute inset-y-0 flex items-center pl-2">
                       <CgUserlane className="w-4 h-4" aria-hidden="true" />
@@ -193,7 +202,7 @@ const Signup = () => {
                 </Label>
               </div>
               <Label className="pt-4">
-                <span>Email *</span>
+                <span>Email*</span>
                 <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
                   <div className="absolute inset-y-0 flex items-center pl-2">
                     <MdAlternateEmail className="w-4 h-4" aria-hidden="true" />
@@ -236,9 +245,8 @@ const Signup = () => {
                   </div>
                 </div>
               </Label>
-
               <Label className="pt-4">
-                <span>Confirm Password</span>
+                <span>Confirm Password*</span>
                 <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
                   <div className="absolute inset-y-0 flex items-center pl-2">
                     <BsFillLockFill className="w-4 h-4" aria-hidden="true" />

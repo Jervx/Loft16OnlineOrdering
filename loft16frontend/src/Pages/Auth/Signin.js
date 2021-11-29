@@ -98,9 +98,9 @@ const Singin = (props) => {
                     className="mt-1 pl-8"
                     type="email"
                     placeholder="john@doe.com"
+                    value={email}
                     onChange={(e) => {
                       setEmail(e.currentTarget.value);
-                      console.log(email);
                     }}
                   />
                 </div>
@@ -118,7 +118,6 @@ const Singin = (props) => {
                     placeholder="********"
                     onChange={(e) => {
                       setPassword(e.currentTarget.value);
-                      console.log(password);
                     }}
                     value={password}
                   />

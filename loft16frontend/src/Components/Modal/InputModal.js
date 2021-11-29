@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Modal, ModalBody, ModalFooter, Button} from '@windmill/react-ui'
+import { Modal, ModalBody } from '@windmill/react-ui'
 
 /* Redux */
 import { useSelector ,useDispatch } from "react-redux";
@@ -14,10 +14,10 @@ const InputModal = () => {
     dispatch(closeInputModal())
   }
 
-  const accept = () =>{
-    closeModal()
-    inputModalState.onAccept()
-  }
+  // const accept = () =>{
+  //   closeModal()
+  //   inputModalState.onAccept()
+  // }
 
   return (
     <>
@@ -26,7 +26,7 @@ const InputModal = () => {
         <ModalBody>
           {inputModalState.component}
         </ModalBody>
-        <ModalFooter>
+        {/* <ModalFooter>
           <div className="hidden sm:block">
             <Button className="rounded-xl  " layout="outline" onClick={closeModal}>
               {inputModalState.cancelBtnText}
@@ -45,7 +45,7 @@ const InputModal = () => {
               {inputModalState.cancelBtnText}
             </Button>
           </div>
-        </ModalFooter>
+        </ModalFooter> */}
       </Modal>
     </>
   );

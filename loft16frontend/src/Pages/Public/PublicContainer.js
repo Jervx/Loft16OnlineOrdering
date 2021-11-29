@@ -16,7 +16,6 @@ import NotFound from '../NotFound'
 
 
 const PublicContainer = ({toAuth}) => {
-    console.log("PUBLIC")
     return (
         <div>
                 <Header />
