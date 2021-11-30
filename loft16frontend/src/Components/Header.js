@@ -35,9 +35,7 @@ const Header = (props) => {
   //current user
   const _cur_user = useSelector((state) => state.user);
 
-  const signOut = () => {
-    dispatch(signout());
-  };
+  const signOut = () => { dispatch(signout()); };
 
   const toggleMyCart = () => {
     if (!_cur_user.hasUser) {
@@ -116,7 +114,7 @@ const Header = (props) => {
               aria-haspopup="true"
             >
               <BsCart3 className="w-5 h-5" aria-hidden="true" />
-              { _cur_user.hasUser && <span
+              {  _cur_user.hasUser && _cur_user.userData.cart.total_items > 0 && <span
                 aria-hidden="true"
                 className="absolute top-0 right-0 inline-block w-5 h-5 transform translate-x-3 -translate-y-3 bg-red-600 border-2 text-white border-white rounded-full dark:border-gray-800"
               >

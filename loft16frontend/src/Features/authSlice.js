@@ -15,11 +15,24 @@ export const authSlice = createSlice({
           ...state.registration,
           confirmation_code : action.payload.confirmation_code
       }
-    }
+    },
+    cleanRegistration : (state) =>{
+      state.registration = {}
+    },
+    setSignInCredential : (state, action) => {
+      state.signin = action.payload
+    },
+    setSignInTwoFactor : (state, action ) =>{
+      state.signin = {
+        ...state.signin,
+        twoFactorCode : action.payload.twoFactorCode
+      }
+    },
+    cleanSignInCredential : (state) =>{ state.signin = {}}
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { signin, signout, partialRegistration, finalRegistration } = authSlice.actions
+export const { setSignInCredential, setSignInTwoFactor, cleanSignInCredential ,partialRegistration, finalRegistration, cleanRegistration } = authSlice.actions
 
 export default authSlice.reducer

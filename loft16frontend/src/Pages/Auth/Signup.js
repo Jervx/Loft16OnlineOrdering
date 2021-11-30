@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 /* Components */
 import RegistrationConfirm from "../../Components/ModalComponent/RegistrationConfirm";
@@ -15,16 +14,16 @@ import { RiUser6Fill } from "react-icons/ri";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 
 /* Redux, Reducers */
-import { closeLoader, openInputModal, openAlertModal } from "../../Features/uiSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { closeLoader, openInputModal, openAlertModal } from "../../Features/uiSlice";
 import { openLoader } from "../../Features/uiSlice";
 import { partialRegistration } from "../../Features/authSlice";
 
+/* API */
+import API from "../../Helpers/api"
+
 
 const Signup = () => {
-  const api = axios.create({
-    baseURL: "http://192.168.1.100:3001/auth",
-  });
 
   const dispatch = useDispatch();
   const uiState = useSelector((state) => state.ui);
@@ -94,8 +93,7 @@ const Signup = () => {
       return;
     }
 
-    api
-      .post("/confirm_email", {
+    API.post("/auth/confirm_email", {
         name,
         user_name,
         email_address,

@@ -6,7 +6,7 @@ import { withRouter} from "react-router-dom";
 import axios from "axios";
 
 import { useSelector, useDispatch } from "react-redux";
-import { finalRegistration } from "../../Features/authSlice";
+import { finalRegistration, cleanRegistration } from "../../Features/authSlice";
 import { closeLoader, openAlertModal, closeAlertModal , closeInputModal } from "../../Features/uiSlice";
 import { signin } from '../../Features/userSlice'
 
@@ -31,10 +31,11 @@ const RegistrationConfirm = (props) => {
         ...authRegisterState,
       })
       .then((res) => {
-        // dispatch(closeInputModal())
-        // dispatch(closeAlertModal())
-        // dispatch(signin(res.data.data))
-        // props.history.push('/')
+         dispatch(closeInputModal())
+         dispatch(closeAlertModal())
+         dispatch(signin(res.data.data.user))
+         dispatch(cleanRegistration())
+         props.history.push('/')
       })
       .catch((error) => {
         dispatch(closeLoader());
