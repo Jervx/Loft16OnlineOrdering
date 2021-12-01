@@ -4,7 +4,8 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState: {
     registration : {},
-    signin : {}
+    signin : {},
+    recovery : {}
   },
   reducers: {
     partialRegistration : (state, action) => {
@@ -28,11 +29,23 @@ export const authSlice = createSlice({
         twoFactCode : action.payload.twoFactCode
       }
     },
-    cleanSignInCredential : (state) =>{ state.signin = {}}
+    cleanSignInCredential : (state) =>{ state.signin = {}},
+    setRecoveryAccount : (state, action) =>{
+      state.recovery = action.payload
+    },
+    setRecoveryCode : (state, action) =>{
+      state.recovery = {
+        ...state.recovery,
+        recovery_code : action.payload.recovery_code
+      }
+    },
+    clearRecovery : (state) => {
+      state.recovery = {}
+    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setSignInCredential, setSignInTwoFactor, cleanSignInCredential ,partialRegistration, finalRegistration, cleanRegistration } = authSlice.actions
+export const { setRecoveryAccount, setRecoveryCode, clearRecovery ,setSignInCredential, setSignInTwoFactor, cleanSignInCredential ,partialRegistration, finalRegistration, cleanRegistration } = authSlice.actions
 
 export default authSlice.reducer

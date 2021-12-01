@@ -8,6 +8,7 @@ import {
 // PAGES
 import Signin from "../Auth/Signin";
 import Signup from "../Auth/Signup";
+import RecoverAccount from "../Auth/RecoverAccount"
 import NotFound from "../NotFound";
 
 const AuthContainer = () => {
@@ -16,6 +17,7 @@ const AuthContainer = () => {
         <Switch>
           <Route exact path="/auth/signin" component={Signin}/>
           <Route exact path="/auth/signup" component={Signup}/>
+          <Route exact path="/auth/recover" component={RecoverAccount}/>
           <Route exact path="/auth" component={Signin}/>
           <Route exact path="*" component={NotFound}/>
         </Switch>

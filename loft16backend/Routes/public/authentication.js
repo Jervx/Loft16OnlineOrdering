@@ -122,7 +122,7 @@ router.post("/recover", async(req, res)=>{
     // sent it to email TODO: implement future email helper
     //return 200 code sent
     return res.status(200).json({
-      recovery_codre : true,
+      recovery_code_sent : true,
       message : "recovery code sent!"
     })
   }else{   
@@ -157,17 +157,19 @@ router.post("/recover", async(req, res)=>{
   }
 
   const password = await bcrypt.hash(newPassword, 10)
-  const updatedPassword = await User.findOneAndUpdate({ email_address }, {$set : { password }} )
+  const updatedPassword = await User.findOneAndUpdate({ email_address }, {$set : { password }} ).lean()
 
   //invalidate the recovery code
-  await RecoveryCode.updateOne({email_address} , {$set : {used : true}})
+  const invalidateRecovery = await RecoveryCode.updateOne({email_address, used : false} , {$set : {used : true}})
+
+  console.log(updatedPassword)
 
     //final return of response
     return res.status(201).json({
       code: 201,
       description: "User Created Successfully!",
-      data: {
-        updatedPassword
+      userData: {
+        ...updatedPassword
       },
     });
 })
@@ -193,7 +195,7 @@ router.post("/signin", async (req, res) => {
       solution: "Please input all required data",
     });
 
-  let USER = await User.findOne({ email_address } );
+  const USER = await User.findOne({ email_address }).lean();
 
   if (!USER)
     return res.status(401).json({
@@ -274,6 +276,8 @@ router.post("/signin", async (req, res) => {
   // set authorization via cookie & httponly secure desu 
   res.cookie( "access_token",token,{ httpOnly: true, secure : false } )
   res.cookie( "refresh_token", refresh, { httpOnly: true, secure : false })
+
+  console.log(USER)
 
   return res.status(200).json(
     { 

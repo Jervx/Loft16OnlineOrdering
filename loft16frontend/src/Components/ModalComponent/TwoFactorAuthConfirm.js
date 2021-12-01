@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Label, Input, Button, Alert } from "@windmill/react-ui";
 import { HiLockClosed } from "react-icons/hi";
 import { setSignInTwoFactor, cleanSignInCredential } from "../../Features/authSlice";
-import { openAlertModal } from "../../Features/uiSlice";
+import { closeInputModal, openAlertModal } from "../../Features/uiSlice";
 
 import API from "../../Helpers/api";
 import { signin } from "../../Features/userSlice";
@@ -25,6 +25,7 @@ const TwoFactorAuthConfirm = (props) => {
 
       dispatch(cleanSignInCredential())
       dispatch(signin(userData))
+      dispatch(closeInputModal())
       props.history.push("/")
     } catch (error) {
       if (error.response) {

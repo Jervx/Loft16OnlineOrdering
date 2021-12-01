@@ -300,7 +300,7 @@ const Signup = () => {
               <p className="mt-4">
                 <Link
                   className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
-                  to="/recover_account"
+                  to="/auth/recover"
                 >
                   Recover Account
                 </Link>
