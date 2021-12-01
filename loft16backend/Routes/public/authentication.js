@@ -87,7 +87,7 @@ router.post("/renewToken", async(req, res) =>{
 
 /* TODO: Recover Account */
 router.post("/recover", async(req, res)=>{
-  const { email, newPassword, confirmation_code}
+  const { email, newPassword, confirmation_code} = req.body
 
   //check if email not exist in db
   // return 403 no user
@@ -122,9 +122,12 @@ router.post("/recover", async(req, res)=>{
   remove refresh token
 */
 
-/*SIGNIN TODO: Sign via Google */ 
+/*SIGNIN 
+  TODO: Sign via Google 
+  if via google then bypass two factor auth
+  */ 
 router.post("/signin", async (req, res) => {
-  const { email_address, password } = req.body;
+  const { email_address, password, twoFactCode } = req.body;
 
   //check if all required fields has value
   if (!(email_address, password))
@@ -151,11 +154,9 @@ router.post("/signin", async (req, res) => {
         description: "Forbidden",
         solution: "Please check the credential provided",
       });
-  
-  const { confirmation_code } = req.body
 
   if(USER.two_factor_auth == true)
-    if(!confirmation_code){
+    if(!twoFactCode){
       // ✅ Two Factor Sign In
       // iissue a two factor code & save it on two factor auth db
 
@@ -184,7 +185,7 @@ router.post("/signin", async (req, res) => {
 
       // check if the given code  == two factor auth
       // if not, then return invalid auth 401
-      if(confirmation_code !== users_twoFactorCode.confirmation_code)
+      if(twoFactCode !== users_twoFactorCode.confirmation_code)
         return res.status(401).json({
           err : 401,
           description : "The provided authentication code is not correct",
@@ -223,13 +224,16 @@ router.post("/signin", async (req, res) => {
       code: 200,
       description: "Signed in successfuly!",
       twoFactorRequired : false,
-      data: {
-        USER
+      userData: {
+        ...USER
       },
     });
 });
 
-/*SUGNUP TODO: Sign via Google */
+/*SUGNUP && issuance of email confirmation
+TODO: Sign via Google 
+  if via google gmail, bypass email confirmation code
+*/
 router.post("/signup", async (req, res) => {
   try {
     const { name, user_name, email_address, password, confirmation_code } =

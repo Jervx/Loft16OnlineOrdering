@@ -25,7 +25,7 @@ export const authSlice = createSlice({
     setSignInTwoFactor : (state, action ) =>{
       state.signin = {
         ...state.signin,
-        twoFactorCode : action.payload.twoFactorCode
+        twoFactCode : action.payload.twoFactCode
       }
     },
     cleanSignInCredential : (state) =>{ state.signin = {}}

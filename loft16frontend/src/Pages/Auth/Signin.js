@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import { Link, withRouter } from "react-router-dom";
 import { Button, Label, Input } from "@windmill/react-ui";
+import Loader from "../../Components/Loader"
 
 import { BsFillLockFill } from "react-icons/bs";
 import { MdAlternateEmail } from "react-icons/md";
@@ -9,46 +10,94 @@ import { MdAlternateEmail } from "react-icons/md";
 /* redux */
 import { useDispatch } from "react-redux";
 import { signin } from "../../Features/userSlice";
-import { openAlertModal } from "../../Features/uiSlice"
+import { openAlertModal, openInputModal, openLoader, closeLoader } from "../../Features/uiSlice";
+import { setSignInCredential, cleanSignInCredential } from "../../Features/authSlice";
 
 /* API */
 import API from "../../Helpers/api";
+import TwoFactorAuthConfirm from "../../Components/ModalComponent/TwoFactorAuthConfirm";
 
 const Singin = (props) => {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const signInUser = async () => {
-    try{
+    try {
       //dispatch save logindata
+      dispatch(openLoader({ state: true, message: "checking.." }))
+      dispatch(
+        setSignInCredential({
+          email_address: email,
+          password,
+        })
+      );
 
-      const data = await API.post("/auth/signin",{
-        email_address : email,
-        password
-      })
+      const response = await API.post("/auth/signin", {
+        email_address: email,
+        password,
+      });
+
+      console.log(response);
+      dispatch(closeLoader());
 
       // if twofactorrequired
-      //  show inputmodal with custom TODO:  component two factor code 
-      //                  this component should contain function for saving user data like below
-      // return
+      if (response.data.twoFactorRequired) {
+        //  👍 show inputmodal with custom TODO:  component two factor code
+        //  this component should contain function for saving user data like below
+        dispatch(closeLoader());
+        dispatch(
+          openInputModal({
+            title: "Verification Code",
+            component: <TwoFactorAuthConfirm />,
+            onAccept: () => {},
+            acceptBtnText: "Finish",
+            cancelBtnText: "Cancel",
+          })
+        );
+        return;
+      }
+
+      dispatch(closeLoader());
 
       // get user data
       // dispatch signin
       // dispatch clear signin
       // history push / or home
-    }catch(error){
-
-      //TODO: propper error handling
+      const userData = response.data.userData
+      dispatch(signin(userData))
+      dispatch(cleanSignInCredential())
+      props.history.push("/")
+    } catch (error) {
+      //👍 TODO: propper error handling
       // No Request At All
       // error codes get err response data
-
-      dispatch(openAlertModal({
-        component : (<></>),
-        data : error.response.data
-      }))
+      dispatch(closeLoader());
+      if (error.response) {
+        //request was made but theres a response status code
+        dispatch(
+          openAlertModal({
+            component: <></>,
+            data: error.response.data,
+          })
+        );
+      } else if (error.request) {
+        // The request was made but no response was received
+        dispatch(
+          openAlertModal({
+            component: <></>,
+            data: {
+              err: 500,
+              description: "Sorry, but we can't reach the server",
+              solution: "Please try again later",
+            },
+          })
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message);
+      }
     }
   };
 
@@ -97,7 +146,7 @@ const Singin = (props) => {
                   />
                 </div>
               </Label>
-
+              <Loader />
               <Button
                 className="mt-4 rounded-xl defBackground hover:bg-green-500"
                 block

@@ -7,6 +7,7 @@ const RecoveryCodeSchema = new mongoose.Schema({
     confirmation_code : { type : String, required : true },
     iat : {type: Date, default : Date.now},
     exp : {type: Date, required : true},
+    
   });
   
 module.exports = mongoose.model("recovery_code", RecoveryCodeSchema);
