@@ -15,6 +15,7 @@ const TwoFactorAuth = require("../../models/TwoFactorAuth");
 const auth = require("../../middleware/auth")
 
 let ObjectId = require('mongoose').Types.ObjectId; 
+const RecoveryCode = require("../../models/RecoveryCode");
 
 //generate loft confirmation code
 let generateCode = () => {
@@ -87,33 +88,88 @@ router.post("/renewToken", async(req, res) =>{
 
 /* TODO: Recover Account */
 router.post("/recover", async(req, res)=>{
-  const { email, newPassword, confirmation_code} = req.body
+  const { email_address, newPassword, recovery_code} = req.body
 
+  if(!email_address)
+    return res.status(400).json({
+      err: 400,
+      description: "Required Data Missing",
+      solution: "Please input all required data",
+    });
+
+  const USER = await User.findOne({email_address})
+
+  
   //check if email not exist in db
-  // return 403 no user
+  // return no user
+  if (!USER)
+    return res.status(401).json({
+      err: 401,
+      description: "Account Not Found",
+      solution:
+        "The given credential doesn't belong to our existing users, please create an account",
+    });
   
   //if no recovery code provided
-  //create code (findOneUpdate, upsert)
-  // sent it to email TODO: implement future email helper
-  //return 200 code sent
+  if(!recovery_code){
+    //create code (findOneUpdate, upsert)
+    const code = await RecoveryCode.findOneAndUpdate({email_address, used : false},{
+      user_ID : USER._id,
+      email_address,
+      recovery_code : generateCode(),
+      exp : getAddedMinutes()
+    }, {new : true, upsert : true})
+    // sent it to email TODO: implement future email helper
+    //return 200 code sent
+    return res.status(200).json({
+      recovery_codre : true,
+      message : "recovery code sent!"
+    })
+  }else{   
+    //query recovery code matching email && not marked as used
+    const USER_RECOVERY = await RecoveryCode.findOne({ email_address, used : false })
 
-  //query recovery code matching email && not marked as used
+    //if none then
+    //return 410 we haven't establish a recovery code fo that email, try again
+    if(!USER_RECOVERY)
+      return res.status(403).json({
+        err : 403,
+        description : "You didn't Send Us Recovery Request",
+        solution : "We haven't establish a recovery code for your email, Try recovery again"
+      })
 
-  //if none then
-  //return 410 we haven't establish a recovery code fo that email, try again
+    if(recovery_code !== USER_RECOVERY.recovery_code)
+      return res.status(401).json({
+        err : 401,
+        description : "The provided recovery code is not correct",
+        solution : "Please make sure that the recovery code provided is correct"
+      })
 
-  //if provided code != to the given code
-  //return 401 
+    // check if the given code is expired or not
+    // if expired then return status 410 expired code
+    if(isExpired(USER_RECOVERY.exp))
+      return res.status(409).json({
+        err : 409,
+        description : "Your recovery code was expired",
+        solution : "Please resend or signin again to get a new recovery code"
+      })
+      //end no other logic
+  }
 
-  //if provided code is expired
-  //return 409 
+  const password = await bcrypt.hash(newPassword, 10)
+  const updatedPassword = await User.findOneAndUpdate({ email_address }, {$set : { password }} )
 
-  //update password from user $set password to new
-  //update recovery token $set use to true
+  //invalidate the recovery code
+  await RecoveryCode.updateOne({email_address} , {$set : {used : true}})
 
-  //
-  
-  //return 200 oks👍
+    //final return of response
+    return res.status(201).json({
+      code: 201,
+      description: "User Created Successfully!",
+      data: {
+        updatedPassword
+      },
+    });
 })
 
 
@@ -197,7 +253,7 @@ router.post("/signin", async (req, res) => {
       if(isExpired(users_twoFactorCode.exp))
         return res.status(409).json({
           err : 409,
-          description : "Your expiration code was expired",
+          description : "Your two factor authentication code was expired",
           solution : "Please resend or signin again to get new confirmation code"
         })
       else
@@ -302,7 +358,6 @@ router.post("/signup", async (req, res) => {
 
     const token = generateToken( { user_name, email_address } )
     const refresh = jwt.sign( {user_name, email_address} , process.env.JWT_RFSH)
-
 
     // set authorization via cookie & httponly 
     res.cookie( "access_token",token,{ httpOnly: true, secure : false } )
