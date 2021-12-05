@@ -8,6 +8,8 @@ import loft16Theme from './Theme/loft16Theme';
 import {Provider} from 'react-redux'
 import store from "./app/store"
 
+require('dotenv').config()
+
 ReactDOM.render(
   <Provider store={store}>
     <Windmill dark={false} theme={loft16Theme}>

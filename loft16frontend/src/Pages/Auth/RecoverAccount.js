@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Label, Input } from "@windmill/react-ui";
 import Loader from "../../Components/Loader"
 
@@ -9,7 +9,6 @@ import { MdAlternateEmail } from "react-icons/md";
 
 /* redux */
 import { useDispatch } from "react-redux";
-import { signin } from "../../Features/userSlice";
 import { openAlertModal, openInputModal, openLoader, closeLoader } from "../../Features/uiSlice";
 import { setRecoveryAccount } from "../../Features/authSlice";
 
@@ -96,7 +95,7 @@ const RecoverAccount = (props) => {
           <div className="flex flex-col overflow-y-auto ">
             <main className="flex items-center justify-center p-6 sm:p-12 ">
               <div className="w-full">
-                <h1 className="pacifico defTextCOlorGreen mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
+                <h1 className="MoonTime defTextCOlorGreen mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
                   Recover Account
                 </h1>
                 <div className="flex justify-center"></div>

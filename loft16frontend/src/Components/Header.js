@@ -13,8 +13,8 @@ import { withRouter, Link } from "react-router-dom";
 import { BiSearch } from "react-icons/bi";
 import { AiFillFire, AiFillShopping } from "react-icons/ai";
 import { RiUser6Fill } from "react-icons/ri";
-import { BsGearFill, BsCart3 } from "react-icons/bs";
-import { MdOutlineLogout } from "react-icons/md";
+import { BsGearFill } from "react-icons/bs";
+import { MdOutlineLogout, MdOutlineShoppingCart} from "react-icons/md";
 import { GoPackage } from "react-icons/go";
 
 /*redux */
@@ -25,6 +25,7 @@ import { openNotifier } from "../Features/uiSlice";
 
 /* components */
 import Notifier from "./Modal/Notifier";
+
 
 const Header = (props) => {
   const { history } = props;
@@ -43,7 +44,7 @@ const Header = (props) => {
         openNotifier({
           title: "No User",
           message: "Please Sign In First",
-          onAccept: () => {history.push("/mycart");},
+          onAccept: () => { history.push("/mycart"); },
           acceptBtnText: "Sign In",
           cancelBtnText: "No, Thanks",
         })
@@ -55,49 +56,49 @@ const Header = (props) => {
     history.push("/mycart")
   };
 
-  useEffect(() => {}, [isProfileMenuOpen]);
+  useEffect(() => {
+  }, []);
 
   return (
-    <header className="HHeader z-40 py-4 bg-whie shadow-bottom dark:bg-gray-800">
+    <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800">
       <Notifier></Notifier>
       <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
         <a
-          className="hidden pacifico defTextCOlorGreen lg:block ml-6 text-lg font-bold text-gray-800 dark:text-gray-200"
+          className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
           href="/"
-        >
-          Loft 16
-        </a>
+        > Loft 16 </a>
+
 
         {/* <!-- Embedded Routes --> */}
-        <div className="flex text-gray-400  justify-center flex-1 lg:mr-32">
+        <div className="flex text-gray-400 items-center justify-center flex-1 lg:mr-32">
           <h3
             onClick={() => history.push("/")}
-            className="cursor-pointer text-sm flex hover:text-red-500 items-center py-2 mb-2 "
+            className="cursor-pointer text-sm flex hover:text-red-500 items-center py-2 "
           >
             <AiFillFire className="w-6 h-6 pr-2" aria-hidden="true" />
-            <p className="hidden md:block transition duration-200 ease-linear">
+            <p className="hidden font-medium md:block transition duration-200 ease-linear">
               What's Hot
             </p>
           </h3>
           <h3
             onClick={() => history.push("/products")}
-            className="cursor-pointer ml-4 hover:text-red-500 text-sm flex items-center py-2 mb-2 "
+            className="cursor-pointer ml-4 hover:text-red-500 text-sm flex items-center py-2 "
           >
             <AiFillShopping className="w-6 h-6 pr-2" aria-hidden="true" />
-            <p className="hidden md:block transition duration-200 ease-linear">
+            <p className="hidden font-medium md:block transition duration-200 ease-linear">
               Products
             </p>
           </h3>
         </div>
 
         {/* <!-- Search input --> */}
-        <div className="flex justify-end flex-1 lg:mr-8">
-          <div className="relative w-full max-w-xs mr-2 focus-within:text-purple-500">
+        <div className="flex justify-end flex-1 mr-2 lg:mr-8">
+          <div className="relative  h-full md:w-7/12 mr-2 focus-within:text-purple-500">
             <div className="absolute inset-y-0 flex items-center pl-2">
               <BiSearch className="w-4 h-4" aria-hidden="true" />
             </div>
             <Input
-              className="pl-8 text-gray-700"
+              className="pl-8 rounded-lg border-0 bg-gray-100 text-gray-700"
               placeholder="Search Product"
               aria-label="Search"
             />
@@ -113,7 +114,7 @@ const Header = (props) => {
               aria-label="Notifications"
               aria-haspopup="true"
             >
-              <BsCart3 className="w-5 h-5" aria-hidden="true" />
+              <MdOutlineShoppingCart className="w-5 h-5 defTextCOlorGreen" aria-hidden="true" />
               {  _cur_user.hasUser && _cur_user.userData.cart.total_items > 0 && <span
                 aria-hidden="true"
                 className="absolute top-0 right-0 inline-block w-5 h-5 transform translate-x-3 -translate-y-3 bg-red-600 border-2 text-white border-white rounded-full dark:border-gray-800"
@@ -137,7 +138,8 @@ const Header = (props) => {
                 className="rounded-full focus:shadow-outline-purple focus:ring-4 focus:outline-none"
                 aria-label="Account"
                 aria-haspopup="true"
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                onClick={() => setIsProfileMenuOpen(true)}
+                onMouseEnter={() => setIsProfileMenuOpen(true)}
               >
                 <Avatar
                   className="align-middle"
@@ -148,6 +150,7 @@ const Header = (props) => {
               </button>
             )}
             <Dropdown
+            className = "shadow-2xl p-3"
               align="right"
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}

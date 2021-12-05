@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router";
 
 /* Components */
 import RegistrationConfirm from "../../Components/ModalComponent/RegistrationConfirm";
@@ -22,8 +23,7 @@ import { partialRegistration } from "../../Features/authSlice";
 /* API */
 import API from "../../Helpers/api"
 
-
-const Signup = () => {
+const Signup = (props) => {
 
   const dispatch = useDispatch();
   const uiState = useSelector((state) => state.ui);
@@ -39,6 +39,10 @@ const Signup = () => {
 
   const [passVis, setPassVis] = useState(false);
   const [passVis2, setPassVis2] = useState(false);
+
+
+  useEffect(() => {
+  }, []);
 
   //validate the form inputs
   const validate = () => {
@@ -321,4 +325,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default withRouter(Signup);

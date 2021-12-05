@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter&family=Pacifico&display=swap');
+@font-face {
+    font-family: 'Moontime';
+    src:  url('/src/assets/MoonTime.ttf') format('truetype')
+  }
+
+.MoonTime{
+    font-family: 'Moontime';
+}
 
 .pacifico{
     font-family: 'Pacifico', 'cursive'
@@ -30,4 +38,9 @@
 
 .HHeader{
     box-shadow: 0px 4px 22px rgba(183, 183, 183, 0.25);
+}
+
+.hero-bg{
+    background-image: url("https://images.unsplash.com/photo-1511389026070-a14ae610a1be?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWluaW1hbGlzdCUyMHJvb218ZW58MHx8MHx8&w=1000&q=80");
+    background-size: cover;
 }

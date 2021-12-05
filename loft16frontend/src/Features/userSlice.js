@@ -1,11 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+
 export const userSlice = createSlice({
   name: 'user',
-  initialState: {
-    hasUser : false,
-    userData : null
-  },
+  initialState:{ hasUser : false, userData : null},
   reducers: {
     signin: (state, action) => {
       state.hasUser = true
@@ -14,11 +12,17 @@ export const userSlice = createSlice({
     signout: (state) => {
       state.hasUser = false
       state.userData = null
+    },
+    setCart : (state, action) => {
+      state.userData.cart = action.payload 
+    },
+    addToCart : (state, action) =>  {
+      state.userData.cart.items = [ ...state.userData.cart, action.payload ]
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { signin, signout } = userSlice.actions
+export const { signin, signout, setCart, addToCart } = userSlice.actions
 
 export default userSlice.reducer

@@ -273,3 +273,34 @@
   "uby": "fg9s7a62950g0sg8a9124asdg97350bm01",
   "dat": "11-11-2021"
 }]
+
+
+{
+  
+  "schema_v" : 1,
+  "name"  : "Vase",
+  "categories" : ["Metal Sign","Accessories"],
+  "likes" : 1,
+  "total_stock" : 1,
+  "is_hot" : true,
+  "replacement_day" : 7,
+  "Images" : ["https://images.unsplash.com/photo-1533090161767-e6ffed986c88?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=869&q=80"],
+  "description" : "Idk why is this?",
+  "variants" : [
+    {
+      "name": "Wood Version",
+      "stock" : 5,
+      "price" : 25.5
+    }
+  ],
+  "n_ratings" : 0,
+  "n_no_ratings" : 0,
+  "ratings" : [],
+  "total_item_sold" : 0,
+  "generated_sale" : 0,
+  "cat" : "11-11-2021",
+  "cby" : "1243ogjdg89asg",
+  "uat" : "11-11-2022",
+  "uby" : "89agag8a9gga9sg",
+  "dat" : "11-23-2022"
+ }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Link, withRouter } from "react-router-dom";
 import { Button, Label, Input } from "@windmill/react-ui";
@@ -17,11 +17,17 @@ import { setSignInCredential, cleanSignInCredential } from "../../Features/authS
 import API from "../../Helpers/api";
 import TwoFactorAuthConfirm from "../../Components/ModalComponent/TwoFactorAuthConfirm";
 
+
+
 const Singin = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
+
+
+  useEffect(() => {
+  }, []);
 
   const signInUser = async () => {
     try {
@@ -37,7 +43,7 @@ const Singin = (props) => {
       const response = await API.post("/auth/signin", {
         email_address: email,
         password,
-      });
+      },{withCredentials : true});
 
       console.log(response);
       dispatch(closeLoader());
@@ -66,6 +72,8 @@ const Singin = (props) => {
       // dispatch clear signin
       // history push / or home
       const userData = response.data.userData
+
+      
       dispatch(signin(userData))
       dispatch(cleanSignInCredential())
       props.history.push("/")

@@ -44,17 +44,10 @@ let isExpired = (d2) => {
 // generate a token
 const generateToken = (user_data) => { return jwt.sign(user_data, process.env.JWT_SCRT, { expiresIn: process.env.JWT_EXP_TIME }) }
 
+
 // reissue new token
 router.post("/renewToken", async(req, res) =>{
-  const refreshToken = req.cookies.refresh_token
   const { userId, email_address, user_name } = req.body
-
-  if (!(refreshToken, userId)) 
-    return res.status(401).json({
-      err: 401,
-      description : "Missing authorization or User information",
-      solution : "Make sure that you are not logged out. Else login again"
-    })
 
   const UserRefreshToken = await Refresh_Token.findOne({user_ID: new ObjectId(userId)})
 
@@ -73,14 +66,14 @@ router.post("/renewToken", async(req, res) =>{
     })
 
     const token = generateToken({ user_name , email_address })
-    let USER = await User.findOne({ email_address });
+    let USER = await User.findOne({ email_address }).lean();
 
     res.cookie( "access_token",token,{ httpOnly: true, secure : false })
     res.status(200).json({
       code: 200,
       description: "Got a new token!",
-      data: {
-        USER
+      userData: {
+        ...USER
       },
     })
   })
@@ -103,8 +96,8 @@ router.post("/recover", async(req, res)=>{
   //check if email not exist in db
   // return no user
   if (!USER)
-    return res.status(401).json({
-      err: 401,
+    return res.status(404).json({
+      err: 404,
       description: "Account Not Found",
       solution:
         "The given credential doesn't belong to our existing users, please create an account",
@@ -198,8 +191,8 @@ router.post("/signin", async (req, res) => {
   const USER = await User.findOne({ email_address }).lean();
 
   if (!USER)
-    return res.status(401).json({
-      err: 401,
+    return res.status(404).json({
+      err: 404,
       description: "Account Not Found",
       solution:
         "The given credential doesn't belong to our existing users, please create an account",
@@ -274,8 +267,8 @@ router.post("/signin", async (req, res) => {
   })
   
   // set authorization via cookie & httponly secure desu 
-  res.cookie( "access_token",token,{ httpOnly: true, secure : false } )
-  res.cookie( "refresh_token", refresh, { httpOnly: true, secure : false })
+  res.cookie( "access_token",token,{ httpOnly: true, secure : true, sameSite : 'None' } )
+  res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite : 'None' } )
 
   console.log(USER)
 
@@ -364,15 +357,23 @@ router.post("/signup", async (req, res) => {
     const refresh = jwt.sign( {user_name, email_address} , process.env.JWT_RFSH)
 
     // set authorization via cookie & httponly 
-    res.cookie( "access_token",token,{ httpOnly: true, secure : false } )
-    res.cookie( "refresh_token", refresh, { httpOnly: true, secure : false })
+    res.cookie( "access_token",token,{ httpOnly: true, secure : true,  sameSite:'Lax'  } )
+    res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite:'Lax' })
+
+    // Create a session Refresh Token for attaining new access token
+    // should be destroyed on logout - @hjerbe
+    await Refresh_Token.create({
+      user_ID : user._id,
+      refresh_token : refresh
+    })
+  
 
     //final return of response
     return res.status(201).json({
       code: 201,
       description: "User Created Successfully!",
-      data: {
-        user
+      userData: {
+        ...user
       },
     });
   } catch (e) {

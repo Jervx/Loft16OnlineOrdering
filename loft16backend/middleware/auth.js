@@ -5,7 +5,9 @@ const config = process.env;
 
 
 const verifyToken = (req, res, next) => {
-  const token = req.cookies.access_token
+  let token = req.cookies.access_token
+
+  console.log(req.cookies)
 
   if (!token)
     return res.status(403).json({

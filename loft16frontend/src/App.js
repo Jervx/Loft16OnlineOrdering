@@ -13,6 +13,7 @@ import Informative from './Components/Modal/Informative';
 
 /* Modal */
 import InputModal from "./Components/Modal/InputModal"
+import AccountProfile from './Pages/User/AccountProfile';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <InputModal />
         <Switch>
           <Route path="/auth" component={AuthContainer} />
+          <Route path="/user" component={AccountProfile} />
           <Route path="/admin" component={AdminContainer} />
           <Route path="/" component={PublicContainer} />
           <Route path="*" component={NotFound} />

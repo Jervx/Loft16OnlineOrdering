@@ -1,32 +1,25 @@
-import React, { useState } from "react";
-import { Label, Input, Button , Alert } from "@windmill/react-ui";
+import React from "react";
+import { Label, Input, Button } from "@windmill/react-ui";
 import { HiLockClosed } from "react-icons/hi";
 import { withRouter} from "react-router-dom";
 
-import axios from "axios";
-
 import { useSelector, useDispatch } from "react-redux";
 import { setRecoveryCode, clearRecovery } from "../../Features/authSlice";
-import { closeLoader, openAlertModal , closeInputModal } from "../../Features/uiSlice";
+import { openAlertModal , closeInputModal } from "../../Features/uiSlice";
 import { signin } from '../../Features/userSlice'
 
 import API from '../../Helpers/api'
 
 const RecoveryCodeConfirm = (props) => {
-  const api = axios.create({ baseURL: "http://192.168.1.100:3001/auth" });
 
   const recoveryState = useSelector((state) => state.auth.recovery);
   const dispatch = useDispatch();
-
-  const [codeStatus, setCodeStatus] = useState(true)
-  const [codeError, setCodeError] = useState("")
 
   // TODO: ResendCode Logic
 
   const saveCode = (e) => {
     let recovery_code = e.target.value;
     dispatch(setRecoveryCode({ recovery_code }));
-    setCodeStatus(true)
   };
 
   const finalSignup =  async () => {
@@ -95,7 +88,6 @@ const RecoveryCodeConfirm = (props) => {
               onChange={(e) => saveCode(e)}
               />
           </div>
-            { !codeStatus && <Alert type="danger" className="mt-4 text-xs">{codeError}</Alert> }
           <div className="flex justify-center">
             <Button
               onClick={finalSignup}
