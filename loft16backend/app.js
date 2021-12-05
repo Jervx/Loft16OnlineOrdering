@@ -18,11 +18,6 @@ const corsConfig = {
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
 
-app.use(cors({
-        origin:"https://192.168.1.100:3000",
-        methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
-        credentials: true
-    }))
 app.use(cookieParser());
 
 app.use(function(req, res, next) {

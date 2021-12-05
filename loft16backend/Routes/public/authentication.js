@@ -172,6 +172,20 @@ router.post("/recover", async(req, res)=>{
   invalidate access token
   remove refresh token
 */
+router.delete("/signout", auth ,async (req, res) => {
+  // get the access token
+
+  // get user info from req body : email or _id
+
+  // if those token where missing or null
+    // if user info is missing 
+      //return 200 ok
+  
+  // set res cookie expiretime to 1s to invalidate the refresh token
+
+  // delete the refresh token in the db tied to user
+  // return ok
+})
 
 /*SIGNIN 
   TODO: Sign via Google 

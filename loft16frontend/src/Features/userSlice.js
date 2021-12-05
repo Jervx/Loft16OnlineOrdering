@@ -12,6 +12,7 @@ export const userSlice = createSlice({
     signout: (state) => {
       state.hasUser = false
       state.userData = null
+      localStorage.removeItem("userData")
     },
     setCart : (state, action) => {
       state.userData.cart = action.payload 

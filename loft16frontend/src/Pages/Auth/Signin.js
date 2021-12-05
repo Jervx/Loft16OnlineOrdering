@@ -76,6 +76,7 @@ const Singin = (props) => {
       
       dispatch(signin(userData))
       dispatch(cleanSignInCredential())
+      localStorage.setItem("userData",JSON.stringify(userData))
       props.history.push("/")
     } catch (error) {
       //👍 TODO: propper error handling
