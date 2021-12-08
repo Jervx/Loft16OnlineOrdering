@@ -6,13 +6,12 @@ import AdminContainer from './Pages/Admin/AdminContainer';
 import PublicContainer from './Pages/Public/PublicContainer';
 import NotFound from './Pages/NotFound'
 import AuthContainer from './Pages/Auth/AuthContainer';
-
-/* Alerts Component*/
-import Informative from './Components/Modal/Informative';
-
-/* Modal */
-import InputModal from "./Components/Modal/InputModal"
 import AccountProfile from './Pages/User/AccountProfile';
+
+/* Modals */
+import Informative from './Components/Modal/Informative';
+import InputModal from "./Components/Modal/InputModal"
+import Notifier from "./Components/Modal/Notifier";
 
 /* Helpers */
 import API from './Helpers/api';
@@ -46,6 +45,7 @@ function App() {
       <Router>
         <Informative />
         <InputModal />
+        <Notifier />
           <Switch>
             <Route path="/auth" component={AuthContainer} />
             <Route path="/user" component={AccountProfile} />

@@ -43,7 +43,7 @@ const Notifier = () => {
           </div>
           <div className="block w-full sm:hidden">
             <Button onClick={accept} className="rounded-xl  " block size="large">
-              {notifierState.cancelBtnText}
+              {notifierState.acceptBtnText}
             </Button>
           </div>
         </ModalFooter>

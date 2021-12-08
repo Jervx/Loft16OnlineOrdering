@@ -5,13 +5,14 @@ const GAuthVerify = require('../helper/GAuthVerify')
 
 const verifyToken = async (req, res, next) => {
   let token = req.cookies.access_token
-  let issuer = req.cookies.issuer
+  let client_id = req.cookies.client_id
+  let auth_iss = req.cookies.auth_iss
 
-  console.log(token)
-  if(issuer)
-    if(issuer === process.env.JWT_ISSUER){
+  console.log("--------COOKIES AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
+  if(auth_iss)
+    if(auth_iss === process.env.GIssuer){
       try{
-        const auth_user = await GAuthVerify(token, issuer)
+        const auth_user = await GAuthVerify(token, client_id)
       }catch(error){
         return res.status(401).json({
           err : 401,

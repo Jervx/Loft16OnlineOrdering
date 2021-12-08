@@ -23,8 +23,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { signout } from "../Features/userSlice";
 import { openNotifier } from "../Features/uiSlice";
 
-/* components */
-import Notifier from "./Modal/Notifier";
 
 const Header = (props) => {
   const { history } = props;
@@ -63,7 +61,7 @@ const Header = (props) => {
 
   return (
     <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800">
-      <Notifier></Notifier>
+      
       <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
         <a
           className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
@@ -119,7 +117,7 @@ const Header = (props) => {
               aria-haspopup="true"
             >
               <MdOutlineShoppingCart
-                className="w-5 h-5 defTextCOlorGreen"
+                className="w-5 h-5  defTextCOlorGreen"
                 aria-hidden="true"
               />
               {_cur_user.hasUser && _cur_user.userData.cart.total_items > 0 && (
@@ -146,7 +144,7 @@ const Header = (props) => {
               </Button>
             ) : (
               <button
-                className="rounded-full hover:bg-gray-100 p-2 focus:shadow-outline-purple focus:ring-4 focus:outline-none"
+                className="rounded-full hover:bg-gray-100 p-1 focus:shadow-outline-purple focus:ring-4 focus:outline-none"
                 aria-label="Account"
                 aria-haspopup="true"
                 onClick={() => setIsProfileMenuOpen(true)}
@@ -160,7 +158,7 @@ const Header = (props) => {
                     aria-hidden="true"
                   />
                 ) : (
-                  <AiOutlineUser className="align-middle  w-4 h-4" />
+                  <AiOutlineUser className="align-middle defTextCOlorGreen w-5 h-5" />
                 )}
               </button>
             )}

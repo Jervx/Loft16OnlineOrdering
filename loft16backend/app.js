@@ -7,6 +7,8 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const { OAuth2Client } = require('google-auth-library');
 
+const auth = require('./middleware/auth')
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 
@@ -15,12 +17,10 @@ const corsConfig = {
     credentials: true,
   };
   
+app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
-
-app.use(cookieParser());
-
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
     const allowedOrigins = ['https://127.0.0.1:3000', 'https://localhost:3000', 'https://127.0.0.1:3000', 'https://localhost:3000', 'https://192.168.1.100:3000'];
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
@@ -32,12 +32,6 @@ app.use(function(req, res, next) {
     next();
   });
 
-// app.use(session({
-//     secret: 'keyboard cat',
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true }
-//   }))
 
 //Routes
 const authenticationRoute = require('./Routes/public/authentication')
@@ -57,16 +51,9 @@ async function verify(token, client_id) {
   return {payload , userid, msg:"Ok lods!👌"}
 }
 
-app.get("/test",async(req,res)=>{
-  const access_token = req.cookies.access_token
-  const client_id = req.cookies.client_id
-
-  console.log("AT,CI",access_token, client_id)
-
-  const ress = await verify(access_token, client_id)
-
+app.get("/test",auth,async(req,res)=>{
   res.status(200).json({
-    ress
+    private_content:"Jerb has a 🍆"
   })
 })
 

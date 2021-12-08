@@ -21,6 +21,9 @@ const auth = require("../../middleware/auth")
 let ObjectId = require('mongoose').Types.ObjectId; 
 const RecoveryCode = require("../../models/RecoveryCode");
 
+/* CONFIG */
+const loftCookieConifg = { httpOnly: true, secure : true, SameSite : 'none' }
+
 //generate loft confirmation code
 let generateCode = () => {
   let code = randomstring.generate({
@@ -37,6 +40,10 @@ const getAddedMinutes = () => {
   return new Date(currentDate.getTime() + minutesToAdd * 60000);
 };
 
+// cookie expiration/ maxage
+// FIXME: Fix Tommorerearo w 
+const createCookieExpiration = (hour) => { return  Date.now() + ( process.env.COOKIE_EXP * 60000) }
+
 // check loft confirmation code expiry d1-current d2-expiry
 let isExpired = (d2) => {
   let d1 = new Date();
@@ -52,6 +59,15 @@ const generateToken = (user_data) => { return jwt.sign(user_data, process.env.JW
 // reissue new token
 router.post("/renewToken", async(req, res) =>{
   const { userId, email_address, user_name } = req.body
+  const auth_iss = req.cookies.auth_iss
+
+  if(auth_iss === process.env.GIssuer){
+    return res.status(401).json({
+      err : 401,
+      description : "The issued token by google was expired or gone!",
+      solution : "Try signing in again manually or via google Single Sign On"
+    })
+  }
 
   const UserRefreshToken = await Refresh_Token.findOne({user_ID: new ObjectId(userId)})
 
@@ -72,7 +88,7 @@ router.post("/renewToken", async(req, res) =>{
     const token = generateToken({ user_name , email_address })
     let USER = await User.findOne({ email_address }).lean();
 
-    res.cookie( "access_token",token,{ httpOnly: true, secure : false })
+    res.cookie( "access_token",token,  {...loftCookieConifg, maxAge  : createCookieExpiration(process.env.COOKIE_EXP) } )
     res.status(200).json({
       code: 200,
       description: "Got a new token!",
@@ -231,11 +247,11 @@ router.post("/signin", async (req, res) => {
       
       // set cookie access_token
       // set cookie client_id
-      res.cookie( "access_token", access_token,{ httpOnly: true, secure : true, sameSite : 'None' } )
-      res.cookie( "client_id", client_id,{ httpOnly: true, secure : true, sameSite : 'None' } )
+      res.cookie( "access_token", access_token, loftCookieConifg )
+      res.cookie( "client_id", client_id, loftCookieConifg )
 
       // set body iss as google 
-      res.cookie( "auth_iss", GUserInfo.iss)
+      res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg )
 
       //include flag to response
       return res.status(200).json({
@@ -349,8 +365,9 @@ router.post("/signin", async (req, res) => {
   })
   
   // set authorization via cookie & httponly secure desu 
-  res.cookie( "access_token",token,{ httpOnly: true, secure : true, sameSite : 'None' } )
-  res.cookie( "auth_iss", 'loft16')
+  res.cookie( "access_token",token, {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
+  res.cookie( "auth_iss", process.env.JWT_ISSUER,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
+
 
   return res.status(200).json(
     { 
@@ -368,10 +385,58 @@ TODO: Sign via Google
   if via google gmail, bypass email confirmation code
 */
 router.post("/signup", async (req, res) => {
-  try {
-    const { name, user_name, email_address, password, confirmation_code } =
+    const {access_token, client_id,  name, user_name, email_address, password, confirmation_code } =
       req.body;
 
+  ///////////// for via google ///////////////
+  try{
+    if((client_id, access_token)){
+      // verify if access token is valid
+
+      const GUserInfo = await GAuthVerify(access_token, client_id)
+
+      // if not valid then return 401, invalid G token
+      if(!GUserInfo)
+        return res.status(401).json({
+          err: 401,
+          description : "Your "
+        })
+        
+      // check if the user email exist
+      let userData = await User.findOne({ email_address : GUserInfo.email })
+
+      // if it does exist 
+      if(!userData)
+        userData = await User.create({
+          name,
+          user_name,
+          profile_picture: GUserInfo.picture ,
+          email_address : userEmail,
+          password: hashedPassword,
+        });
+      
+        
+      // then return that user data with secure cookie of 
+      // access_token, client_id, auth_issuer
+      res.cookie( "access_token", access_token, loftCookieConifg )
+      res.cookie( "client_id", client_id, loftCookieConifg)
+      // set body iss as google 
+      res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg )
+
+    }
+    
+    //TODO: To remove later after implementing signup via google
+    return res.status(200).json({ msg : "Just Text! 👌"})
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({
+      err: 500,
+      description: e,
+      solution: "Try Again Later",
+    });
+  }
+  ///////// for normal signup //////////
+  try{
     //check if all required fields has value
     if (!(name, user_name, email_address, password, confirmation_code))
       return res.status(400).json({
@@ -431,24 +496,22 @@ router.post("/signup", async (req, res) => {
       password: hashedPassword,
     });
 
-    
-
     const token = generateToken( { user_name, email_address } )
     const refresh = jwt.sign( {user_name, email_address} , process.env.JWT_RFSH)
 
     // set authorization via cookie & httponly 
-    res.cookie( "access_token",token,{ httpOnly: true, secure : true,  sameSite:'Lax'  } )
-    res.cookie( "auth_iss", 'loft16')
+    res.cookie( "access_token",token,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
+    res.cookie( "auth_iss", process.env.JWT_ISSUER,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
+
     //res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite:'Lax' })
 
     // Create a session Refresh Token for attaining new access token
-    // should be destroyed on logout - @hjerbe
+    // NOTE: should be destroyed on logout - @hjerbe
     await Refresh_Token.create({
       user_ID : user._id,
       refresh_token : refresh
     })
   
-
     //final return of response
     return res.status(201).json({
       code: 201,

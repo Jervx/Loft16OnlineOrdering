@@ -175,7 +175,7 @@ const Signup = (props) => {
                       <RiUser6Fill className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <Input
-                      className="mt-1 pl-8"
+                      className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
                       type="text"
                       placeholder="name"
                       value={name}
@@ -192,7 +192,7 @@ const Signup = (props) => {
                       <CgUserlane className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <Input
-                      className="mt-1 pl-8"
+                      className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
                       type="text"
                       placeholder="username"
                       value={user_name}
@@ -210,7 +210,7 @@ const Signup = (props) => {
                     <MdAlternateEmail className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8"
+                    className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
                     type="email"
                     placeholder="john@doe.com"
                     value={email_address}
@@ -220,14 +220,14 @@ const Signup = (props) => {
                   />
                 </div>
               </Label>
-              <Label className="pt-4">
+              <Label className="pt-4 hover:border-gray-400  bg-gray-50">
                 <span>Password *</span>
                 <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
                   <div className="absolute inset-y-0 flex items-center pl-2">
                     <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8"
+                    className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
                     type={!passVis ? "password" : "text"}
                     placeholder=""
                     onChange={(e) => {
@@ -254,7 +254,7 @@ const Signup = (props) => {
                     <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8"
+                    className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
                     type={!passVis2 ? "password" : "text"}
                     placeholder=""
                     onChange={(e) => {

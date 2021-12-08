@@ -101,9 +101,6 @@ const Singin = (props) => {
       localStorage.setItem("userData", JSON.stringify(userData));
       props.history.push("/");
     } catch (error) {
-      //👍 TODO: propper error handling
-      // No Request At All
-      // error codes get err response data
       dispatch(closeLoader());
       if (error.response) {
         //request was made but theres a response status code
@@ -134,7 +131,6 @@ const Singin = (props) => {
 
   /* G Login */
   const GOnSuccess = async (res) => {
-    console.log("logon",res)
     try {
       //dispatch save logindata
       dispatch(openLoader({ state: true, message: "checking.." }));
@@ -144,7 +140,6 @@ const Singin = (props) => {
           password,
         })
       );
-
       const response = await API.post(
         "/auth/signin",
         {
@@ -153,19 +148,14 @@ const Singin = (props) => {
         },
         { withCredentials: true }
       );
-
-      console.log("LOGGED IN BOII!",response);
-
       dispatch(closeLoader());
       const userData = response.data.userData;
       dispatch(signin(userData));
       dispatch(cleanSignInCredential());
       localStorage.setItem("userData", JSON.stringify(userData));
       props.history.push("/");
+
     } catch (error) {
-      //👍 TODO: propper error handling
-      // No Request At All
-      // error codes get err response data
       dispatch(closeLoader());
       if (error.response) {
         //request was made but theres a response status code
@@ -194,7 +184,8 @@ const Singin = (props) => {
     }
   };
 
-  const GOnFailure = (res) => {
+  /* G One Tap */
+  const GOnFailure = async (res) => {
     console.log(res)
   };
 
@@ -205,14 +196,64 @@ const Singin = (props) => {
     context: 'signin', // optional
   };
   
-  googleOneTap(options, (response) => {
+  googleOneTap(options, async (res) => {
     // Send response to server
-    console.log("THIS",response);
+    console.log(res)
+    try {
+      //dispatch save logindata
+      dispatch(openLoader({ state: true, message: "checking.." }));
+      dispatch(
+        setSignInCredential({
+          email_address: email,
+          password,
+        })
+      );
+      const response = await API.post(
+        "/auth/signin",
+        {
+          access_token : res.credential,
+          client_id : res.clientId
+        },
+        { withCredentials: true }
+      );
+      dispatch(closeLoader());
+      const userData = response.data.userData;
+      dispatch(signin(userData));
+      dispatch(cleanSignInCredential());
+      localStorage.setItem("userData", JSON.stringify(userData));
+      props.history.push("/");
+    } catch (error) {
+      dispatch(closeLoader());
+      if (error.response) {
+        //request was made but theres a response status code
+        dispatch(
+          openAlertModal({
+            component: <></>,
+            data: error.response.data,
+          })
+        );
+      } else if (error.request) {
+        // The request was made but no response was received
+        dispatch(
+          openAlertModal({
+            component: <></>,
+            data: {
+              err: 500,
+              description: "Sorry, but we can't reach the server",
+              solution: "Please try again later",
+            },
+          })
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message);
+      }
+    }
   });
 
   return (
-    <div id="auth_signin" className="flex items-center min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
-      <div className="flex-1 h-full max-w-md mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
+    <div id="auth_signin" className="flex items-center min-h-screen p-6 dark:bg-gray-900">{/*bg-gray-50*/} 
+      <div className="flex-1 h-full max-w-md mx-auto overflow-hidden bg-white rounded-lg dark:bg-gray-800"> {/* shadow-xl */}
         <div className="flex flex-col overflow-y-auto ">
           <main className="flex items-center justify-center p-6 sm:p-12 ">
             <div className="w-full">
@@ -227,7 +268,7 @@ const Singin = (props) => {
                 autoLoad={false}
                 render={(renderProps) => (
                   <Button
-                    className="mt-4 google_signin font-roboto rounded-xl text-gray-600 gbutton"
+                    className="my-2 google_signin font-inter rounded-xl font-medium text-gray-800 gbutton"
                     block
                     onClick={renderProps.onClick}
                   >
@@ -262,8 +303,8 @@ const Singin = (props) => {
                     Sign in with Google
                   </Button>
                 )}
-                cookiePolicy={"single_host_origin"} autoLoad={AUTO_SIGNIN}/>
-                <p className="my-4 text-xs text-center  font-inter font-bold" style={{color : "#2A9E9A"}}>or</p>
+                cookiePolicy={"single_host_origin"} isSignedIn={false}/>
+                <p className="my-2 text-xs text-center  font-inter font-bold" style={{color : "#2A9E9A"}}>or</p>
               <Label>
                 <span>Email</span>
                 <div className="flex relative w-full max-w-xl focus-within:text-gray-700">
@@ -271,7 +312,7 @@ const Singin = (props) => {
                     <MdAlternateEmail className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8 bg-gray-100"
+                    className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
                     type="email"
                     placeholder=""
                     value={email}
@@ -289,7 +330,7 @@ const Singin = (props) => {
                     <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8"
+                    className="mt-1 pl-8 hover:border-gray-400 bg-gray-50"
                     type="password"
                     placeholder=""
                     onChange={(e) => {
@@ -301,7 +342,7 @@ const Singin = (props) => {
               </Label>
               <Loader />
               <Button
-                className="mt-4 rounded-xl defBackground hover:bg-green-500"
+                className="mt-7 rounded-xl defBackground hover:bg-green-500"
                 block
                 onClick={signInUser}
               >
