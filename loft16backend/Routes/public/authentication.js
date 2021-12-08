@@ -4,7 +4,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const randomstring = require("randomstring");
 const jwt = require("jsonwebtoken");
-const { OAuth2Client } = require('google-auth-library')
+
+/* Helper */
+// pang check ng Google JWt
+const GAuthVerify = require("../../helper/GAuthVerify")
 
 /* Models */
 const User = require("../../models/User");
@@ -17,18 +20,6 @@ const auth = require("../../middleware/auth")
 
 let ObjectId = require('mongoose').Types.ObjectId; 
 const RecoveryCode = require("../../models/RecoveryCode");
-
-
-//GoogleVerify OAUTH
-const client = new OAuth2Client(process.env.GCLIENTID)
-
-const verifyGauth = async (token, client_id) => {
-	const ticket = await client.verifyIdToken({ idToken: token, audience: client_id });
-	const payload = ticket.getPayload();
-	const userid = payload['sub'];
-  return payload
-}
-
 
 //generate loft confirmation code
 let generateCode = () => {
@@ -210,7 +201,7 @@ router.post("/signin", async (req, res) => {
   
   if((access_token, client_id)){
     try{
-      const GUserInfo = await verifyGauth(access_token, client_id)
+      const GUserInfo = await GAuthVerify(access_token, client_id)
       
       const userEmail = GUserInfo.email
       const name = GUserInfo.name
