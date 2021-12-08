@@ -29,7 +29,6 @@ router.post("/addToCart",auth, async (req,res)=>{
 //remove a specific item from cart
 router.delete("/removefromcart", auth, async(req,res)=>{
     let { _id , item } = req.body
-
     _id = mongoose.Types.ObjectId(_id)
 
     item.product_ID = mongoose.Types.ObjectId(item.product_ID)

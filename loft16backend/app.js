@@ -5,7 +5,7 @@ const cors = require('cors')
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
-//var session = require('express-session');
+const { OAuth2Client } = require('google-auth-library');
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
@@ -21,7 +21,12 @@ app.options('*', cors(corsConfig));
 app.use(cookieParser());
 
 app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', "https://192.168.1.100:3000");
+    const allowedOrigins = ['https://127.0.0.1:3000', 'https://localhost:3000', 'https://127.0.0.1:3000', 'https://localhost:3000'];
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    //res.header('Access-Control-Allow-Origin', "https://192.168.1.100:3000");
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
@@ -43,19 +48,26 @@ app.use('/auth', authenticationRoute)
 app.use('/user', userController)
 app.use('/browse', browsing)
 
-app.get('/getcookie', (req,res)=>{
+const client = new OAuth2Client(process.env.GCLIENTID)
 
-    console.log("Something trigger get cookie")
+async function verify(token, client_id) {
+	const ticket = await client.verifyIdToken({ idToken: token, audience: client_id });
+	const payload = ticket.getPayload();
+	const userid = payload['sub'];
+  return {payload , userid, msg:"Ok lods!👌"}
+}
 
-    res.cookie('cookie1', 'cokeiajfa 🍪',{httpOnly: true, secure : true})
-    res.cookie('cookie2', 'cokeiajfa 🍪',{httpOnly: true, secure : true})
-    res.cookie('cookie3', 'cokeiajfa 🍪',{httpOnly: true, secure : true})
+app.get("/test",async(req,res)=>{
+  const access_token = req.cookies.access_token
+  const client_id = req.cookies.client_id
 
-    res.status(200).json({msg : "ok 👌"})
-})
+  console.log("AT,CI",access_token, client_id)
 
-app.get('/nocookie',(req,res)=>{
-    res.status(200).json({msg : "no cookie ok 🍪 but its 👌ok"})
+  const ress = await verify(access_token, client_id)
+
+  res.status(200).json({
+    ress
+  })
 })
 
 const Product = require("./models/Product")

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const randomstring = require("randomstring");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require('google-auth-library')
 
 /* Models */
 const User = require("../../models/User");
@@ -16,6 +17,18 @@ const auth = require("../../middleware/auth")
 
 let ObjectId = require('mongoose').Types.ObjectId; 
 const RecoveryCode = require("../../models/RecoveryCode");
+
+
+//GoogleVerify OAUTH
+const client = new OAuth2Client(process.env.GCLIENTID)
+
+const verifyGauth = async (token, client_id) => {
+	const ticket = await client.verifyIdToken({ idToken: token, audience: client_id });
+	const payload = ticket.getPayload();
+	const userid = payload['sub'];
+  return payload
+}
+
 
 //generate loft confirmation code
 let generateCode = () => {
@@ -79,7 +92,7 @@ router.post("/renewToken", async(req, res) =>{
   })
 })
 
-/* TODO: Recover Account */
+
 router.post("/recover", async(req, res)=>{
   const { email_address, newPassword, recovery_code} = req.body
 
@@ -192,8 +205,72 @@ router.delete("/signout", auth ,async (req, res) => {
   if via google then bypass two factor auth
   */ 
 router.post("/signin", async (req, res) => {
-  const { email_address, password, twoFactCode } = req.body;
 
+  const { access_token, client_id } = req.body
+  
+  if((access_token, client_id)){
+    try{
+      const GUserInfo = await verifyGauth(access_token, client_id)
+      
+      const userEmail = GUserInfo.email
+      const name = GUserInfo.name
+      const user_name = GUserInfo.given_name
+
+      let userData = await User.findOne({email_address : userEmail})
+
+      let flag = 'old'
+
+      if(!userData){
+        // no user where found
+        const hashedPassword = await bcrypt.hash(userEmail, 10);
+        //creation of user data to database
+
+        userData = await User.create({
+          name,
+          user_name,
+          profile_picture: GUserInfo.picture ,
+          email_address : userEmail,
+          password: hashedPassword,
+        });
+
+        //set flag as new
+        flag = 'new'
+      }
+
+      
+      // set cookie access_token
+      // set cookie client_id
+      res.cookie( "access_token", access_token,{ httpOnly: true, secure : true, sameSite : 'None' } )
+      res.cookie( "client_id", client_id,{ httpOnly: true, secure : true, sameSite : 'None' } )
+
+      // set body iss as google 
+      res.cookie( "auth_iss", GUserInfo.iss)
+
+      //include flag to response
+      return res.status(200).json({
+        code: 200,
+        description: "Signed in successfuly!",
+        twoFactorRequired : false,
+        GUserInfo,
+        userData : userData,
+        flag
+      })
+    }catch(err){
+      return res.status(400).json({
+        err : 403,
+        error : err,
+        description : "Something wen't wrong with your google authentication",
+        solution : "Contact Developer or Try Again Later"
+      })
+    }
+  }
+  
+  
+  //TODO: REmove this after implementing in signin
+  //return res.status(200).json({msg : "reach end"})
+  
+  const { email_address, password, twoFactCode } = req.body;
+  
   //check if all required fields has value
   if (!(email_address, password))
     return res.status(400).json({
@@ -282,9 +359,7 @@ router.post("/signin", async (req, res) => {
   
   // set authorization via cookie & httponly secure desu 
   res.cookie( "access_token",token,{ httpOnly: true, secure : true, sameSite : 'None' } )
-  res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite : 'None' } )
-
-  console.log(USER)
+  res.cookie( "auth_iss", 'loft16')
 
   return res.status(200).json(
     { 
@@ -324,9 +399,7 @@ router.post("/signup", async (req, res) => {
       });
 
     //get existing registration confirmation record
-    const confirmation_codeRecord = await Email_Confirmation.findOne({
-      email_address,
-    });
+    const confirmation_codeRecord = await Email_Confirmation.findOne({ email_address, used: false });
 
     //check if the user already has an issued confirmation email
     if (!confirmation_codeRecord)
@@ -360,19 +433,22 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     //creation of user data to database
-    const user = await User.create({
+    let user = await User.create({
       name,
       user_name,
       email_address,
       password: hashedPassword,
     });
 
+    
+
     const token = generateToken( { user_name, email_address } )
     const refresh = jwt.sign( {user_name, email_address} , process.env.JWT_RFSH)
 
     // set authorization via cookie & httponly 
     res.cookie( "access_token",token,{ httpOnly: true, secure : true,  sameSite:'Lax'  } )
-    res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite:'Lax' })
+    res.cookie( "auth_iss", 'loft16')
+    //res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite:'Lax' })
 
     // Create a session Refresh Token for attaining new access token
     // should be destroyed on logout - @hjerbe
@@ -387,7 +463,7 @@ router.post("/signup", async (req, res) => {
       code: 201,
       description: "User Created Successfully!",
       userData: {
-        ...user
+        ...(user.toObject())
       },
     });
   } catch (e) {
@@ -413,8 +489,9 @@ router.post("/confirm_email", async (req, res) => {
       });
 
     let email_confirmation = await Email_Confirmation.findOne({
-      email_address,
+      email_address, used : false
     });
+
     let alreadyInUse = await User.findOne({ email_address });
 
     if (alreadyInUse)
@@ -443,6 +520,7 @@ router.post("/confirm_email", async (req, res) => {
       data: email_confirmation,
     });
   } catch (e) {
+    console.log(e)
     return res.status(408).json({
       status: 403,
       message: "Theres an error",

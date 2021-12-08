@@ -7,7 +7,7 @@ const config = process.env;
 const verifyToken = (req, res, next) => {
   let token = req.cookies.access_token
 
-  console.log(req.cookies)
+  console.log(token)
 
   if (!token)
     return res.status(403).json({
@@ -17,6 +17,7 @@ const verifyToken = (req, res, next) => {
     })
   try {
     const user = jwt.verify(token, config.JWT_SCRT);
+    console.log("VALID!", user)
   } catch (err) {
     return res.status(401).json({
         err : 401,

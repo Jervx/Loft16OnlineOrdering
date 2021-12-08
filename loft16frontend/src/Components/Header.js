@@ -11,10 +11,10 @@ import { withRouter, Link } from "react-router-dom";
 
 /* Icons */
 import { BiSearch } from "react-icons/bi";
-import { AiFillFire, AiFillShopping } from "react-icons/ai";
+import { AiFillFire, AiFillShopping, AiOutlineUser } from "react-icons/ai";
 import { RiUser6Fill } from "react-icons/ri";
 import { BsGearFill } from "react-icons/bs";
-import { MdOutlineLogout, MdOutlineShoppingCart} from "react-icons/md";
+import { MdOutlineLogout, MdOutlineShoppingCart } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
 
 /*redux */
@@ -26,7 +26,6 @@ import { openNotifier } from "../Features/uiSlice";
 /* components */
 import Notifier from "./Modal/Notifier";
 
-
 const Header = (props) => {
   const { history } = props;
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -36,7 +35,9 @@ const Header = (props) => {
   //current user
   const _cur_user = useSelector((state) => state.user);
 
-  const signOut = () => { dispatch(signout()); };
+  const signOut = () => {
+    dispatch(signout());
+  };
 
   const toggleMyCart = () => {
     if (!_cur_user.hasUser) {
@@ -44,7 +45,9 @@ const Header = (props) => {
         openNotifier({
           title: "No User",
           message: "Please Sign In First",
-          onAccept: () => { history.push("/mycart"); },
+          onAccept: () => {
+            history.push("/mycart");
+          },
           acceptBtnText: "Sign In",
           cancelBtnText: "No, Thanks",
         })
@@ -53,11 +56,10 @@ const Header = (props) => {
     }
 
     // else continue to cart page
-    history.push("/mycart")
+    history.push("/mycart");
   };
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800">
@@ -66,8 +68,10 @@ const Header = (props) => {
         <a
           className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
           href="/"
-        > Loft 16 </a>
-
+        >
+          {" "}
+          Loft 16{" "}
+        </a>
 
         {/* <!-- Embedded Routes --> */}
         <div className="flex text-gray-400 items-center justify-center flex-1 lg:mr-32">
@@ -114,13 +118,20 @@ const Header = (props) => {
               aria-label="Notifications"
               aria-haspopup="true"
             >
-              <MdOutlineShoppingCart className="w-5 h-5 defTextCOlorGreen" aria-hidden="true" />
-              {  _cur_user.hasUser && _cur_user.userData.cart.total_items > 0 && <span
+              <MdOutlineShoppingCart
+                className="w-5 h-5 defTextCOlorGreen"
                 aria-hidden="true"
-                className="absolute top-0 right-0 inline-block w-5 h-5 transform translate-x-3 -translate-y-3 bg-red-600 border-2 text-white border-white rounded-full dark:border-gray-800"
-              >
-                 <p className="text-white text-xs">{_cur_user.userData.cart.total_items}</p>
-              </span> }
+              />
+              {_cur_user.hasUser && _cur_user.userData.cart.total_items > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute top-0 right-0 inline-block w-5 h-5 transform translate-x-3 -translate-y-3 bg-red-600 border-2 text-white border-white rounded-full dark:border-gray-800"
+                >
+                  <p className="text-white text-xs">
+                    {_cur_user.userData.cart.total_items}
+                  </p>
+                </span>
+              )}
             </button>
           </li>
           <li className="relative">
@@ -135,22 +146,26 @@ const Header = (props) => {
               </Button>
             ) : (
               <button
-                className="rounded-full focus:shadow-outline-purple focus:ring-4 focus:outline-none"
+                className="rounded-full hover:bg-gray-100 p-2 focus:shadow-outline-purple focus:ring-4 focus:outline-none"
                 aria-label="Account"
                 aria-haspopup="true"
                 onClick={() => setIsProfileMenuOpen(true)}
                 onMouseEnter={() => setIsProfileMenuOpen(true)}
               >
-                <Avatar
-                  className="align-middle"
-                  src={_cur_user.userData.profile_picture}
-                  alt="User Profile"
-                  aria-hidden="true"
-                />
+                {_cur_user.userData.profile_picture ? (
+                  <Avatar
+                    className="align-middle"
+                    src={_cur_user.userData.profile_picture}
+                    alt="User Profile"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <AiOutlineUser className="align-middle  w-4 h-4" />
+                )}
               </button>
             )}
             <Dropdown
-            className = "shadow-2xl p-3"
+              className="shadow-2xl p-3"
               align="right"
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}

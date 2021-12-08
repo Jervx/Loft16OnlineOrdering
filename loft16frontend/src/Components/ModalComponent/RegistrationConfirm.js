@@ -10,8 +10,9 @@ import { finalRegistration, cleanRegistration } from "../../Features/authSlice";
 import { closeLoader, openAlertModal, closeAlertModal , closeInputModal } from "../../Features/uiSlice";
 import { signin } from '../../Features/userSlice'
 
+import API from "../../Helpers/api";
+
 const RegistrationConfirm = (props) => {
-  const api = axios.create({ baseURL: "http://192.168.1.100:3001/auth" });
 
   const authRegisterState = useSelector((state) => state.auth.registration);
   const dispatch = useDispatch();
@@ -28,23 +29,26 @@ const RegistrationConfirm = (props) => {
   };
 
   const finalSignup = () => {
-    api
-      .post("/signup", {
+    API.post("/auth/signup", {
         ...authRegisterState,
       })
       .then((res) => {
+        console.log(res)
          dispatch(closeInputModal())
          dispatch(closeAlertModal())
-         dispatch(signin(res.data.data.user))
+         dispatch(signin(res.data.userData))
+         localStorage.setItem("userData", JSON.stringify(res.data.userData));
          dispatch(cleanRegistration())
          props.history.push('/')
       })
       .catch((error) => {
+        console.log(error)
         dispatch(closeLoader());
         if (error.response) {
           //request was made but theres a response status code
           setCodeStatus(false)
-          setCodeError(error.response.data.description)
+          console.log(error.response)
+          //setCodeError(error.response.data.description)
         } else if (error.request) {
           // The request was made but no response was received
           dispatch(
@@ -59,7 +63,7 @@ const RegistrationConfirm = (props) => {
           );
         } else {
           // Something happened in setting up the request that triggered an Error
-          console.log("Error", error.message);
+          console.log(error);
         }
       });
   };
