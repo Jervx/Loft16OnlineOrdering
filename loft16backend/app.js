@@ -5,9 +5,7 @@ const cors = require('cors')
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
-const { OAuth2Client } = require('google-auth-library');
 
-const auth = require('./middleware/auth')
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
@@ -42,32 +40,15 @@ app.use('/auth', authenticationRoute)
 app.use('/user', userController)
 app.use('/browse', browsing)
 
-const client = new OAuth2Client(process.env.GCLIENTID)
-
-async function verify(token, client_id) {
-	const ticket = await client.verifyIdToken({ idToken: token, audience: client_id });
-	const payload = ticket.getPayload();
-	const userid = payload['sub'];
-  return {payload , userid, msg:"Ok lods!👌"}
-}
-
-app.get("/test",auth,async(req,res)=>{
-  res.status(200).json({
-    private_content:"Jerb has a 🍆"
-  })
-})
 
 const Product = require("./models/Product")
 app.post('/createProduct', async(req,res) => {
-    // TODO: Fill Products name, categories[string], description, variants [{name, stock, price}], 
     const product_data = req.body
 
     let total_stock = 0
     product_data.variants.forEach((variant) => { total_stock += variant.stock })
 
-    const product = await Product.create({
-        ...product_data
-    })    
+    const product = await Product.create({ ...product_data })    
 
     res.status(201).json({
         msg : 'created 👌',

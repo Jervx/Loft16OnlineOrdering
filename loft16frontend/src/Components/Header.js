@@ -12,7 +12,7 @@ import { withRouter, Link } from "react-router-dom";
 /* Icons */
 import { BiSearch } from "react-icons/bi";
 import { AiFillFire, AiFillShopping, AiOutlineUser } from "react-icons/ai";
-import { RiUser6Fill } from "react-icons/ri";
+import { RiUserSmileFill } from "react-icons/ri";
 import { BsGearFill } from "react-icons/bs";
 import { MdOutlineLogout, MdOutlineShoppingCart } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
@@ -22,7 +22,6 @@ import { useSelector, useDispatch } from "react-redux";
 /* userSlice */
 import { signout } from "../Features/userSlice";
 import { openNotifier } from "../Features/uiSlice";
-
 
 const Header = (props) => {
   const { history } = props;
@@ -60,8 +59,7 @@ const Header = (props) => {
   useEffect(() => {}, []);
 
   return (
-    <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800">
-      
+    <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800 border-b-2 border-gray-200 md:px-6">
       <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
         <a
           className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
@@ -95,12 +93,12 @@ const Header = (props) => {
 
         {/* <!-- Search input --> */}
         <div className="flex justify-end flex-1 mr-2 lg:mr-8">
-          <div className="relative  h-full md:w-7/12 mr-2 focus-within:text-purple-500">
+          <div className="relative text-green-900 h-full md:w-7/12 mr-2  focus-within:text-green-700 ">
             <div className="absolute inset-y-0 flex items-center pl-2">
               <BiSearch className="w-4 h-4" aria-hidden="true" />
             </div>
             <Input
-              className="pl-8 rounded-lg border-0 bg-gray-100 text-gray-700"
+              className="pl-8 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
               placeholder="Search Product"
               aria-label="Search"
             />
@@ -144,11 +142,10 @@ const Header = (props) => {
               </Button>
             ) : (
               <button
-                className="rounded-full hover:bg-gray-100 p-1 focus:shadow-outline-purple focus:ring-4 focus:outline-none"
+                className="rounded-full hover:bg-gray-100 border-2 focus:shadow-outline-purple focus:ring-2 focus:outline-none"
                 aria-label="Account"
                 aria-haspopup="true"
                 onClick={() => setIsProfileMenuOpen(true)}
-                onMouseEnter={() => setIsProfileMenuOpen(true)}
               >
                 {_cur_user.userData.profile_picture ? (
                   <Avatar
@@ -163,24 +160,37 @@ const Header = (props) => {
               </button>
             )}
             <Dropdown
-              className="shadow-2xl p-3"
+              className="custom_shadow p-5"
               align="right"
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}
             >
-              <DropdownItem tag="a" href="#">
-                <RiUser6Fill className="w-4 h-4 mr-3" aria-hidden="true" />
-                <span>Profile</span>
+              <DropdownItem className="text-gray-600 bg-gray-50 hover:text-green-600" tag="a" href="#">
+                {_cur_user.hasUser ? (
+                  <div className="flex items-center">
+                    <Avatar
+                      className="mr-3"
+                      src={_cur_user.userData.profile_picture}
+                      alt="User Profile"
+                      aria-hidden="true"
+                    />
+                    <h1>{_cur_user.userData.user_name}</h1>
+                  </div>
+                ) : (
+                  <></>
+                )}
               </DropdownItem>
-              <DropdownItem tag="a" href="#">
-                <BsGearFill className="w-4 h-4 mr-3" aria-hidden="true" />
+               
+              <DropdownItem className="text-gray-600 hover:text-green-600" tag="a" href="#">
+                <BsGearFill className="w-5 h-5 mr-3" aria-hidden="true" />
                 <span>Settings</span>
               </DropdownItem>
-              <DropdownItem>
-                <GoPackage className="w-4 h-4 mr-3" aria-hidden="true" />
+              <DropdownItem className="text-gray-600 hover:text-green-600">
+                <GoPackage className="w-5 h-5 mr-3 " aria-hidden="true" />
                 <span>Orders</span>
               </DropdownItem>
               <DropdownItem
+              className="text-gray-600  hover:text-orange-600"
                 onClick={() =>
                   dispatch(
                     openNotifier({
@@ -196,7 +206,7 @@ const Header = (props) => {
                   )
                 }
               >
-                <MdOutlineLogout className="w-4 h-4 mr-3" aria-hidden="true" />
+                <MdOutlineLogout className="w-5 h-5 mr-3" aria-hidden="true" />
                 <span>Signout</span>
               </DropdownItem>
             </Dropdown>

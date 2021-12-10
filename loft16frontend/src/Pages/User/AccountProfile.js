@@ -20,7 +20,7 @@ const AccountProfile = () => {
         }
 
         loadUserDetail()
-    },[userData._id])
+    })
 
     return (
         <div>

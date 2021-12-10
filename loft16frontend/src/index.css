@@ -8,8 +8,29 @@
     src:  url('/src/assets/MoonTime.ttf') format('truetype')
   }
 
+@font-face {
+    font-family: 'NotoSerif';
+    src:  url('/src/assets/NotoSerif-Regular.ttf') format('truetype')
+}
+
+
+.custom_shadow{
+    filter: drop-shadow(0px 11px 28px rgba(157, 157, 157, 0.25));
+}
+
+
+.hero{
+    background-image: url("./assets/background/Hero_Background.png");
+    background-size: fill;
+    background-repeat: no-repeat;
+}
+
 .MoonTime{
     font-family: 'Moontime';
+}
+
+.NotoSerif{
+    font-family: 'NotoSerif', sans-serif;
 }
 
 .pacifico{
@@ -42,7 +63,7 @@
 }
 
 .HHeader{
-    box-shadow: 0px 4px 22px rgba(183, 183, 183, 0.25);
+    box-shadow: 0px 4px 22px rgba(221, 221, 221, 0.25);
 }
 
 .hero-bg{

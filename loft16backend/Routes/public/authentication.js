@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+// NOTE: Hello World!
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const randomstring = require("randomstring");
@@ -40,27 +41,25 @@ const getAddedMinutes = () => {
   return new Date(currentDate.getTime() + minutesToAdd * 60000);
 };
 
-// cookie expiration/ maxage
-// FIXME: Fix Tommorerearo w 
-const createCookieExpiration = (hour) => { return  Date.now() + ( process.env.COOKIE_EXP * 60000) }
+// generate cookie expiration/maxAge
+const createCookieExpiration = (hour) => {
+  return  Number.parseInt(process.env.COOKIE_EXP) * 60 * 60 * 1000
+}
 
 // check loft confirmation code expiry d1-current d2-expiry
 let isExpired = (d2) => {
-  let d1 = new Date();
-  let d22 = new Date(d2);
-
-  return d1.getTime() > d22.getTime();
+  return new Date().getTime() > new Date(d2).getTime();
 };
 
 // generate a token
 const generateToken = (user_data) => { return jwt.sign(user_data, process.env.JWT_SCRT, { expiresIn: process.env.JWT_EXP_TIME }) }
-
 
 // reissue new token
 router.post("/renewToken", async(req, res) =>{
   const { userId, email_address, user_name } = req.body
   const auth_iss = req.cookies.auth_iss
 
+  // make sure that loft will only reissue a new access token if auth issuer is itself
   if(auth_iss === process.env.GIssuer){
     return res.status(401).json({
       err : 401,
@@ -188,33 +187,17 @@ router.post("/recover", async(req, res)=>{
 })
 
 
-/*TODO: Signout
-  invalidate access token
-  remove refresh token
-*/
+/* SIGNOUT*/
 router.delete("/signout", auth ,async (req, res) => {
-  // get the access token
-
-  // get user info from req body : email or _id
-
-  // if those token where missing or null
-    // if user info is missing 
-      //return 200 ok
   
-  // set res cookie expiretime to 1s to invalidate the refresh token
-
-  // delete the refresh token in the db tied to user
-  // return ok
 })
 
-/*SIGNIN 
-  TODO: Sign via Google 
-  if via google then bypass two factor auth
-  */ 
+/*SIGNIN (manual, via Google SSO) */ 
 router.post("/signin", async (req, res) => {
 
   const { access_token, client_id } = req.body
   
+  // if this condition met, then user has authenticated via google SSO
   if((access_token, client_id)){
     try{
       const GUserInfo = await GAuthVerify(access_token, client_id)
@@ -228,10 +211,7 @@ router.post("/signin", async (req, res) => {
       let flag = 'old'
 
       if(!userData){
-        // no user where found
         const hashedPassword = await bcrypt.hash(userEmail, 10);
-        //creation of user data to database
-
         userData = await User.create({
           name,
           user_name,
@@ -239,18 +219,12 @@ router.post("/signin", async (req, res) => {
           email_address : userEmail,
           password: hashedPassword,
         });
-
-        //set flag as new
         flag = 'new'
       }
 
-      
-      // set cookie access_token
-      // set cookie client_id
+      // set cookies
       res.cookie( "access_token", access_token, loftCookieConifg )
       res.cookie( "client_id", client_id, loftCookieConifg )
-
-      // set body iss as google 
       res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg )
 
       //include flag to response
@@ -272,10 +246,7 @@ router.post("/signin", async (req, res) => {
     }
   }
   
-  
-  //TODO: REmove this after implementing in signin
-  //return res.status(200).json({msg : "reach end"})
-  
+  // beyond this point will be normal sign in authentication
   const { email_address, password, twoFactCode } = req.body;
   
   //check if all required fields has value
@@ -380,10 +351,7 @@ router.post("/signin", async (req, res) => {
     });
 });
 
-/*SUGNUP && issuance of email confirmation
-TODO: Sign via Google 
-  if via google gmail, bypass email confirmation code
-*/
+/*SUGNUP && issuance of email confirmation if two factor enabled*/
 router.post("/signup", async (req, res) => {
     const {access_token, client_id,  name, user_name, email_address, password, confirmation_code } =
       req.body;
@@ -416,15 +384,11 @@ router.post("/signup", async (req, res) => {
         });
       
         
-      // then return that user data with secure cookie of 
-      // access_token, client_id, auth_issuer
+      //set cookiee access_token, client_id, auth_issuer
       res.cookie( "access_token", access_token, loftCookieConifg )
       res.cookie( "client_id", client_id, loftCookieConifg)
-      // set body iss as google 
-      res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg )
-
+      res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg)
     }
-    
     //TODO: To remove later after implementing signup via google
     return res.status(200).json({ msg : "Just Text! 👌"})
   } catch (e) {
@@ -435,6 +399,7 @@ router.post("/signup", async (req, res) => {
       solution: "Try Again Later",
     });
   }
+
   ///////// for normal signup //////////
   try{
     //check if all required fields has value
@@ -503,10 +468,8 @@ router.post("/signup", async (req, res) => {
     res.cookie( "access_token",token,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
     res.cookie( "auth_iss", process.env.JWT_ISSUER,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
 
-    //res.cookie( "refresh_token", refresh, { httpOnly: true, secure : true, sameSite:'Lax' })
 
     // Create a session Refresh Token for attaining new access token
-    // NOTE: should be destroyed on logout - @hjerbe
     await Refresh_Token.create({
       user_ID : user._id,
       refresh_token : refresh

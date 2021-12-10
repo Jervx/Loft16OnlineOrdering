@@ -29,9 +29,7 @@ function App() {
       let savedUser = JSON.parse(localStorage.getItem("userData"))
       if(!savedUser) return
       try{
-
         const response = await API.get(`/user/mydetails/${savedUser._id}`)
-
         dispatch(signin(response.data.userData))
       }catch(e){
         console.log({msg : "There's a user but we failed to get data from server, maybe the cookies where expired", err : e })
@@ -48,7 +46,6 @@ function App() {
         <Notifier />
           <Switch>
             <Route path="/auth" component={AuthContainer} />
-            <Route path="/user" component={AccountProfile} />
             <Route path="/admin" component={AdminContainer} />
             <Route path="/" component={PublicContainer} />
             <Route path="*" component={NotFound} />
