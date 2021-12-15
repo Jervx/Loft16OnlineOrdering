@@ -7,21 +7,25 @@ import {
   Avatar,
   Button,
 } from "@windmill/react-ui";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter, Link, useLocation } from "react-router-dom";
 
 /* Icons */
 import { BiSearch } from "react-icons/bi";
 import { AiFillFire, AiFillShopping, AiOutlineUser } from "react-icons/ai";
-import { RiUserSmileFill } from "react-icons/ri";
 import { BsGearFill } from "react-icons/bs";
-import { MdOutlineLogout, MdOutlineShoppingCart } from "react-icons/md";
+import { ImCart } from "react-icons/im";
+import { MdOutlineLogout } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
 
 /*redux */
 import { useSelector, useDispatch } from "react-redux";
+import { setUserSearch, setData } from "../Features/appSlice";
+
 /* userSlice */
 import { signout } from "../Features/userSlice";
 import { openNotifier } from "../Features/uiSlice";
+
+import API from '../Helpers/api'
 
 const Header = (props) => {
   const { history } = props;
@@ -31,9 +35,11 @@ const Header = (props) => {
 
   //current user
   const _cur_user = useSelector((state) => state.user);
+  const appState = useSelector((state) => state.app.appState )
 
   const signOut = () => {
     dispatch(signout());
+    props.history.push("/")
   };
 
   const toggleMyCart = () => {
@@ -43,7 +49,7 @@ const Header = (props) => {
           title: "No User",
           message: "Please Sign In First",
           onAccept: () => {
-            history.push("/mycart");
+            history.push("/auth/signin");
           },
           acceptBtnText: "Sign In",
           cancelBtnText: "No, Thanks",
@@ -53,7 +59,19 @@ const Header = (props) => {
     }
 
     // else continue to cart page
-    history.push("/mycart");
+    history.push("/user/mycart");
+  };
+
+  const onSearchEnter = async(event) => {
+    if (event.key === "Enter"){
+        props.history.push('/products')
+        try {
+          const req = await API.post("/browse/getproduct", appState );
+          dispatch(setData({ data: req.data.products }));
+        } catch (e) {
+          console.log("ERR", e);
+        }
+    }
   };
 
   useEffect(() => {}, []);
@@ -65,15 +83,17 @@ const Header = (props) => {
           className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
           href="/"
         >
-          {" "}
-          Loft 16{" "}
+          Loft 16
         </a>
 
         {/* <!-- Embedded Routes --> */}
         <div className="flex text-gray-400 items-center justify-center flex-1 lg:mr-32">
           <h3
             onClick={() => history.push("/")}
-            className="cursor-pointer text-sm flex hover:text-red-500 items-center py-2 "
+            className={
+              (useLocation().pathname === "/" ? "text-red-500" : "") +
+              " cursor-pointer text-sm flex hover:text-red-500 items-center py-2 "
+            }
           >
             <AiFillFire className="w-6 h-6 pr-2" aria-hidden="true" />
             <p className="hidden font-medium md:block transition duration-200 ease-linear">
@@ -82,7 +102,10 @@ const Header = (props) => {
           </h3>
           <h3
             onClick={() => history.push("/products")}
-            className="cursor-pointer ml-4 hover:text-red-500 text-sm flex items-center py-2 "
+            className={
+              (useLocation().pathname === "/products" ? "text-red-500" : "") +
+              " cursor-pointer text-sm flex hover:text-red-500 items-center ml-2"
+            }
           >
             <AiFillShopping className="w-6 h-6 pr-2" aria-hidden="true" />
             <p className="hidden font-medium md:block transition duration-200 ease-linear">
@@ -101,6 +124,10 @@ const Header = (props) => {
               className="pl-8 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
               placeholder="Search Product"
               aria-label="Search"
+              onChange={(e) => {
+                dispatch(setUserSearch({ userSearch: e.target.value }));
+              }}
+              onKeyDown={onSearchEnter}
             />
           </div>
         </div>
@@ -114,7 +141,7 @@ const Header = (props) => {
               aria-label="Notifications"
               aria-haspopup="true"
             >
-              <MdOutlineShoppingCart
+              <ImCart
                 className="w-5 h-5  defTextCOlorGreen"
                 aria-hidden="true"
               />
@@ -165,13 +192,19 @@ const Header = (props) => {
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}
             >
-              <DropdownItem className="text-gray-600 bg-gray-50 hover:text-green-600" tag="a" href="#">
+              <DropdownItem
+                className="dark:text-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-800 hover:text-green-600"
+                tag="a"
+                onClick={() => {
+                  props.history.push("/user/profile");
+                }}
+              >
                 {_cur_user.hasUser ? (
                   <div className="flex items-center">
                     <Avatar
-                      className="mr-3"
+                      className="mr-5"
                       src={_cur_user.userData.profile_picture}
-                      alt="User Profile"
+                      alt=""
                       aria-hidden="true"
                     />
                     <h1>{_cur_user.userData.user_name}</h1>
@@ -180,17 +213,21 @@ const Header = (props) => {
                   <></>
                 )}
               </DropdownItem>
-               
-              <DropdownItem className="text-gray-600 hover:text-green-600" tag="a" href="#">
-                <BsGearFill className="w-5 h-5 mr-3" aria-hidden="true" />
-                <span>Settings</span>
+
+              <DropdownItem
+                className="dark:text-gray-200 text-gray-500 hover:text-green-600"
+                tag="a"
+                href="#"
+              >
+                <BsGearFill className="w-5 h-5 mr-5" aria-hidden="true" />
+                <span className=" font-normal">Settings</span>
               </DropdownItem>
-              <DropdownItem className="text-gray-600 hover:text-green-600">
-                <GoPackage className="w-5 h-5 mr-3 " aria-hidden="true" />
-                <span>Orders</span>
+              <DropdownItem className="dark:text-gray-200 text-gray-500 hover:text-green-600">
+                <GoPackage className="w-5 h-5 mr-5 " aria-hidden="true" />
+                <span className=" font-normal">Orders</span>
               </DropdownItem>
               <DropdownItem
-              className="text-gray-600  hover:text-orange-600"
+                className="text-gray-500  dark:text-gray-200 hover:text-orange-600"
                 onClick={() =>
                   dispatch(
                     openNotifier({
@@ -206,8 +243,8 @@ const Header = (props) => {
                   )
                 }
               >
-                <MdOutlineLogout className="w-5 h-5 mr-3" aria-hidden="true" />
-                <span>Signout</span>
+                <MdOutlineLogout className="w-5 h-5 mr-5" aria-hidden="true" />
+                <span className=" font-normal">Signout</span>
               </DropdownItem>
             </Dropdown>
           </li>

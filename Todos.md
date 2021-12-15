@@ -1,40 +1,30 @@
 ### TODO: User should exist when reload happens
-- [ ] save it on the localstorage
-- [ ] on load we should load it & dispatch load
+- [x] save it on the cookies
+- [x] on load we should load it & dispatch load
+
+### TODO: PRODUCT
+- [ ] Search & Filters
+- [ ] Product Details Page & Functionality
 
 ### TODO: User Cart
-- [ ] should request the data from backend
+- [x] should request the data from backend
 - [x] mycart 
-- [x] add to cart
+- [ ] delete item & add item logic should be in front end (Usually cancellation of order)
+      & will only sent the full cart object to the server
+- [ ] On Checkout Create record in Orders collection & pending orders collection
 
+### TODO: ORDER, ARRIVED, Cancelled
+- [ ] removable order if not yet accepted by admin
+- [ ] deletable record in Arrived & Cancelled
 
+### TODO: User Cart BACKEND
+- [ ] when requesting the user cart, sync realtime data of products on cart to prevent price, name, variant, & photo difference 
+- [ ] set cart as full
 
+### TODO: User Orders BACKEND
+- [ ] get record from pending & in progress
+- [ ] delete request 1 item (Usually cancellation of order)
 
-
-
-
-
-MONGO_URI="mongodb://127.0.0.1:27017/loft"
-PORT="3001"
-
-JWT_SCRT = abcdefg
-JWT_RFSH = gfedcba
-JWT_ISSUER =loft16
-
-GCLIENTID="878595322259-0qr43vmjnkr9f6l4k89tdiv1plo2dl1j.apps.googleusercontent.com"
-
-JWT_EXP_TIME = '12h'
-
-EML_CONF_EXP_DRTN=10
-
-
-
-
-HTTPS=true
-SSL_CRT_FILE=cert/cert.pem
-SSL_KEY_FILE=cert/key.pem
-
-REACT_APP_GCLIENTID="878595322259-0qr43vmjnkr9f6l4k89tdiv1plo2dl1j.apps.googleusercontent.com"
-REACT_APP_GSECRET="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"
-
-REACT_APP_AUTO_SIGN_IN=false
+### TODO: User Arrived BACKEND
+- [ ] get record from completed_orders collection
+- [ ] delete a record

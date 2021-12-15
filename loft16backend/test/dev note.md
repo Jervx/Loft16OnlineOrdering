@@ -60,7 +60,21 @@ db.users.findOne({email_address: "louellagracechua1@gmail.com" ,  "cart.items" :
 FIXME: Possible Flaw in my cart - Prices & Var Name should not be stored because when updated by admin 
     it will not going to update on cart
 
-Solution 1 : when user query his/her cart, then the mycart route should query the details of multiple items
+TODO: Implement checking of user cart data
+NOTE: Solution when user query his/her cart, then the mycart route should query the details of multiple items
     in the cart, if the variation or the price of that product changed then update it before returning
     the letest cart data
 
+NOTE: ISO9126 - Test (Sftwre Qlty Chrchtrstc)
+NOTE: ISO25010 - (Latest)
+
+
+Wag na mag traditional so wala na comparison bali test nalang ng web based ordering - Maam Em
+
+OBJ - Maam Em
+    1 - To be able to evaluate by IT professional the pruposed system
+    2 - To be able to evaluate by the Loft16 Owner/Admin & Customer
+
+SOP - Maam Em
+    1 -  How does the IT expert will evaluate the pruposed system in terms of the ff : Accuracy, Efficiency, Userfriendly... etc.
+    2 - How does the Owner/Admin & Customer will evaluate the proposed system in terms of : user friendliness, accuracy etc..

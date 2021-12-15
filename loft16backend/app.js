@@ -21,9 +21,8 @@ app.options('*', cors(corsConfig));
 app.use((req, res, next) => {
     const allowedOrigins = ['https://127.0.0.1:3000', 'https://localhost:3000', 'https://127.0.0.1:3000', 'https://localhost:3000', 'https://192.168.1.100:3000'];
     const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin))
         res.setHeader('Access-Control-Allow-Origin', origin);
-    }
     //res.header('Access-Control-Allow-Origin', "https://192.168.1.100:3000");
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -44,6 +43,8 @@ app.use('/browse', browsing)
 const Product = require("./models/Product")
 app.post('/createProduct', async(req,res) => {
     const product_data = req.body
+const mongoose = require('mongoose')
+// TODO: Fill Products name, Images[String], categories[string], description, variants [{name, stock, price}], 
 
     let total_stock = 0
     product_data.variants.forEach((variant) => { total_stock += variant.stock })

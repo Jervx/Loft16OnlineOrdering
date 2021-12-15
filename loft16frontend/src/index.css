@@ -13,11 +13,9 @@
     src:  url('/src/assets/NotoSerif-Regular.ttf') format('truetype')
 }
 
-
 .custom_shadow{
-    filter: drop-shadow(0px 11px 28px rgba(157, 157, 157, 0.25));
+    filter: drop-shadow(0px 0px 31px rgba(213, 213, 213, 0.25));
 }
-
 
 .hero{
     background-image: url("./assets/background/Hero_Background.png");
@@ -53,6 +51,17 @@
     color : #1D1D41
 }
 
+.defBackground-nohover{
+    background-color: #2A9E9A
+}
+
+.loft-defbg{
+    background-color: #2A9E9A
+}
+
+.loft-defbg:hover{
+    background-color: #19807c
+}
 
 .defBackground{
     background-color: #2A9E9A

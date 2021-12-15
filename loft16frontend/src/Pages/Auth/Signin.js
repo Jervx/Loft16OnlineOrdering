@@ -23,10 +23,11 @@ import {
 
 /* API */
 import API from "../../Helpers/api";
+
 import TwoFactorAuthConfirm from "../../Components/ModalComponent/TwoFactorAuthConfirm";
 
 /* GLogin - OneTap and Login */ 
-import { GoogleLogin, GoogleLogout } from "react-google-login";
+import { GoogleLogin } from "react-google-login";
 import googleOneTap from 'google-one-tap';
 
 /* GAssets */
@@ -189,13 +190,14 @@ const Singin = (props) => {
     console.log(res)
   };
 
+  
   const options = {
     client_id: CLID, // required
     auto_select: AUTO_SIGNIN, // optional
     cancel_on_tap_outside: false, // optional
     context: 'signin', // optional
   };
-  
+
   googleOneTap(options, async (res) => {
     // Send response to server
     console.log(res)
@@ -362,7 +364,7 @@ const Singin = (props) => {
 
               <p className="mt-4">
                 <Link
-                  className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  className="text-sm font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/recover"
                 >
                   Recover Account
@@ -370,7 +372,7 @@ const Singin = (props) => {
               </p>
               <p className="mt-1">
                 <Link
-                  className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  className="text-sm font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/signup"
                 >
                   Sign Up

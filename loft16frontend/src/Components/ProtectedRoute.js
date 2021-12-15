@@ -1,10 +1,9 @@
 import React from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Redirect, Route , withRouter } from "react-router-dom";
 
-import { useSelector } from "react-redux";
 
 const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const _cur_user = useSelector((state) => state.user);
+const userData = localStorage.getItem("userData")
 
   //   if ( !_cur_user.hasUser ) {
   //     return <Redirect to="/auth/signin"></Redirect>;
@@ -14,7 +13,7 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
     <Route
       {...rest}
       render={(props) => {
-        if (_cur_user.hasUser) {
+        if (userData) {
           return <Component {...props} />;
         } else {
           return <Redirect to="/auth/signin" />;
@@ -24,4 +23,4 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
   );
 };
 
-export default ProtectedRoute
+export default withRouter(ProtectedRoute)

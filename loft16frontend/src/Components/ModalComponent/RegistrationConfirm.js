@@ -3,7 +3,6 @@ import { Label, Input, Button , Alert } from "@windmill/react-ui";
 import { HiLockClosed } from "react-icons/hi";
 import { withRouter} from "react-router-dom";
 
-import axios from "axios";
 
 import { useSelector, useDispatch } from "react-redux";
 import { finalRegistration, cleanRegistration } from "../../Features/authSlice";
@@ -48,7 +47,7 @@ const RegistrationConfirm = (props) => {
           //request was made but theres a response status code
           setCodeStatus(false)
           console.log(error.response)
-          //setCodeError(error.response.data.description)
+          setCodeError(error.response.data.description)
         } else if (error.request) {
           // The request was made but no response was received
           dispatch(

@@ -23,7 +23,7 @@ const Notifier = () => {
   return (
     <>
       <Modal isOpen={notifierState.state} onClose={closeModal}>
-        <ModalHeader>{notifierState.title}</ModalHeader>
+        <ModalHeader className="dark:text-blue-200">{notifierState.title}</ModalHeader>
         <ModalBody>
           {notifierState.message}
         </ModalBody>
