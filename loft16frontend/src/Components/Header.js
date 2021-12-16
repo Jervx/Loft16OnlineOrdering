@@ -177,7 +177,7 @@ const Header = (props) => {
                 {_cur_user.userData.profile_picture ? (
                   <Avatar
                     className="align-middle"
-                    src={_cur_user.userData.profile_picture}
+                    src={_cur_user.userData.profile_picture }
                     alt="User Profile"
                     aria-hidden="true"
                   />
@@ -203,7 +203,7 @@ const Header = (props) => {
                   <div className="flex items-center">
                     <Avatar
                       className="mr-5"
-                      src={_cur_user.userData.profile_picture}
+                      src={_cur_user.userData.profile_picture ? _cur_user.userData.profile_picture : 'https://cdn.discordapp.com/attachments/912411399458795593/921097628446498887/36..04.jpg'}
                       alt=""
                       aria-hidden="true"
                     />

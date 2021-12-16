@@ -19,6 +19,9 @@ const TwoFactorAuth = require("../../models/TwoFactorAuth");
 /* Middleware */
 const auth = require("../../middleware/auth")
 
+/* EMailer */
+const sendEmail = require('../../helper/SendEmail')
+
 let ObjectId = require('mongoose').Types.ObjectId; 
 const RecoveryCode = require("../../models/RecoveryCode");
 
@@ -388,9 +391,8 @@ router.post("/signup", async (req, res) => {
       res.cookie( "access_token", access_token, loftCookieConifg )
       res.cookie( "client_id", client_id, loftCookieConifg)
       res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg)
+      return res.status(200).json({ msg : "Just Text! 👌"})
     }
-    //TODO: To remove later after implementing signup via google
-    return res.status(200).json({ msg : "Just Text! 👌"})
   } catch (e) {
     console.log(e)
     return res.status(500).json({
@@ -529,6 +531,13 @@ router.post("/confirm_email", async (req, res) => {
       confirmation_code: generateCode(),
       exp: getAddedMinutes(),
     });
+
+    // template_content  { email_address, user_name, template_name, subject}
+    const sendConfirmationCode = sendEmail(email_address, {
+        ...email_confirmation.toObject(),
+        template_name:'EmailConfirmation.html',
+        subject : 'Loft16 Sign Up Email Confirmation'
+    })
 
     return res.status(201).json({
       status: 201,

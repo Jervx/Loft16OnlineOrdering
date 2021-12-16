@@ -21,7 +21,6 @@ import {
   AiFillCheckCircle,
 } from "react-icons/ai";
 import { GiWindpump } from "react-icons/gi";
-import { CgFilters } from "react-icons/cg";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -158,11 +157,11 @@ const Products = () => {
             <div class="flex flex-wrap -m-4">
               {appState.data.map((prod, idx) => (
                 <div class="lg:w-1/4 md:w-1/2 p-4 w-full" key={idx}>
-                  <img
-                    className="h-60 rounded-lg w-full object-cover object-center mb-4"
+                  <Link to={`/productdetail/${prod._id}`}  ><img
+                    className="h-60 rounded-lg cursor-pointer w-full object-cover object-center mb-4"
                     src={prod.Images[0]}
                     alt="content"
-                  />
+                  /></Link>
                   <h1 className="text-lg font-inter font-semibold defText-Col-2">
                     {prod.name}
                   </h1>

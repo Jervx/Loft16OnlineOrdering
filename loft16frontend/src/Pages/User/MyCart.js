@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { BsFillGrid1X2Fill } from "react-icons/bs";
-import { GrFormSubtract } from "react-icons/gr";
-import { BiPlus } from "react-icons/bi";
 
 import { useSelector, useDispatch } from "react-redux";
 import { signin } from "../../Features/userSlice";
@@ -11,7 +9,6 @@ import FullPageLoader from "../../Components/FullPageLoader";
 
 /* Axios API */
 import API from "../../Helpers/api";
-import { Button, Select } from "@windmill/react-ui";
 
 const MyCart = () => {
   const userData = useSelector((state) => state.user.userData);

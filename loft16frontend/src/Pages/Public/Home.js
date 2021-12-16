@@ -28,10 +28,8 @@ const Home = () => {
 
   useEffect(() => {
     const getHotProducts = async () => {
-      console.log("DATA NICE!");
       try {
         const data = await API.get("/browse/gethotproducts");
-        console.log(data.data);
         setHotProducts(data.data);
       } catch (e) {
         console.log("ERR", e);
@@ -150,7 +148,7 @@ const Home = () => {
           >
             {hotProducts.map((prod, idx) => (
               <SwiperSlide key={idx} className="">
-                <div className="rounded-lg m">
+                <Link to={`/productdetail/${prod._id}`} className="rounded-lg m">
                   <img
                     className="h-60 rounded-lg w-full object-cover object-center mb-4"
                     src={prod.Images[0]}
@@ -184,7 +182,7 @@ const Home = () => {
                     <BsFillClockFill className="w-3 h-3  mr-2"></BsFillClockFill>
                     <p className="text-xs">Last update blabla</p>
                   </div>
-                </div>
+                </Link>
               </SwiperSlide>
             ))}
           </Swiper>
