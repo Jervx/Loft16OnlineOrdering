@@ -27,7 +27,6 @@ const Informative = () => {
         <ModalBody>
           <div>
             <div className="flex items-center">
-                <VscError className="bg-red-100 dark:bg-gray-500 text-red-600 dark:text-red-800 rounded-full p-3 w-14 h-14" />
                 <div className="pl-4 ">
                   <h4 className="font-inter dark:text-gray-100 font-medium text-2xl defText-Col-2">{alertModalState.data.description}</h4>
                   <p className="text-gray-500 dark:text-gray-300 mt-2">{alertModalState.data.solution}</p>

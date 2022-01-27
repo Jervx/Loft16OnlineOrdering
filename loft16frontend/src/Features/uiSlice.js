@@ -13,6 +13,7 @@ export const uiSlice = createSlice({
     },
     inputModal : {
       state : false,
+      title : "",
       component : (<></>),
       onAccept : () => {},
       acceptBtnText : "",
@@ -40,14 +41,12 @@ export const uiSlice = createSlice({
       }
     },
     closeNotifier : (state) => {
-      state.notifier = {
-          state : false,
-          onAccept : () => {}
-      }
+      state.notifier.state = false
     },
     openInputModal : (state, action) =>{
       state.inputModal ={
         state : true,
+        title : action.payload.title,
         component : action.payload.component,
         onAccept : action.payload.onAccept,
         acceptBtnText : action.payload.acceptBtnText,
@@ -55,10 +54,7 @@ export const uiSlice = createSlice({
       }
     },
     closeInputModal : (state) =>{
-      state.inputModal = {
-        ...state.inputModal,
-        state : false
-      }
+      state.inputModal.state = false
     },
     openLoader : (state, action) =>{
       state.loader = action.payload

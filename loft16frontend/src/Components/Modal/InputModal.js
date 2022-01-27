@@ -7,7 +7,7 @@ import { useSelector ,useDispatch } from "react-redux";
 import { closeInputModal } from "../../Features/uiSlice";
 
 const InputModal = () => {
-    const inputModalState = useSelector((state)=> state.ui.inputModal);
+const inputModalState = useSelector((state)=> state.ui.inputModal);
   const dispatch = useDispatch()
 
   function closeModal() {

@@ -28,6 +28,8 @@ const RecoveryCodeConfirm = (props) => {
         const response = await API.post("/auth/recover", recoveryState);
   
         const userData = response.data.userData
+
+      localStorage.setItem("userData", JSON.stringify(userData));
   
         dispatch(clearRecovery())
         dispatch(signin(userData))

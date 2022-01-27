@@ -175,7 +175,7 @@ const Signup = (props) => {
       dispatch(openLoader({ state: true, message: "checking.." }));
       dispatch(
         setSignInCredential({
-          email_address,
+          email_address : email_address.toLowerCase(),
           password,
         })
       );

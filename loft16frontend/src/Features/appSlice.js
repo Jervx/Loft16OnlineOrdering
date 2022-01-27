@@ -11,7 +11,11 @@ export const appSlice = createSlice({
            availability : 'all',
            sortBy : 'all'
        },
-       data : []
+       data : [],
+       userCheckout : {
+           chosenAddress : null,
+           chosenCourier : null
+       }
      }
     },
   reducers: {
@@ -28,11 +32,14 @@ export const appSlice = createSlice({
     },
     setData : (state, action) =>{
         state.appState.data = action.payload.data
+    },
+    setCheckOut : (state, action) => {
+        state.appState.userCheckout = action.payload
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUserSearch, setFilter, setData } = appSlice.actions
+export const { setCheckOut, setUserSearch, setFilter, setData } = appSlice.actions
 
 export default appSlice.reducer

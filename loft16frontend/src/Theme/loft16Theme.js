@@ -1,4 +1,7 @@
 const myTheme = {
+  backdrop: {
+    base: "filter fixed inset-0 z-40 flex items-end bg-black bg-opacity-50 sm:items-center sm:justify-center",
+  },
   link: {
     base: "text-gray-600 dark:text-gray-400 focus:outline-none border border-transparent",
     active:
@@ -18,6 +21,12 @@ const myTheme = {
     size: {
       regular: "px-4 py-2 text-sm",
     },
+    primary: {
+      base: "text-white bg-teal-500 border border-transparent",
+      active:
+        "active:bg-teal-600 hover:bg-teal-700 focus:ring focus:ring-teal-300",
+      disabled: "opacity-50 cursor-not-allowed",
+    },
   },
   input: {
     base: "block w-full text-sm focus:outline-none dark:text-gray-300 leading-5 rounded-md",
@@ -32,7 +41,7 @@ const myTheme = {
       "text-purple-600 form-radio focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-offset-0 dark:focus:ring-gray-300",
     checkbox:
       "text-purple-600 form-checkbox focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-offset-0 rounded dark:focus:ring-gray-300",
-  }
+  },
 };
 
 export default myTheme;

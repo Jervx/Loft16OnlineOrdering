@@ -94,7 +94,7 @@ const Home = () => {
                 </p>
                 <Link
                   className="flex items-center text-purple-400 hover:underline"
-                  href="#"
+                  to={`/productdetail/${hotProducts[0]._id}`} 
                 >
                   More Info <BsArrowRightShort className="w-5 h-5" />
                 </Link>
@@ -175,12 +175,18 @@ const Home = () => {
                       )}
                     </div>
                     <p className="font-inter defText-Col-2 text-xl">
-                      <span className="font-semibold text-lg">Php</span> 600
+                      <span className="font-semibold text-lg">Php</span> {prod.variants[0].price}
                     </p>
                   </div>
                   <div className="flex mt-4 text-gray-400 mb-16">
                     <BsFillClockFill className="w-3 h-3  mr-2"></BsFillClockFill>
-                    <p className="text-xs">Last update blabla</p>
+                    <p className="text-xs">Last update {new Date(prod.uat).toLocaleString("en-us", {
+                        month: "long",
+                      }) +
+                        " " +
+                        new Date(prod.uat).getDate() +
+                        ", " +
+                        new Date(prod.uat).getFullYear()}</p>
                   </div>
                 </Link>
               </SwiperSlide>

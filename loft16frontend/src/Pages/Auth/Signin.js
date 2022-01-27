@@ -6,6 +6,7 @@ import Loader from "../../Components/Loader";
 
 import { BsFillLockFill } from "react-icons/bs";
 import { MdAlternateEmail } from "react-icons/md";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
 
 /* redux */
 import { useDispatch } from "react-redux";
@@ -42,7 +43,10 @@ const Singin = (props) => {
   const AUTO_SIGNIN = process.env.REACT_APP_AUTO_SIGN_IN
 
   const [email, setEmail] = useState("");
+  const [passVis, setPassVis] = useState(false);
   const [password, setPassword] = useState("");
+
+  const togglePassVis = () => { setPassVis(!passVis); };
 
   const dispatch = useDispatch();
 
@@ -69,7 +73,6 @@ const Singin = (props) => {
         { withCredentials: true }
       );
 
-      console.log(response);
       dispatch(closeLoader());
 
       // if twofactorrequired
@@ -324,22 +327,31 @@ const Singin = (props) => {
                   />
                 </div>
               </Label>
-
-              <Label className="pt-4">
+              <Label className="pt-4 hover:border-gray-400  ">
                 <span>Password</span>
-                <div className="flex relative w-full max-w-xl focus-within:text-gray-700">
+                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
                   <div className="absolute inset-y-0 flex items-center pl-2">
                     <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8 hover:border-gray-400 bg-gray-50"
-                    type="password"
+                    className="mt-1 pl-8 hover:border-gray-400  "
+                    type={!passVis ? "password" : "text"}
                     placeholder=""
                     onChange={(e) => {
                       setPassword(e.currentTarget.value);
                     }}
                     value={password}
                   />
+                  <div
+                    onClick={togglePassVis}
+                    className="absolute cursor-pointer right-2 inset-y-2 flex items-center pl-2"
+                  >
+                    {!passVis ? (
+                      <FaEyeSlash className="w-4 h-4" aria-hidden="true" />
+                    ) : (
+                      <FaEye className="w-4 h-4" aria-hidden="true" />
+                    )}
+                  </div>
                 </div>
               </Label>
               <Loader />

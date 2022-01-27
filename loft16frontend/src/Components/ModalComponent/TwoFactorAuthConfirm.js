@@ -1,10 +1,13 @@
 import React from "react";
-import { withRouter } from 'react-router-dom'
+import { withRouter } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { Label, Input, Button } from "@windmill/react-ui";
 import { HiLockClosed } from "react-icons/hi";
-import { setSignInTwoFactor, cleanSignInCredential } from "../../Features/authSlice";
+import {
+  setSignInTwoFactor,
+  cleanSignInCredential,
+} from "../../Features/authSlice";
 import { closeInputModal, openAlertModal } from "../../Features/uiSlice";
 
 import API from "../../Helpers/api";
@@ -14,19 +17,55 @@ const TwoFactorAuthConfirm = (props) => {
   const dispatch = useDispatch();
   const signInData = useSelector((state) => state.auth.signin);
 
-  // const [codeStatus, setCodeStatus] = useState(true);
-  // const [codeError, setCodeError] = useState("");
+  const resend = async () => {
+    try {
+      const response = await API.post(
+        "/auth/signin",
+        {
+          email_address: signInData.email_address,
+          password: signInData.password,
+          oauth: false,
+        },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      if (error.response) {
+        //request was made but theres a response status code
+        dispatch(
+          openAlertModal({
+            component: <></>,
+            data: error.response.data,
+          })
+        );
+      } else if (error.request) {
+        // The request was made but no response was received
+        dispatch(
+          openAlertModal({
+            component: <></>,
+            data: {
+              err: 500,
+              description: "Sorry, but we can't reach the server",
+              solution: "Please try again later",
+            },
+          })
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message);
+      }
+    }
+  };
 
   const checkTwoFactorCode = async () => {
     try {
       const response = await API.post("/auth/signin", signInData);
 
-      const userData = response.data.userData
-
-      dispatch(cleanSignInCredential())
-      dispatch(signin(userData))
-      dispatch(closeInputModal())
-      props.history.push("/")
+      const userData = response.data.userData;
+      localStorage.setItem("userData", JSON.stringify(userData));
+      dispatch(cleanSignInCredential());
+      dispatch(signin(userData));
+      dispatch(closeInputModal());
+      props.history.push("/");
     } catch (error) {
       if (error.response) {
         //request was made but theres a response status code
@@ -69,7 +108,9 @@ const TwoFactorAuthConfirm = (props) => {
         </h2>
         <p className="defText-Col-2 text-center leading-relaxed text-base">
           We've sent your two factor authentication code to your email<br></br>
-          <span className="text-center font-medium">{signInData.email_address}</span>
+          <span className="text-center font-medium">
+            {signInData.email_address}
+          </span>
         </p>
       </div>
       <div className="flex sm:justify-center md:justify-center">
@@ -105,7 +146,10 @@ const TwoFactorAuthConfirm = (props) => {
         <p className="text-center text-gray-400 leading-relaxed text-base">
           Didn't receive a code?
         </p>
-        <p className="text-center cursor-pointer text-blue-500 text-base">
+        <p
+          onClick={resend}
+          className="text-center cursor-pointer text-blue-500 text-base"
+        >
           Resend
         </p>
       </div>

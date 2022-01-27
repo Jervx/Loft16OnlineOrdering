@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector} from 'react-redux'
+import { openAlertModal } from '../../Features/uiSlice'
+import { signin } from '../../Features/userSlice'
+
 import { useParams } from "react-router-dom";
 
-import { Badge, Input, Button } from "@windmill/react-ui";
+import { Badge, Input, Button, Avatar } from "@windmill/react-ui";
 
 import API from "../../Helpers/api";
 
 import FullPageLoader from "../../Components/FullPageLoader";
+
+import Informative from "../../Components/Modal/Informative";
 
 import {
   AiFillCloseCircle,
@@ -14,7 +20,12 @@ import {
   AiFillStar,
 } from "react-icons/ai";
 import { HiFire } from "react-icons/hi";
-import { BsFillCalendarCheckFill, BsShieldCheck, BsCheckCircle , BsFillClockFill} from "react-icons/bs";
+import {
+  BsFillCalendarCheckFill,
+  BsShieldCheck,
+  BsCheckCircle,
+  BsFillClockFill,
+} from "react-icons/bs";
 
 const ProductView = () => {
   const [loading, setLoading] = useState(true);
@@ -22,7 +33,60 @@ const ProductView = () => {
 
   const [selectedVariant, setSelectedVariant] = useState(0);
 
+  const [QTY,setQTY] = useState(1)
+
   const { prod_id } = useParams();
+
+  const dispatch = useDispatch()
+
+  const _cur_user = useSelector((state) => state.user);
+
+
+  const addToCart = async () => {
+
+    try{
+        API.post("/user/addToCart",{
+            _id : _cur_user.userData._id,
+            item : {
+                thumb : productDetail.Images[0],
+                product_ID : prod_id,
+                product_name : productDetail.name,
+                qty : QTY,
+                variant : productDetail.variants[selectedVariant].name,
+                variant_price : productDetail.variants[selectedVariant].price,
+                rated : false
+            }
+        })
+
+        dispatch(
+            openAlertModal({
+            component: <Informative />,
+            data: {
+                description : "Add To Cart",
+                solution : "The items was added to your cart!"
+            },
+            })
+        );
+
+        const response = await API.get(`/user/mydetails/${_cur_user.userData._id}`);
+
+        dispatch(signin(response.data.userData));
+    }catch(err){
+        dispatch(
+            openAlertModal({
+            component: <Informative />,
+            data: {
+                description : "Add To Cart Failed",
+                solution : "Please Try Again Later!"
+            },
+            })
+        );
+    }
+  }
+
+  const checkIfQtyGivenValid = () => { 
+      return productDetail.variants[selectedVariant].stock < QTY || QTY <= 0
+    }
 
   const chechkIsNew = (date1) => {
     var currentDate = new Date().toJSON().slice(0, 10);
@@ -34,19 +98,16 @@ const ProductView = () => {
 
     let res = check > from && check < to;
 
-    console.log(res);
-
     return res;
   };
 
   const getRating = () => {
     const N_r = productDetail.n_ratings;
     const N_no = productDetail.n_no_ratings;
-    let must = N_no * 10;
 
-    if (must === 0) return 0.0;
+    if (N_r === 0) return 0
 
-    let R = N_r / must / 10;
+    let R = N_r / (N_no * 10) * 10;
     return R.toFixed(1) + "";
   };
 
@@ -60,11 +121,11 @@ const ProductView = () => {
     try {
       setLoading(true);
       const resp = await API.get(`/browse/getproductdetail/${prod_id}`);
-      console.log("RECIEVED PROD DET", resp.data);
-      setProductDetail(resp.data.productData);
+      let proddata = resp.data.productData;
+      setProductDetail(proddata);
       setLoading(false);
     } catch (e) {
-      console.log(e.response);
+      console.log(e);
     }
   };
 
@@ -141,9 +202,10 @@ const ProductView = () => {
                   <div>
                     {productDetail.variants[selectedVariant].stock !== 0 ? (
                       <div className="flex items-center">
-                          <BsCheckCircle className="h-6 w-6 text-teal-400 mr-2" />
-                          {productDetail.variants[selectedVariant].stock} items in stock
-                          </div>
+                        <BsCheckCircle className="h-6 w-6 text-teal-400 mr-2" />
+                        {productDetail.variants[selectedVariant].stock} items in
+                        stock
+                      </div>
                     ) : (
                       <Badge
                         type="danger"
@@ -180,36 +242,79 @@ const ProductView = () => {
                 </div>
                 <div className="flex flex-wrap my-5 defText-Col-2">
                   {productDetail.variants.map((variant, idx) => (
-                    <button key={idx} onClick={()=> setSelectedVariant(idx)} className={ selectVariant(idx) }>{variant.name}</button>
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedVariant(idx)}
+                      className={selectVariant(idx)}
+                    >
+                      {variant.name}
+                    </button>
                   ))}
                 </div>
                 <p className="leading-relaxed">{productDetail.description}</p>
                 <div className="my-7 flex items-center">
-                    <h1 className="text-2xl font-medium">Quantity</h1>
-                    <div className="w-2/12">
-                        <Input className="ml-4 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"></Input>
-                    </div>
-                    <div>
-                        <Button
-                            className="ml-7 rounded-xl defBackground hover:bg-green-500"
-                            block
-                        >
-                            Add To Cart
-                        </Button>
-                    </div>
+                  <h1 className="text-2xl font-medium">Quantity</h1>
+                  <div className="w-2/12">
+                    <Input onChange={(e) => {
+                        if(isNaN(e.target.value)) return
+                        if(e.target.value.length === 0){
+                            setQTY("")
+                            return
+                        }
+                        let val = Number.parseInt(e.target.value)
+                        setQTY(val)
+                    }} value={QTY} className="ml-4 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"></Input>
+                  </div>
+                  <div>
+                    <Button
+                      className="ml-7 rounded-xl defBackground hover:bg-green-500"
+                      block
+                      onClick={() => addToCart()}
+                      disabled = {checkIfQtyGivenValid()}
+                    >
+                      Add To Cart
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex mt-4 text-gray-400 mb-16 items-center">
-                    <BsFillClockFill className="w-3 h-3  mr-2"></BsFillClockFill>
-                    <p className="text-xs">Last update 
-                      {" " + new Date(productDetail.uat).toLocaleString("en-us", {
+                  <BsFillClockFill className="w-3 h-3  mr-2"></BsFillClockFill>
+                  <p className="text-xs">
+                    Last update
+                    {" " +
+                      new Date(productDetail.uat).toLocaleString("en-us", {
                         month: "long",
                       }) +
-                        " " +
-                        new Date(productDetail.uat).getDate() +
-                        ", " +
-                        new Date(productDetail.uat).getFullYear()}
-                    </p>
-                  </div>
+                      " " +
+                      new Date(productDetail.uat).getDate() +
+                      ", " +
+                      new Date(productDetail.uat).getFullYear()}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xl my-6">Ratings & Reviews</p>
+                <div>
+                  {productDetail.ratings.map((rating, idx) => (
+                    <div className="" key={idx}>
+                      <div className="flex items-center">
+                        <Avatar
+                          src={rating.profile_picture}
+                          alt={rating.user_name}
+                        />
+                        <p className="text-md font-medium mx-4 text-gray-700">
+                          {rating.user_name}
+                        </p>
+                        <div className="flex items-center  bg-gray-100 p-2 rounded-md">
+                          <AiFillStar className="text-yellow-300 mr-2"/>
+                          <p>{rating.score}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 text-gray-600 border-l-4 pl-2 border-gray-100 py-2">
+                        <p>{rating.rating}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

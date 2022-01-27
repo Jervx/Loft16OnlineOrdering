@@ -6,6 +6,8 @@ import Loader from "../../Components/Loader"
 
 import { BsFillLockFill } from "react-icons/bs";
 import { MdAlternateEmail } from "react-icons/md";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
+
 
 /* redux */
 import { useDispatch } from "react-redux";
@@ -19,8 +21,13 @@ import RecoveryCodeConfirm from "../../Components/ModalComponent/RecoveryCodeCon
 const RecoverAccount = (props) => {
     const [email, setEmail] = useState("");
     const [newPassword, setPassword] = useState("");
+
+
+    const [passVis, setPassVis] = useState(false);
   
     const dispatch = useDispatch();
+
+    const togglePassVis = () => { setPassVis(!passVis); };
   
     const signInUser = async () => {
       try {
@@ -100,7 +107,7 @@ const RecoverAccount = (props) => {
                 </h1>
                 <div className="flex justify-center"></div>
                 <Label>
-                  <span>Email*</span>
+                  <span>Email</span>
                   <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
                     <div className="absolute inset-y-0 flex items-center pl-2">
                       <MdAlternateEmail className="w-4 h-4" aria-hidden="true" />
@@ -108,7 +115,7 @@ const RecoverAccount = (props) => {
                     <Input
                       className="mt-1 pl-8"
                       type="email"
-                      placeholder="john@doe.com"
+                      placeholder="email"
                       value={email}
                       onChange={(e) => {
                         setEmail(e.currentTarget.value);
@@ -117,23 +124,33 @@ const RecoverAccount = (props) => {
                   </div>
                 </Label>
   
-                <Label className="pt-4">
-                  <span>New Password*</span>
-                  <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
-                    <div className="absolute inset-y-0 flex items-center pl-2">
-                      <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
-                    </div>
-                    <Input
-                      className="mt-1 pl-8"
-                      type="password"
-                      placeholder="********"
-                      onChange={(e) => {
-                        setPassword(e.currentTarget.value);
-                      }}
-                      value={newPassword}
-                    />
+                <Label className="pt-4 hover:border-gray-400  ">
+                <span>New Password</span>
+                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                  <div className="absolute inset-y-0 flex items-center pl-2">
+                    <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
                   </div>
-                </Label>
+                  <Input
+                    className="mt-1 pl-8 hover:border-gray-400  "
+                    type={!passVis ? "password" : "text"}
+                    placeholder=""
+                    onChange={(e) => {
+                      setPassword(e.currentTarget.value);
+                    }}
+                    value={newPassword}
+                  />
+                  <div
+                    onClick={togglePassVis}
+                    className="absolute cursor-pointer right-2 inset-y-2 flex items-center pl-2"
+                  >
+                    {!passVis ? (
+                      <FaEyeSlash className="w-4 h-4" aria-hidden="true" />
+                    ) : (
+                      <FaEye className="w-4 h-4" aria-hidden="true" />
+                    )}
+                  </div>
+                </div>
+              </Label>
                 <Loader />
                 <Button
                   className="mt-4 rounded-xl defBackground hover:bg-green-500"
