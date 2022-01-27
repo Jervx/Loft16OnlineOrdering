@@ -35,10 +35,12 @@ const authenticationRoute = require('./Routes/public/authentication')
 const userController = require('./Routes/private/User/userController')
 const browsing = require('./Routes/public/browsing')
 
+const adminController = require('./Routes/private/Admin/adminController')
+
 app.use('/auth', authenticationRoute)
 app.use('/user', userController)
 app.use('/browse', browsing)
-
+app.use('/admin', adminController)
 
 const Product = require("./models/Product")
 app.post('/createProduct', async(req,res) => {

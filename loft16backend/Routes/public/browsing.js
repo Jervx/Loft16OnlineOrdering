@@ -2,6 +2,8 @@ const express = require("express");
 const { Mongoose } = require("mongoose");
 const router = express.Router();
 const Product = require("../../models/Product");
+const User = require("../../models/User");
+const Courier = require("../../models/Courier");
 let ObjectId = require("mongoose").Types.ObjectId;
 
 // NOTE: Loft16 Getting hot product
@@ -56,6 +58,29 @@ router.post("/getproduct", async (req, res) => {
     msg: "Ok! 👌",
     products: finalRes,
   });
+});
+
+// NOTE: Get Couriers
+router.get("/getCouriers", async (req, res) => {
+  try {
+    const COURIERS = await Courier.find(
+      {},
+      { _id: 0, courier_name: 1, courier_email: 1, courier_contact: 1 }
+    );
+
+    return res.status(200).json({
+        couriers : COURIERS
+    })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      err: 500,
+      description: "Internal Server Error",
+      solution:
+        "Sorry! Something's wrong with the server, please try again later or contact loft16 admin",
+    });
+  }
 });
 
 // NOTE: DONE

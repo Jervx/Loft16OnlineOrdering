@@ -8,7 +8,7 @@ const verifyToken = async (req, res, next) => {
   let client_id = req.cookies.client_id
   let auth_iss = req.cookies.auth_iss
 
-  console.log("--------COOKIES AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
+  // console.log("--------COOKIES AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
   if(auth_iss)
     if(auth_iss === process.env.GIssuer){
       try{
@@ -25,8 +25,8 @@ const verifyToken = async (req, res, next) => {
   if (!token)
     return res.status(403).json({
         err : 403,
-        description : "Authorization is missing",
-        solution : "Please sign in to get authorization"
+        description : "Your sign in was expired",
+        solution : "Please sign out & sign in again" 
     })
   try {
     const user = jwt.verify(token, config.JWT_SCRT);

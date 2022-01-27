@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-// NOTE: Hello World!
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const randomstring = require("randomstring");
@@ -127,15 +126,27 @@ router.post("/recover", async(req, res)=>{
   
   //if no recovery code provided
   if(!recovery_code){
+      let rec_code = generateCode()
     //create code (findOneUpdate, upsert)
     const code = await RecoveryCode.findOneAndUpdate({email_address, used : false},{
       user_ID : USER._id,
       email_address,
-      recovery_code : generateCode(),
+      recovery_code : rec_code,
       exp : getAddedMinutes()
     }, {new : true, upsert : true})
+
+
     // sent it to email TODO: implement future email helper
-    //return 200 code sent
+    //return 200 code sent 
+    // template_content  { email_address, user_name, template_name, subject}
+    let toSent = {...USER.toObject(), recovery_code : rec_code}
+
+    const sendConfirmationCode = sendEmail(email_address, {
+        ...toSent,
+        template_name:'Recovery.html',
+        subject : 'Loft16 Account Recovery'
+    })
+
     return res.status(200).json({
       recovery_code_sent : true,
       message : "recovery code sent!"
@@ -177,7 +188,6 @@ router.post("/recover", async(req, res)=>{
   //invalidate the recovery code
   const invalidateRecovery = await RecoveryCode.updateOne({email_address, used : false} , {$set : {used : true}})
 
-  console.log(updatedPassword)
 
     //final return of response
     return res.status(201).json({
@@ -230,13 +240,16 @@ router.post("/signin", async (req, res) => {
       res.cookie( "client_id", client_id, loftCookieConifg )
       res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg )
 
+      const loginCount = await User.updateOne({_id : userData._id},{$inc : { login_count : 1 }})
+      let userData2 = await User.findOne({email_address : userEmail}, {password : 0}).lean()
+
       //include flag to response
       return res.status(200).json({
         code: 200,
         description: "Signed in successfuly!",
         twoFactorRequired : false,
         GUserInfo,
-        userData : userData,
+        userData : {...userData2, login_count : userData.login_count + 1},
         flag
       })
     }catch(err){
@@ -252,6 +265,7 @@ router.post("/signin", async (req, res) => {
   // beyond this point will be normal sign in authentication
   const { email_address, password, twoFactCode } = req.body;
   
+
   //check if all required fields has value
   if (!(email_address, password))
     return res.status(400).json({
@@ -262,6 +276,7 @@ router.post("/signin", async (req, res) => {
 
   const USER = await User.findOne({ email_address }).lean();
 
+
   if (!USER)
     return res.status(404).json({
       err: 404,
@@ -270,6 +285,7 @@ router.post("/signin", async (req, res) => {
         "The given credential doesn't belong to our existing users, please create an account",
     });
 
+  // NOTE: this 
 
   if (!(await bcrypt.compare(password, USER.password)))
     return res.status(403).json({
@@ -283,14 +299,29 @@ router.post("/signin", async (req, res) => {
       // ✅ Two Factor Sign In
       // iissue a two factor code & save it on two factor auth db
 
+      let conf_code = generateCode()
+
       let code = await TwoFactorAuth.findOneAndUpdate({email_address},{
         user_ID : USER._id,
         email_address,
-        confirmation_code : generateCode(),
+        confirmation_code : conf_code,
         exp : getAddedMinutes()
       }, {new : true, upsert : true})
 
       //send it to email - TODO: @jervx to be implemented later
+
+      // sent it to email TODO: implement future email helper
+    //return 200 code sent two_fact_auth
+    // template_content  { email_address, user_name, template_name, subject}
+
+
+    let toSent = {...USER, two_fact_auth : conf_code}
+    const sendConfirmationCode = sendEmail(email_address, {
+        ...toSent,
+        template_name:'TwoFactorAuth.html',
+        subject : 'Loft16 TwoFactorAuthentication Code'
+    })
+
       return res.status(200).json({ twoFactorRequired : true, code })
       // if code provided
     }else{
@@ -331,10 +362,12 @@ router.post("/signin", async (req, res) => {
   const token = generateToken( { email_address, user_name : USER.user_name } )
   const refresh = jwt.sign( { email_address, user_name : USER.user_name } , process.env.JWT_RFSH)
 
+  const USER2 = await User.findOne({ email_address }, {password : 0}).lean();
+
   // Create a session Refresh Token for attaining new access token
   // should be destroyed on logout - @hjerbe
   await Refresh_Token.create({
-    user_ID : USER._id,
+    user_ID : USER2._id,
     refresh_token : refresh
   })
   
@@ -342,6 +375,7 @@ router.post("/signin", async (req, res) => {
   res.cookie( "access_token",token, {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
   res.cookie( "auth_iss", process.env.JWT_ISSUER,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
 
+  const loginCount = await User.updateOne({_id : USER._id},{$inc : { login_count : 1 }})
 
   return res.status(200).json(
     { 
@@ -349,7 +383,8 @@ router.post("/signin", async (req, res) => {
       description: "Signed in successfuly!",
       twoFactorRequired : false,
       userData: {
-        ...USER
+        ...USER2,
+        login_count : USER.login_count + 1  
       },
     });
 });
@@ -420,7 +455,6 @@ router.post("/signup", async (req, res) => {
         description: "User already exist using that Email",
         solution: "Please use other Email",
       });
-
     //get existing registration confirmation record
     const confirmation_codeRecord = await Email_Confirmation.findOne({ email_address, used: false });
 
@@ -431,6 +465,7 @@ router.post("/signup", async (req, res) => {
         description: "You didn't sign up",
         solution: "Please sign up",
       });
+
 
     //check if the given confirmation code is valid to the issued confirmation code
     if (confirmation_codeRecord.confirmation_code !== confirmation_code)
@@ -447,6 +482,8 @@ router.post("/signup", async (req, res) => {
         description: "The confirmation code has expired",
         solution: "Please resend or signup again",
       });
+
+    //TODO: SYNC Check If Confirmation Code Expired
 
     //if everything goes right, the registration entry confirmation code will be cleared from
     //loft 16 confirmation code collections
@@ -533,24 +570,24 @@ router.post("/confirm_email", async (req, res) => {
     });
 
     // template_content  { email_address, user_name, template_name, subject}
-    const sendConfirmationCode = sendEmail(email_address, {
-        ...email_confirmation.toObject(),
-        template_name:'EmailConfirmation.html',
-        subject : 'Loft16 Sign Up Email Confirmation'
-    })
+    if(!req.body.debug)
+        sendConfirmationCode = sendEmail(email_address, {
+            ...email_confirmation.toObject(),
+            template_name:'EmailConfirmation.html',
+            subject : 'Loft16 Sign Up Email Confirmation'
+        })
 
     return res.status(201).json({
       status: 201,
       message:
-        "Registration created, Please see confirmation code we sent to your Email",
-      data: email_confirmation,
+        "Registration created, Please see confirmation code we sent to your Email"
     });
   } catch (e) {
     console.log(e)
     return res.status(408).json({
       status: 403,
       message: "Theres an error",
-      err: e,
+      err: e
     });
   }
 });
