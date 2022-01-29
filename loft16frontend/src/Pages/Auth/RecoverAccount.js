@@ -46,7 +46,6 @@ const RecoverAccount = (props) => {
           newPassword,
         });
   
-        console.log(response);
         dispatch(closeLoader());
   
         // if twofactorrequired

@@ -14,7 +14,7 @@ import { BiSearch } from "react-icons/bi";
 import { AiFillFire, AiFillShopping, AiOutlineUser } from "react-icons/ai";
 import { BsGearFill } from "react-icons/bs";
 import { ImCart } from "react-icons/im";
-import { MdOutlineLogout } from "react-icons/md";
+import { MdOutlineLogout, MdQuestionAnswer } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
 
 /*redux */
@@ -25,7 +25,7 @@ import { setUserSearch, setData } from "../Features/appSlice";
 import { signout } from "../Features/userSlice";
 import { openNotifier } from "../Features/uiSlice";
 
-import API from '../Helpers/api'
+import API from "../Helpers/api";
 
 const Header = (props) => {
   const { history } = props;
@@ -35,11 +35,11 @@ const Header = (props) => {
 
   //current user
   const _cur_user = useSelector((state) => state.user);
-  const appState = useSelector((state) => state.app.appState )
+  const appState = useSelector((state) => state.app.appState);
 
   const signOut = () => {
     dispatch(signout());
-    props.history.push("/")
+    props.history.push("/");
   };
 
   const toggleMyCart = () => {
@@ -62,15 +62,15 @@ const Header = (props) => {
     history.push("/user/mycart");
   };
 
-  const onSearchEnter = async(event) => {
-    if (event.key === "Enter"){
-        props.history.push('/products')
-        try {
-          const req = await API.post("/browse/getproduct", appState );
-          dispatch(setData({ data: req.data.products }));
-        } catch (e) {
-          console.log("ERR", e);
-        }
+  const onSearchEnter = async (event) => {
+    if (event.key === "Enter") {
+      props.history.push("/products");
+      try {
+        const req = await API.post("/browse/getproduct", appState);
+        dispatch(setData({ data: req.data.products }));
+      } catch (e) {
+        console.log("ERR", e);
+      }
     }
   };
 
@@ -87,12 +87,12 @@ const Header = (props) => {
         </a>
 
         {/* <!-- Embedded Routes --> */}
-        <div className="flex text-gray-400 items-center justify-center flex-1 lg:mr-32">
+        <div className="flex text-gray-400 items-center justify-center flex-1">
           <h3
             onClick={() => history.push("/")}
             className={
               (useLocation().pathname === "/" ? "text-red-500" : "") +
-              " cursor-pointer text-sm flex hover:text-red-500 items-center py-2 "
+              " cursor-pointer text-sm flex hover:text-red-500 items-center py-2 mx-4"
             }
           >
             <AiFillFire className="w-6 h-6 pr-2" aria-hidden="true" />
@@ -104,12 +104,24 @@ const Header = (props) => {
             onClick={() => history.push("/products")}
             className={
               (useLocation().pathname === "/products" ? "text-red-500" : "") +
-              " cursor-pointer text-sm flex hover:text-red-500 items-center ml-2"
+              " cursor-pointer text-sm flex hover:text-red-500 items-center mx-4"
             }
           >
             <AiFillShopping className="w-6 h-6 pr-2" aria-hidden="true" />
             <p className="hidden font-medium md:block transition duration-200 ease-linear">
               Products
+            </p>
+          </h3>
+          <h3
+            onClick={() => history.push("/faqs")}
+            className={
+              (useLocation().pathname === "/faqs" ? "text-red-500" : "") +
+              " cursor-pointer text-sm flex hover:text-red-500 items-center mx-4"
+            }
+          >
+            <MdQuestionAnswer className="w-6 h-6 pr-2" aria-hidden="true" />
+            <p className="hidden font-medium md:block transition duration-200 ease-linear">
+              FAQs
             </p>
           </h3>
         </div>
@@ -177,7 +189,7 @@ const Header = (props) => {
                 {_cur_user.userData.profile_picture ? (
                   <Avatar
                     className="align-middle"
-                    src={_cur_user.userData.profile_picture }
+                    src={_cur_user.userData.profile_picture}
                     alt="User Profile"
                     aria-hidden="true"
                   />
@@ -203,7 +215,11 @@ const Header = (props) => {
                   <div className="flex items-center">
                     <Avatar
                       className="mr-5"
-                      src={_cur_user.userData.profile_picture ? _cur_user.userData.profile_picture : 'https://cdn.discordapp.com/attachments/912411399458795593/921097628446498887/36..04.jpg'}
+                      src={
+                        _cur_user.userData.profile_picture
+                          ? _cur_user.userData.profile_picture
+                          : "https://cdn.discordapp.com/attachments/912411399458795593/921097628446498887/36..04.jpg"
+                      }
                       alt=""
                       aria-hidden="true"
                     />
@@ -216,13 +232,19 @@ const Header = (props) => {
 
               <DropdownItem
                 className="dark:text-gray-200 text-gray-500 hover:text-green-600"
-                tag="a"
-                href="#"
+                tag={Link}
+                to="/account"
               >
                 <BsGearFill className="w-5 h-5 mr-5" aria-hidden="true" />
                 <span className=" font-normal">Settings</span>
               </DropdownItem>
-              <DropdownItem className="dark:text-gray-200 text-gray-500 hover:text-green-600">
+              <DropdownItem
+                tag="a"
+                onClick={() => {
+                  props.history.push("/user/myorders");
+                }}
+                className="dark:text-gray-200 text-gray-500 hover:text-green-600"
+              >
                 <GoPackage className="w-5 h-5 mr-5 " aria-hidden="true" />
                 <span className=" font-normal">Orders</span>
               </DropdownItem>

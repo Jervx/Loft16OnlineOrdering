@@ -26,8 +26,8 @@ const MyCart = () => {
 
   const userCheckout = useSelector((state) => state.app.appState.userCheckout);
 
-  const [loading, setLoading] = useState(true);
   const [userCart, setUserCart] = useState();
+  const [loading, setLoading] = useState(true);
 
   const loadUserData = async () => {
     let _id = userData._id;

@@ -203,9 +203,9 @@ const Checkout = () => {
           </div>
         </div>
 
-        <Link className=" text-xs text-blue-500 " to="/settings">
+        <a className=" text-xs text-blue-500 " href="/account">
           Create New Address
-        </Link>
+        </a>
         <div className="flex my-4 w-full items-center">
           <FaMapMarkerAlt className="w-6 h-6 text-teal-500" />
           <div className="ml-4 w-full">

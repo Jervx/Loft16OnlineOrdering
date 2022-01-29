@@ -6,6 +6,7 @@ import AdminContainer from "./Pages/Admin/AdminContainer";
 import NotFound from "./Pages/NotFound";
 import AuthContainer from "./Pages/Auth/AuthContainer";
 import AccountProfile from "./Pages/User/AccountProfile";
+import AccountSettings from "./Pages/User/AccountSetting"
 
 /* Protected Route */
 import ProtectedRoute from "./Components/ProtectedRoute";
@@ -59,6 +60,8 @@ function App() {
           <Route path="/auth" component={AuthContainer} />
           <Route path="/admin" component={AdminContainer} />
           <ProtectedRoute path="/user" component={AccountProfile} />
+          <ProtectedRoute path="/account" component={AccountSettings} />
+
           <Route path="/" component={PublicContainer} />
           <Route path="*" component={NotFound} />
         </Switch>

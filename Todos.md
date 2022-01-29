@@ -7,7 +7,7 @@
 - [x] Product Details Page & Functionality
 - [doing] Add to cart funcionality
 
-### TODO: User Cart
+### TODO: User Cart | Orders | Arrived | Cancelled
 - [x] should request the data from backend
 - [x] mycart
 - [x] mycart item view
@@ -23,7 +23,7 @@
 - [x] deletable record in Arrived & Cancelled
 
 ### TODO: LAST THING ON CARTS 
-- [] When adding to cart, check if the item with the same variant is in the cart
+- [x] When adding to cart, check if the item with the same variant is in the cart
      if so, 
      
         check if the qty of the item already in cart plus the qty of current
@@ -38,31 +38,24 @@
     else 
         add it on cart
 
+
+- [doing] User Order Detail View
+- [doing] Like an item
         
 
 ### TODO: MAJOR PART SETTINGSS FINAL!!!!!
-- [] Create the page for Settings
-- [] load latest user settings
-- [] change photo is not upload photo only pre created graphics
-- [] save photo
-- [] can't change email, only add
-- [] can add more mobile number
+- [x] Create the page for Settings
+- [x] load latest user settings
+- [] change photo is not upload photo only pre created graphics avatar
+- [x] emails
+- [x] mobile numbers
 - [] add more shipping address
 
-### TODO: User Cart BACKEND
-- [ ] when requesting the user cart, sync realtime data of products on cart to prevent price, name, variant, & photo difference 
-- [ ] set cart as full
-
-### TODO: User Orders BACKEND
-- [ ] get record from pending & in progress
-- [ ] delete request 1 item (Usually cancellation of order)
-
-### TODO: User Arrived BACKEND
-- [ ] get record from completed_orders collection
-- [ ] delete a record
 
 
 
+
+### TODO: ADMIN
 
 
 

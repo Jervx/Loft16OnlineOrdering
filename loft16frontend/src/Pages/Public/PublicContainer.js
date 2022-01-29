@@ -10,10 +10,11 @@ import ProductView from './ProductView'
 
 import NotFound from '../NotFound'
 
-
+import Footer from "../../Components/Footer"
 
 const PublicContainer = ({toAuth}) => {
     return (
+        <>
         <div>
                 <Header />
                 <Switch>
@@ -24,6 +25,8 @@ const PublicContainer = ({toAuth}) => {
                     <Route path="*" component={NotFound} />
                 </Switch>
         </div>
+        <Footer />
+        </>
     )
 }
 

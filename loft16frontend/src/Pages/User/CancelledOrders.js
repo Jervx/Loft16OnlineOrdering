@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { MdOutlineClose } from "react-icons/md";
+import { ImTruck } from "react-icons/im";
 
 import Informative from "../../Components/Modal/Informative";
 import FullPageLoader from "../../Components/FullPageLoader";
@@ -71,7 +72,7 @@ const ArrivedOrders = () => {
         _id: userData._id,
         cancelled: item,
       });
-      await loadUserData()
+      await loadUserData();
     } catch (error) {
       if (error.response) {
         dispatch(
@@ -168,12 +169,11 @@ const ArrivedOrders = () => {
                         </h1>
                         <div className="inline-flex items-center">
                           <span className="flex-grow flex flex-col">
-                            <p className="text-lg text-gray-600">
-                              Chosen Courier{" "}
+                            <p className="flex items-center text-lg text-teal-700">
+                              <ImTruck className="w-5 h-5 mr-2" />{" "}
                               <span className="text-teal-700 font-medium">
                                 {cancelled.courier}
                               </span>
-                              .
                             </p>
                           </span>
                         </div>

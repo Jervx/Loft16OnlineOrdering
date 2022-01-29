@@ -40,7 +40,7 @@ const myTheme = {
     radio:
       "text-purple-600 form-radio focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-offset-0 dark:focus:ring-gray-300",
     checkbox:
-      "text-purple-600 form-checkbox focus:border-purple-400 focus:outline-none focus:ring focus:ring-purple-300 focus:ring-offset-0 rounded dark:focus:ring-gray-300",
+      "text-teal-600 form-checkbox focus:border-teal-400 focus:outline-none focus:ring focus:ring-teal-300 focus:ring-offset-0 rounded dark:focus:ring-gray-300",
   },
 };
 

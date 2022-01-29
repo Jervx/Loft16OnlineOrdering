@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import { MdOutlineClose } from "react-icons/md";
+import { ImTruck } from "react-icons/im";
+
 
 import Informative from "../../Components/Modal/Informative";
 import FullPageLoader from "../../Components/FullPageLoader";
@@ -169,12 +171,11 @@ const Orders = () => {
                         </h1>
                         <div className="inline-flex items-center">
                           <span className="flex-grow flex flex-col">
-                            <p className="text-lg text-gray-600">
-                              Chosen Courier{" "}
+                            <p className="flex items-center text-lg text-teal-700">
+                              <ImTruck className="w-5 h-5 mr-2" />{" "}
                               <span className="text-teal-700 font-medium">
                                 {pendings.courier}
                               </span>
-                              .
                             </p>
                           </span>
                         </div>
@@ -235,12 +236,11 @@ const Orders = () => {
                         </h1>
                         <div className="inline-flex items-center">
                           <span className="flex-grow flex flex-col">
-                            <p className="text-lg text-gray-600">
-                              Chosen Courier{" "}
+                          <p className="flex items-center text-lg text-teal-700">
+                              <ImTruck className="w-5 h-5 mr-2" />{" "}
                               <span className="text-teal-700 font-medium">
                                 {in_progress.courier}
                               </span>
-                              .
                             </p>
                           </span>
                         </div>

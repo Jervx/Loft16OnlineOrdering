@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
+
 
 const mongoose = require("mongoose");
 let ObjectId = require("mongoose").Types.ObjectId;
@@ -31,58 +33,63 @@ router.post("/addToCart", auth, async (req, res) => {
   });
 });
 
-router.post("/removeCancelled", auth, async (req,res)=>{
-    try{
-        const { _id, cancelled } = req.body
+router.post("/removeCancelled", auth, async (req, res) => {
+  try {
+    const { _id, cancelled } = req.body;
 
-        const removedRecord = await User.updateOne({_id}, {
-            $pull : { cancelled : { order_ID : cancelled.order_ID } }
-        })
+    const removedRecord = await User.updateOne(
+      { _id },
+      {
+        $pull: { cancelled: { order_ID: cancelled.order_ID } },
+      }
+    );
 
-        res.status(200).json({
-            status: 200,
-            description: "Record removed"
-          });
+    res.status(200).json({
+      status: 200,
+      description: "Record removed",
+    });
+  } catch (e) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", e);
+  }
+});
 
-    }catch(e){
-        res.status(500).json({
-            status: 500,
-            description: "internal server error",
-            solution: "Please contact server admin or try again later",
-          });
-          console.log("ERR", e);
-    }
-})
+router.post("/removeCompleted", auth, async (req, res) => {
+  try {
+    const { _id, completed } = req.body;
 
-router.post("/removeCompleted", auth, async (req,res)=>{
-    try{
-        const { _id, completed } = req.body
+    const removedRecord = await User.updateOne(
+      { _id },
+      {
+        $pull: {
+          past_transactions: {
+            order_ID: new ObjectId(completed.order_ID),
+          },
+        },
+      }
+    );
 
-        const removedRecord = await User.updateOne({_id}, {
-            $pull : { past_transactions : {
-                order_ID : new ObjectId(completed.order_ID)
-            } }
-        })
-
-        res.status(200).json({
-            status: 200,
-            description: "Record removed"
-          });
-
-    }catch(e){
-        res.status(500).json({
-            status: 500,
-            description: "internal server error",
-            solution: "Please contact server admin or try again later",
-          });
-          console.log("ERR", e);
-    }
-})
-
+    res.status(200).json({
+      status: 200,
+      description: "Record removed",
+    });
+  } catch (e) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", e);
+  }
+});
 
 router.post("/cancelOrder", auth, async (req, res) => {
   try {
-    const { _id, order_object, order_ID} = req.body;
+    const { _id, order_object, order_ID } = req.body;
 
     // check if order_ID is still in pending order collection
 
@@ -104,7 +111,7 @@ router.post("/cancelOrder", auth, async (req, res) => {
         $set: {
           order_status: -1,
           reason: "Cancelled by User",
-        }
+        },
       }
     );
 
@@ -113,18 +120,22 @@ router.post("/cancelOrder", auth, async (req, res) => {
     const updateUserData = await User.updateOne(
       { _id },
       {
-        $pull : { pending_orders : {  order_ID : new ObjectId(order_ID) } },
-        $push : {
-            cancelled : {...order_object, order_status : -1, dat : new Date(), reason : "Cancelled by you" }
-        }
+        $pull: { pending_orders: { order_ID: new ObjectId(order_ID) } },
+        $push: {
+          cancelled: {
+            ...order_object,
+            order_status: -1,
+            dat: new Date(),
+            reason: "Cancelled by you",
+          },
+        },
       }
     );
 
     res.status(200).json({
-        status : 200,
-        message : "Order Cancelled Successfuly"
-    })
-
+      status: 200,
+      message: "Order Cancelled Successfuly",
+    });
   } catch (err) {
     res.status(500).json({
       status: 500,
@@ -199,11 +210,268 @@ router.post("/placeOrder", auth, async (req, res) => {
   }
 });
 
+router.post("/mynumber", auth, async (req, res) => {
+  try {
+    const { _id, number, mode } = req.body;
+
+    if (mode === 0) {
+      const addNumber = await User.updateOne(
+        { _id },
+        {
+          $push: { mobile_numbers: number },
+        }
+      );
+    } else {
+      const removeNumber = await User.updateOne(
+        { _id },
+        {
+          $pull: { mobile_numbers: number },
+        }
+      );
+    }
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/mynumber", auth, async (req, res) => {
+  try {
+    const { _id, number, mode } = req.body;
+
+    if (mode === 0) {
+      const addNumber = await User.updateOne(
+        { _id },
+        {
+          $push: { mobile_numbers: number },
+        }
+      );
+    } else {
+      const removeNumber = await User.updateOne(
+        { _id },
+        {
+          $pull: { mobile_numbers: number },
+        }
+      );
+    }
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/mybasics", auth, async (req, res) => {
+  try {
+    const { _id, user_name, name } = req.body;
+
+    const update = await User.updateOne(
+      { _id },
+      {
+        $set: { user_name, name },
+      }
+    );
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/mypassword", async (req, res) => {
+  try {
+    const { _id, password } = req.body;
+
+    const hashedPassword = await bcrypt.hash( password, 10);
+
+    const addNumber = await User.updateOne(
+      { _id },
+      {
+        $set: { password : hashedPassword },
+      }
+    );
+
+    console.log("password changed")
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/mytwofactorauth", async (req, res) => {
+  try {
+    const { _id, two_factor_auth } = req.body;
+
+    const update = await User.updateOne(
+      { _id },
+      {
+        $set: { two_factor_auth },
+      }
+    );
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/myaddress", auth, async (req, res) => {
+  try {
+    const { _id, address, oldAddress, mode } = req.body;
+    if (mode === 0) {
+      const addAddress = await User.updateOne(
+        { _id },
+        {
+          $push: { "shipping_address.addresses": address },
+        }
+      );
+    } else if (mode === 1) {
+      const removeAddress = await User.updateOne(
+        { _id },
+        {
+          $pull: { "shipping_address.addresses": oldAddress },
+        }
+      );
+      const addAddress = await User.updateOne(
+        { _id },
+        {
+          $push : { "shipping_address.addresses": address },
+          $set : { "shipping_address.default_address" : 0}
+        }
+      );
+    } else {
+      const removeAddress = await User.updateOne(
+        { _id },
+        {
+          $pull: { "shipping_address.addresses": address },
+        }
+      );
+    }
+
+    const userData = await User.findOne({_id})
+
+    if(userData.shipping_address.addresses.length === 0)
+        await User.updateOne({_id}, {$set : {"shipping_address.default_address" : -1}})
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/changeAvatar", auth, async (req, res) => {
+  try {
+    const { _id, avatar } = req.body;
+
+    const addNumber = await User.updateOne(
+      { _id },
+      {
+        $set: { profile_picture: avatar },
+      }
+    );
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
+router.post("/myrecovery", auth, async (req, res) => {
+  try {
+    const { _id, email, mode } = req.body;
+
+    if (mode === 0) {
+      const addEmail = await User.updateOne(
+        { _id },
+        {
+          $push: { recovery_emails: email },
+        }
+      );
+    } else {
+      const removeEmail = await User.updateOne(
+        { _id },
+        {
+          $pull: { recovery_emails: email },
+        }
+      );
+    }
+
+    res.status(201).json({
+      status: 201,
+      message: "Updated!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      description: "internal server error",
+      solution: "Please contact server admin or try again later",
+    });
+    console.log("ERR", err);
+  }
+});
+
 router.post("/updatecart", auth, async (req, res) => {
   try {
     let { _id, cart } = req.body;
     _id = mongoose.Types.ObjectId(_id);
-    console.log("THISCART", cart);
 
     const result = await User.updateOne(
       { _id },
@@ -274,7 +542,7 @@ router.get("/mydetails/:id", auth, async (req, res) => {
       solution: "Please provide required fields",
     });
   _id = mongoose.Types.ObjectId(_id);
-  const userData = await User.findOne({ _id }, {password : 0}).lean();
+  const userData = await User.findOne({ _id }, { password: 0 }).lean();
   if (!userData)
     return res.status(404).json({
       err: 404,
@@ -300,10 +568,7 @@ router.get("/mycart/:_id", auth, async (req, res) => {
   _id = mongoose.Types.ObjectId(_id);
   // get user mycart
   const userCart = await User.findOne({ _id }, { _id: 0, cart: 1 }).lean();
-  // check if items stock, variant. name & price exist or changes
-  // if it does change then update that item
   res.status(200).json(userCart);
-  // else return the cart data
 });
 
 module.exports = router;

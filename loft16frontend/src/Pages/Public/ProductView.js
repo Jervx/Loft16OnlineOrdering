@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector} from 'react-redux'
-import { openAlertModal } from '../../Features/uiSlice'
-import { signin } from '../../Features/userSlice'
+import { useDispatch, useSelector } from "react-redux";
+import { openAlertModal } from "../../Features/uiSlice";
+import { signin } from "../../Features/userSlice";
 
 import { useParams } from "react-router-dom";
 
@@ -33,60 +33,163 @@ const ProductView = () => {
 
   const [selectedVariant, setSelectedVariant] = useState(0);
 
-  const [QTY,setQTY] = useState(1)
+  const [QTY, setQTY] = useState(1);
 
   const { prod_id } = useParams();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const _cur_user = useSelector((state) => state.user);
+  const _cur_user = useSelector((state) => state.user.userData);
 
+  const checkIfAlreadyInCart = (item, cart) => {
+    let found = null;
+
+    cart.forEach((cart_item, idx) => {
+      if (
+        cart_item.product_ID === item.product_ID &&
+        cart_item.variant === productDetail.variants[selectedVariant].name
+      )
+        found = {
+          idx,
+          cart_item,
+        };
+    });
+    return found;
+  };
 
   const addToCart = async () => {
-
-    try{
-        API.post("/user/addToCart",{
-            _id : _cur_user.userData._id,
-            item : {
-                thumb : productDetail.Images[0],
-                product_ID : prod_id,
-                product_name : productDetail.name,
-                qty : QTY,
-                variant : productDetail.variants[selectedVariant].name,
-                variant_price : productDetail.variants[selectedVariant].price,
-                rated : false
-            }
-        })
-
+    if(!_cur_user){
         dispatch(
             openAlertModal({
+              component: <Informative />,
+              data: {
+                description: "You are not signed in",
+                solution: "Please Sign In First",
+              },
+            })
+          );
+        return 
+    }
+
+    try {
+      const doesExist = checkIfAlreadyInCart(
+        {
+          thumb: productDetail.Images[0],
+          product_ID: prod_id,
+          product_name: productDetail.name,
+          qty: QTY,
+          variant: productDetail.variants[selectedVariant].name,
+          variant_price: productDetail.variants[selectedVariant].price,
+          rated: false,
+        },
+        _cur_user.cart.items
+      );
+
+      if (doesExist) {
+        //check if current qty + from user cart qty is not > the avail stock of product
+
+        let qty_in_cart = doesExist.cart_item.qty + QTY;
+
+        if (qty_in_cart > productDetail.variants[selectedVariant].stock) {
+          dispatch(
+            openAlertModal({
+              component: <Informative />,
+              data: {
+                description: "Sorry failed to add",
+                solution: `You already have ${doesExist.cart_item.qty} on your cart, adding qty of ${QTY} will exceed the current stock of ${productDetail.variants[selectedVariant].stock}. Please change the quantity`,
+              },
+            })
+          );
+          return;
+        }
+
+        let CART = { ..._cur_user.cart };
+
+        CART.items = CART.items.filter((item, idx) => idx !== doesExist.idx);
+        CART.total_items = CART.items.length;
+        CART.total_cost -=
+          doesExist.cart_item.variant_price * doesExist.cart_item.qty;
+
+        let response = await API.post("/user/updatecart", {
+          _id: _cur_user._id,
+          cart: CART,
+        });
+
+        await API.post("/user/addToCart", {
+          _id: _cur_user._id,
+          item: {
+            thumb: productDetail.Images[0],
+            product_ID: prod_id,
+            product_name: productDetail.name,
+            qty: qty_in_cart,
+            variant: productDetail.variants[selectedVariant].name,
+            variant_price: productDetail.variants[selectedVariant].price,
+            rated: false,
+          },
+        });
+
+        dispatch(
+          openAlertModal({
             component: <Informative />,
             data: {
-                description : "Add To Cart",
-                solution : "The items was added to your cart!"
+              description: "Item Added",
+              solution: "The items was added to your cart!",
             },
-            })
+          })
         );
 
-        const response = await API.get(`/user/mydetails/${_cur_user.userData._id}`);
-
+        response = await API.get(
+          `/user/mydetails/${_cur_user._id}`
+        );
         dispatch(signin(response.data.userData));
-    }catch(err){
-        dispatch(
-            openAlertModal({
-            component: <Informative />,
-            data: {
-                description : "Add To Cart Failed",
-                solution : "Please Try Again Later!"
-            },
-            })
-        );
-    }
-  }
 
-  const checkIfQtyGivenValid = () => { 
-      return productDetail.variants[selectedVariant].stock < QTY || QTY <= 0
+        return;
+      }
+
+      await API.post("/user/addToCart", {
+        _id: _cur_user._id,
+        item: {
+          thumb: productDetail.Images[0],
+          product_ID: prod_id,
+          product_name: productDetail.name,
+          qty: QTY,
+          variant: productDetail.variants[selectedVariant].name,
+          variant_price: productDetail.variants[selectedVariant].price,
+          rated: false,
+        },
+      });
+
+      dispatch(
+        openAlertModal({
+          component: <Informative />,
+          data: {
+            description: "Item Added",
+            solution: "The items was added to your cart!",
+          },
+        })
+      );
+
+      const response = await API.get(
+        `/user/mydetails/${_cur_user._id}`
+      );
+      dispatch(signin(response.data.userData));
+    } catch (err) {
+        console.log(err)
+      dispatch(
+        openAlertModal({
+          component: <Informative />,
+          data: {
+            description: "Add To Cart Failed",
+            solution: "Please Try Again Later!",
+          },
+        })
+      );
     }
+  };
+
+  const checkIfQtyGivenValid = () => {
+    return productDetail.variants[selectedVariant].stock < QTY || QTY <= 0 ;
+  };
 
   const chechkIsNew = (date1) => {
     var currentDate = new Date().toJSON().slice(0, 10);
@@ -105,9 +208,9 @@ const ProductView = () => {
     const N_r = productDetail.n_ratings;
     const N_no = productDetail.n_no_ratings;
 
-    if (N_r === 0) return 0
+    if (N_r === 0) return 0;
 
-    let R = N_r / (N_no * 10) * 10;
+    let R = (N_r / (N_no * 10)) * 10;
     return R.toFixed(1) + "";
   };
 
@@ -255,22 +358,26 @@ const ProductView = () => {
                 <div className="my-7 flex items-center">
                   <h1 className="text-2xl font-medium">Quantity</h1>
                   <div className="w-2/12">
-                    <Input onChange={(e) => {
-                        if(isNaN(e.target.value)) return
-                        if(e.target.value.length === 0){
-                            setQTY("")
-                            return
+                    <Input
+                      onChange={(e) => {
+                        if (isNaN(e.target.value)) return;
+                        if (e.target.value.length === 0) {
+                          setQTY("");
+                          return;
                         }
-                        let val = Number.parseInt(e.target.value)
-                        setQTY(val)
-                    }} value={QTY} className="ml-4 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"></Input>
+                        let val = Number.parseInt(e.target.value);
+                        setQTY(val);
+                      }}
+                      value={QTY}
+                      className="ml-4 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                    ></Input>
                   </div>
                   <div>
                     <Button
                       className="ml-7 rounded-xl defBackground hover:bg-green-500"
                       block
                       onClick={() => addToCart()}
-                      disabled = {checkIfQtyGivenValid()}
+                      disabled={ checkIfQtyGivenValid() }
                     >
                       Add To Cart
                     </Button>
@@ -305,7 +412,7 @@ const ProductView = () => {
                           {rating.user_name}
                         </p>
                         <div className="flex items-center  bg-gray-100 p-2 rounded-md">
-                          <AiFillStar className="text-yellow-300 mr-2"/>
+                          <AiFillStar className="text-yellow-300 mr-2" />
                           <p>{rating.score}</p>
                         </div>
                       </div>

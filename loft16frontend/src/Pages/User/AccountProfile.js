@@ -13,6 +13,8 @@ import MyCart from "./MyCart";
 import Orders from "./Orders";
 import ArrivedOrders from "./ArrivedOrders";
 import CancelledOrders from './CancelledOrders'
+import Footer from "../../Components/Footer"
+
 
 /* Protected Route */
 import ProtectedRoute from "../../Components/ProtectedRoute";
@@ -23,8 +25,13 @@ import { AiOutlineMail } from "react-icons/ai";
 import { GoVerified, GoUnverified } from "react-icons/go";
 import { IoIosSettings } from "react-icons/io";
 
-const AccountProfile = () => {
+
+import { withRouter } from "react-router-dom";
+
+const AccountProfile = (props) => {
+
   const userData = useSelector((state) => state.user.userData);
+  const { history } = props;
 
   return (
     <div>
@@ -57,7 +64,8 @@ const AccountProfile = () => {
                   {userData.isVerified ? "Verified" : "Unverified"}
                 </p>
               </div>
-              <Button className="defBackground mt-2 rounded-lg">
+              <Button onClick={() => history.push("/account")}
+                className="defBackground mt-2 rounded-lg">
                 <IoIosSettings className="w-5 h-5 mr-2" />
                 Edit Profile
               </Button>
@@ -72,10 +80,11 @@ const AccountProfile = () => {
             <ProtectedRoute exact path="/user/cancelledorders" component={CancelledOrders} />
             <ProtectedRoute exact path="/user/" component={MyCart} />
           </Switch>
+          <Footer />
         </>
       )}
     </div>
   );
 };
 
-export default AccountProfile;
+export default withRouter(AccountProfile);

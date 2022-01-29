@@ -26,11 +26,6 @@ const sendEmail = (userEmail, template_content) => {
         }
     });
 
-    console.log("USING",{
-        user: process.env.MASTEREMAIL,
-        pass: process.env.MASTERPASS
-    })
-
     let mailOptions = {
         from: process.env.MASTEREMAIL,
         to: email_address,

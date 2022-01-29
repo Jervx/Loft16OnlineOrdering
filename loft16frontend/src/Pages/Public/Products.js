@@ -165,88 +165,88 @@ const Products = () => {
           />
         </div>
         <div className="relative">
-            <Dropdown
-              className="custom_shadow p-5"
-              isOpen={FilterOpen}
-              onClose={() => setFilterOpen(false)}
-            >
-              <div>
-                <div className="flex justify-between items-center">
-                  <p className="text-xl font-semibold text-black">Filters</p>
-                  <button
-                    className="bg-teal-500 px-3 py-2 rounded-md text-white"
-                    onClick={() => getProducts()}
-                  >
-                    Apply
-                  </button>
-                </div>
-                <div className="my-4 flex flex-col">
-                  <p className="text-lg text-black">Availability</p>
-                  <Label className="my-1" check>
-                    <Input
-                      type="checkbox"
-                      onChange={() => setvl(0)}
-                      checked={vlby === 0}
-                    />
-                    <span className="ml-2">All</span>
-                  </Label>
-                  <Label className="my-1" check>
-                    <Input
-                      type="checkbox"
-                      onChange={() => setvl(1)}
-                      checked={vlby === 1}
-                    />
-                    <span className="ml-2">In Stock</span>
-                  </Label>
-                  <Label className="my-1" check>
-                    <Input
-                      type="checkbox"
-                      onChange={() => setvl(-1)}
-                      checked={vlby === -1}
-                    />
-                    <span className="ml-2">Out Of Stock</span>
-                  </Label>
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-lg text-black">Sort By Price</p>
-                  <Label className="my-1" check>
-                    <Input
-                      type="checkbox"
-                      onClick={() => setsrt(0)}
-                      checked={srtby === 0}
-                    />
-                    <span className="ml-2">All</span>
-                  </Label>
-                  <Label className="my-1" check>
-                    <Input
-                      type="checkbox"
-                      onClick={() => setsrt(1)}
-                      checked={srtby === 1}
-                    />
-                    <span className="ml-2">Low - High</span>
-                  </Label>
-                  <Label className="my-1" check>
-                    <Input
-                      type="checkbox"
-                      onClick={() => setsrt(-1)}
-                      checked={srtby === -1}
-                    />
-                    <span className="ml-2">High - Low</span>
-                  </Label>
-                </div>
+          <Dropdown
+            className="custom_shadow p-5"
+            isOpen={FilterOpen}
+            onClose={() => setFilterOpen(false)}
+          >
+            <div>
+              <div className="flex justify-between items-center">
+                <p className="text-xl font-semibold text-black">Filters</p>
+                <button
+                  className="bg-teal-500 px-3 py-2 rounded-md text-white"
+                  onClick={() => getProducts()}
+                >
+                  Apply
+                </button>
               </div>
-            </Dropdown>
-            <Button
-              onClick={() => {
-                setFilterOpen(true);
-              }}
-              icon={BsFilter}
-              style={{background:"rgb(240,240,240)"}}
-              className={amIFilter("Filter") + "text-gray-700"}
-            >
-              Filters
-            </Button>
-          </div>
+              <div className="my-4 flex flex-col">
+                <p className="text-lg text-black">Availability</p>
+                <Label className="my-1" check>
+                  <Input
+                    type="checkbox"
+                    onChange={() => setvl(0)}
+                    checked={vlby === 0}
+                  />
+                  <span className="ml-2">All</span>
+                </Label>
+                <Label className="my-1" check>
+                  <Input
+                    type="checkbox"
+                    onChange={() => setvl(1)}
+                    checked={vlby === 1}
+                  />
+                  <span className="ml-2">In Stock</span>
+                </Label>
+                <Label className="my-1" check>
+                  <Input
+                    type="checkbox"
+                    onChange={() => setvl(-1)}
+                    checked={vlby === -1}
+                  />
+                  <span className="ml-2">Out Of Stock</span>
+                </Label>
+              </div>
+              <div className="flex flex-col">
+                <p className="text-lg text-black">Sort By Price</p>
+                <Label className="my-1" check>
+                  <Input
+                    type="checkbox"
+                    onClick={() => setsrt(0)}
+                    checked={srtby === 0}
+                  />
+                  <span className="ml-2">All</span>
+                </Label>
+                <Label className="my-1" check>
+                  <Input
+                    type="checkbox"
+                    onClick={() => setsrt(1)}
+                    checked={srtby === 1}
+                  />
+                  <span className="ml-2">Low - High</span>
+                </Label>
+                <Label className="my-1" check>
+                  <Input
+                    type="checkbox"
+                    onClick={() => setsrt(-1)}
+                    checked={srtby === -1}
+                  />
+                  <span className="ml-2">High - Low</span>
+                </Label>
+              </div>
+            </div>
+          </Dropdown>
+          <Button
+            onClick={() => {
+              setFilterOpen(true);
+            }}
+            icon={BsFilter}
+            style={{ background: "rgb(240,240,240)" }}
+            className={amIFilter("Filter") + "text-gray-700"}
+          >
+            Filters
+          </Button>
+        </div>
       </div>
       <div className="flex flex-wrap flex-col my-8">
         <div className="mx-auto flex-wrap mb-8 flex text-gray-500 items-center rounded-xl  px-7 py-2">
@@ -274,7 +274,6 @@ const Products = () => {
           >
             Metal Sign
           </button>
-          
         </div>
       </div>
       {loading ? (
