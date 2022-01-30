@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 
-
 const mongoose = require("mongoose");
 let ObjectId = require("mongoose").Types.ObjectId;
 
@@ -307,16 +306,24 @@ router.post("/mypassword", async (req, res) => {
   try {
     const { _id, password } = req.body;
 
-    const hashedPassword = await bcrypt.hash( password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const addNumber = await User.updateOne(
       { _id },
       {
-        $set: { password : hashedPassword },
+        $set: { password: hashedPassword, password_change_date: new Date() },
       }
     );
 
-    console.log("password changed")
+    // const mailsent = await sendEmail(userEmail, {
+    //     name,
+    //     user_name,
+    //     email_address : userEmail,
+    //     password : genPass,
+    //     template_name: "YourPassword.html",
+    //     subject: "Loft16 Sign Up Email Confirmation",
+    //   });
+    // }
 
     res.status(201).json({
       status: 201,
@@ -377,8 +384,8 @@ router.post("/myaddress", auth, async (req, res) => {
       const addAddress = await User.updateOne(
         { _id },
         {
-          $push : { "shipping_address.addresses": address },
-          $set : { "shipping_address.default_address" : 0}
+          $push: { "shipping_address.addresses": address },
+          $set: { "shipping_address.default_address": 0 },
         }
       );
     } else {
@@ -390,10 +397,13 @@ router.post("/myaddress", auth, async (req, res) => {
       );
     }
 
-    const userData = await User.findOne({_id})
+    const userData = await User.findOne({ _id });
 
-    if(userData.shipping_address.addresses.length === 0)
-        await User.updateOne({_id}, {$set : {"shipping_address.default_address" : -1}})
+    if (userData.shipping_address.addresses.length === 0)
+      await User.updateOne(
+        { _id },
+        { $set: { "shipping_address.default_address": -1 } }
+      );
 
     res.status(201).json({
       status: 201,

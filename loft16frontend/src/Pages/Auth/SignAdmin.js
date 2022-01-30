@@ -10,7 +10,7 @@ import { FaEyeSlash, FaEye } from "react-icons/fa";
 
 /* redux */
 import { useDispatch } from "react-redux";
-import { signin } from "../../Features/userSlice";
+import { adminSign } from "../../Features/adminSlice"
 import {
   openAlertModal,
   openInputModal,
@@ -37,7 +37,7 @@ import googleOneTap from 'google-one-tap';
 /* env */
 require("dotenv").config();
 
-const Singin = (props) => {
+const SignAdmin = (props) => {
   
   const CLID = process.env.REACT_APP_GCLIENTID;
   const AUTO_SIGNIN = process.env.REACT_APP_AUTO_SIGN_IN
@@ -60,6 +60,7 @@ const Singin = (props) => {
         setSignInCredential({
           email_address: email,
           password,
+          admin : true
         })
       );
 
@@ -68,10 +69,12 @@ const Singin = (props) => {
         {
           email_address: email,
           password,
-          oauth: false
+          oauth: false,
+          admin : true
         },
         { withCredentials: true }
       );
+
 
       dispatch(closeLoader());
 
@@ -98,12 +101,13 @@ const Singin = (props) => {
       // dispatch signin
       // dispatch clear signin
       // history push / or home
-      const userData = response.data.userData;
+      const adminData = response.data.userData;
 
-      dispatch(signin(userData));
+
+      dispatch(adminSign(adminData));
       dispatch(cleanSignInCredential());
-      localStorage.setItem("userData", JSON.stringify(userData));
-      props.history.push("/");
+      localStorage.setItem("adminData", JSON.stringify(adminData));
+      props.history.push("/admin");
     } catch (error) {
       dispatch(closeLoader());
       if (error.response) {
@@ -142,22 +146,24 @@ const Singin = (props) => {
         setSignInCredential({
           email_address: email,
           password,
+          admin : true
         })
       );
       const response = await API.post(
         "/auth/signin",
         {
           access_token : res.tokenId,
-          client_id : CLID
+          client_id : CLID,
+          admin : true
         },
         { withCredentials: true }
       );
       dispatch(closeLoader());
-      const userData = response.data.userData;
-      dispatch(signin(userData));
+      const adminData = response.data.userData;
+      dispatch(adminSign(adminData));
       dispatch(cleanSignInCredential());
-      localStorage.setItem("userData", JSON.stringify(userData));
-      props.history.push("/");
+      localStorage.setItem("adminData", JSON.stringify(adminData));
+      props.history.push("/admin");
 
     } catch (error) {
       dispatch(closeLoader());
@@ -203,7 +209,6 @@ const Singin = (props) => {
 
   googleOneTap(options, async (res) => {
     // Send response to server
-    console.log(res)
     try {
       //dispatch save logindata
       dispatch(openLoader({ state: true, message: "checking.." }));
@@ -211,22 +216,24 @@ const Singin = (props) => {
         setSignInCredential({
           email_address: email,
           password,
+          admin : true
         })
       );
       const response = await API.post(
         "/auth/signin",
         {
           access_token : res.credential,
-          client_id : res.clientId
+          client_id : res.clientId,
+          admin : true
         },
         { withCredentials: true }
       );
       dispatch(closeLoader());
-      const userData = response.data.userData;
-      dispatch(signin(userData));
+      const adminData = response.data.userData;
+      dispatch(adminSign(adminData));
       dispatch(cleanSignInCredential());
-      localStorage.setItem("userData", JSON.stringify(userData));
-      props.history.push("/");
+      localStorage.setItem("adminData", JSON.stringify(adminData));
+      props.history.push("/admin");
     } catch (error) {
       dispatch(closeLoader());
       if (error.response) {
@@ -264,20 +271,20 @@ const Singin = (props) => {
             <img
               aria-hidden="true"
               className="object-cover w-full h-full dark:hidden"
-              src={"https://cdn.discordapp.com/attachments/912411399458795593/937312520690077716/pexels-photo-4843914.png"}
+              src={"https://cdn.discordapp.com/attachments/912411399458795593/937321262903074876/pexels-photo-1646953.png"}
               alt="Loft Product"
             />
             <img
               aria-hidden="true"
               className="hidden object-cover w-full h-full dark:block"
-              src={"https://cdn.discordapp.com/attachments/912411399458795593/937312549664337920/pexels-photo-2562560.png"}
+              src={"https://cdn.discordapp.com/attachments/912411399458795593/937321262903074876/pexels-photo-1646953.png"}
               alt="Loft Product"
             />
           </div>
           <main className="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
             <div className="w-full">
-              <h1 className="pacifico defTextCOlorGreen mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
-                Sign in to Loft 16
+              <h1 className="my-4 font-extrabold text-2xl text-teal-600">
+                HELLO ADMIN
               </h1>
               <GoogleLogin
                 clientId={CLID}
@@ -388,7 +395,7 @@ const Singin = (props) => {
                 Twitter
               </Button> */}
 
-              <p className="mt-4">
+              {/* <p className="mt-4">
                 <Link
                   className="text-sm font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/recover"
@@ -403,7 +410,7 @@ const Singin = (props) => {
                 >
                   Sign Up
                 </Link>
-              </p>
+              </p> */}
             </div>
           </main>
         </div>
@@ -412,4 +419,4 @@ const Singin = (props) => {
   );
 };
 
-export default withRouter(Singin);
+export default withRouter(SignAdmin);

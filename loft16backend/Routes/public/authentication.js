@@ -7,25 +7,26 @@ const jwt = require("jsonwebtoken");
 
 /* Helper */
 // pang check ng Google JWt
-const GAuthVerify = require("../../helper/GAuthVerify")
+const GAuthVerify = require("../../helper/GAuthVerify");
 
 /* Models */
 const User = require("../../models/User");
 const Email_Confirmation = require("../../models/email_confirmation");
-const Refresh_Token = require("../../models/Refresh_Token")
+const Refresh_Token = require("../../models/Refresh_Token");
 const TwoFactorAuth = require("../../models/TwoFactorAuth");
+const RecoveryCode = require("../../models/RecoveryCode");
+const Admin = require("../../models/Admin");
 
 /* Middleware */
-const auth = require("../../middleware/auth")
+const auth = require("../../middleware/auth");
 
 /* EMailer */
-const sendEmail = require('../../helper/SendEmail')
+const sendEmail = require("../../helper/SendEmail");
 
-let ObjectId = require('mongoose').Types.ObjectId; 
-const RecoveryCode = require("../../models/RecoveryCode");
+let ObjectId = require("mongoose").Types.ObjectId;
 
 /* CONFIG */
-const loftCookieConifg = { httpOnly: true, secure : true, SameSite : 'none' }
+const loftCookieConifg = { httpOnly: true, secure: true, SameSite: "none" };
 
 //generate loft confirmation code
 let generateCode = () => {
@@ -45,8 +46,8 @@ const getAddedMinutes = () => {
 
 // generate cookie expiration/maxAge
 const createCookieExpiration = (hour) => {
-  return  Number.parseInt(process.env.COOKIE_EXP) * 60 * 60 * 1000
-}
+  return Number.parseInt(process.env.COOKIE_EXP) * 60 * 60 * 1000;
+};
 
 // check loft confirmation code expiry d1-current d2-expiry
 let isExpired = (d2) => {
@@ -54,66 +55,78 @@ let isExpired = (d2) => {
 };
 
 // generate a token
-const generateToken = (user_data) => { return jwt.sign(user_data, process.env.JWT_SCRT, { expiresIn: process.env.JWT_EXP_TIME }) }
+const generateToken = (user_data) => {
+  return jwt.sign(user_data, process.env.JWT_SCRT, {
+    expiresIn: process.env.JWT_EXP_TIME,
+  });
+};
 
 // reissue new token
-router.post("/renewToken", async(req, res) =>{
-  const { userId, email_address, user_name } = req.body
-  const auth_iss = req.cookies.auth_iss
+router.post("/renewToken", async (req, res) => {
+  const { userId, email_address, user_name } = req.body;
+  const auth_iss = req.cookies.auth_iss;
 
   // make sure that loft will only reissue a new access token if auth issuer is itself
-  if(auth_iss === process.env.GIssuer){
+  if (auth_iss === process.env.GIssuer) {
     return res.status(401).json({
-      err : 401,
-      description : "The issued token by google was expired or gone!",
-      solution : "Try signing in again manually or via google Single Sign On"
-    })
+      err: 401,
+      description: "The issued token by google was expired or gone!",
+      solution: "Try signing in again manually or via google Single Sign On",
+    });
   }
 
-  const UserRefreshToken = await Refresh_Token.findOne({user_ID: new ObjectId(userId)})
+  const UserRefreshToken = await Refresh_Token.findOne({
+    user_ID: new ObjectId(userId),
+  });
 
-  if (!UserRefreshToken) 
+  if (!UserRefreshToken)
     return res.status(403).json({
       err: 403,
-      description : "Looks like you are not authorized",
-      solution : "Please Login"
-    })
+      description: "Looks like you are not authorized",
+      solution: "Please Login",
+    });
 
-  jwt.verify(UserRefreshToken.refresh_token, process.env.JWT_RFSH, async(err, user) => {
-    if (err) return res.sendStatus(403).json({
-      err: 403,
-      description : "Looks like theres a problem giving you authorization",
-      solution : "This might not be your error, try again later"
-    })
+  jwt.verify(
+    UserRefreshToken.refresh_token,
+    process.env.JWT_RFSH,
+    async (err, user) => {
+      if (err)
+        return res.sendStatus(403).json({
+          err: 403,
+          description: "Looks like theres a problem giving you authorization",
+          solution: "This might not be your error, try again later",
+        });
 
-    const token = generateToken({ user_name , email_address })
-    let USER = await User.findOne({ email_address }).lean();
+      const token = generateToken({ user_name, email_address });
+      let USER = await User.findOne({ email_address }).lean();
 
-    res.cookie( "access_token",token,  {...loftCookieConifg, maxAge  : createCookieExpiration(process.env.COOKIE_EXP) } )
-    res.status(200).json({
-      code: 200,
-      description: "Got a new token!",
-      userData: {
-        ...USER
-      },
-    })
-  })
-})
+      res.cookie("access_token", token, {
+        ...loftCookieConifg,
+        maxAge: createCookieExpiration(process.env.COOKIE_EXP),
+      });
+      res.status(200).json({
+        code: 200,
+        description: "Got a new token!",
+        userData: {
+          ...USER,
+        },
+      });
+    }
+  );
+});
 
+router.post("/recover", async (req, res) => {
+  const { email_address, newPassword, recovery_code } = req.body;
 
-router.post("/recover", async(req, res)=>{
-  const { email_address, newPassword, recovery_code} = req.body
-
-  if(!email_address)
+  if (!email_address)
     return res.status(400).json({
       err: 400,
       description: "Required Data Missing",
       solution: "Please input all required data",
     });
 
-  const USER = await User.findOne({email_address})
+  const USER = await User.findOne({ email_address });
 
-  
   //check if email not exist in db
   // return no user
   if (!USER)
@@ -123,148 +136,175 @@ router.post("/recover", async(req, res)=>{
       solution:
         "The given credential doesn't belong to our existing users, please create an account",
     });
-  
-  //if no recovery code provided
-  if(!recovery_code){
-      let rec_code = generateCode()
-    //create code (findOneUpdate, upsert)
-    const code = await RecoveryCode.findOneAndUpdate({email_address, used : false},{
-      user_ID : USER._id,
-      email_address,
-      recovery_code : rec_code,
-      exp : getAddedMinutes()
-    }, {new : true, upsert : true})
 
+  //if no recovery code provided
+  if (!recovery_code) {
+    let rec_code = generateCode();
+    //create code (findOneUpdate, upsert)
+    const code = await RecoveryCode.findOneAndUpdate(
+      { email_address, used: false },
+      {
+        user_ID: USER._id,
+        email_address,
+        recovery_code: rec_code,
+        exp: getAddedMinutes(),
+      },
+      { new: true, upsert: true }
+    );
 
     // sent it to email TODO: implement future email helper
-    //return 200 code sent 
+    //return 200 code sent
     // template_content  { email_address, user_name, template_name, subject}
-    let toSent = {...USER.toObject(), recovery_code : rec_code}
+    let toSent = { ...USER.toObject(), recovery_code: rec_code };
 
     const sendConfirmationCode = sendEmail(email_address, {
-        ...toSent,
-        template_name:'Recovery.html',
-        subject : 'Loft16 Account Recovery'
-    })
+      ...toSent,
+      template_name: "Recovery.html",
+      subject: "Loft16 Account Recovery",
+    });
 
     return res.status(200).json({
-      recovery_code_sent : true,
-      message : "recovery code sent!"
-    })
-  }else{   
+      recovery_code_sent: true,
+      message: "recovery code sent!",
+    });
+  } else {
     //query recovery code matching email && not marked as used
-    const USER_RECOVERY = await RecoveryCode.findOne({ email_address, used : false })
+    const USER_RECOVERY = await RecoveryCode.findOne({
+      email_address,
+      used: false,
+    });
 
     //if none then
     //return 410 we haven't establish a recovery code fo that email, try again
-    if(!USER_RECOVERY)
+    if (!USER_RECOVERY)
       return res.status(403).json({
-        err : 403,
-        description : "You didn't Send Us Recovery Request",
-        solution : "We haven't establish a recovery code for your email, Try recovery again"
-      })
+        err: 403,
+        description: "You didn't Send Us Recovery Request",
+        solution:
+          "We haven't establish a recovery code for your email, Try recovery again",
+      });
 
-    if(recovery_code !== USER_RECOVERY.recovery_code)
+    if (recovery_code !== USER_RECOVERY.recovery_code)
       return res.status(401).json({
-        err : 401,
-        description : "The provided recovery code is not correct",
-        solution : "Please make sure that the recovery code provided is correct"
-      })
+        err: 401,
+        description: "The provided recovery code is not correct",
+        solution: "Please make sure that the recovery code provided is correct",
+      });
 
     // check if the given code is expired or not
     // if expired then return status 410 expired code
-    if(isExpired(USER_RECOVERY.exp))
+    if (isExpired(USER_RECOVERY.exp))
       return res.status(409).json({
-        err : 409,
-        description : "Your recovery code was expired",
-        solution : "Please resend or signin again to get a new recovery code"
-      })
-      //end no other logic
+        err: 409,
+        description: "Your recovery code was expired",
+        solution: "Please resend or signin again to get a new recovery code",
+      });
+    //end no other logic
   }
 
-  const password = await bcrypt.hash(newPassword, 10)
-  const updatedPassword = await User.findOneAndUpdate({ email_address }, {$set : { password }} ).lean()
+  const password = await bcrypt.hash(newPassword, 10);
+  const updatedPassword = await User.findOneAndUpdate(
+    { email_address },
+    { $set: { password } }
+  ).lean();
 
   //invalidate the recovery code
-  const invalidateRecovery = await RecoveryCode.updateOne({email_address, used : false} , {$set : {used : true}})
+  const invalidateRecovery = await RecoveryCode.updateOne(
+    { email_address, used: false },
+    { $set: { used: true } }
+  );
 
+  //final return of response
+  return res.status(201).json({
+    code: 201,
+    description: "User Created Successfully!",
+    userData: {
+      ...updatedPassword,
+    },
+  });
+});
 
-    //final return of response
-    return res.status(201).json({
-      code: 201,
-      description: "User Created Successfully!",
-      userData: {
-        ...updatedPassword
-      },
-    });
-})
+/* SIGNOUT NOTE: Might not be implemented because cookie/authorization automatically expires */
+router.delete("/signout", auth, async (req, res) => {});
 
-
-/* SIGNOUT*/
-router.delete("/signout", auth ,async (req, res) => {
-  
-})
-
-/*SIGNIN (manual, via Google SSO) */ 
+/*SIGNIN (manual, via Google SSO) */
 router.post("/signin", async (req, res) => {
+  const { access_token, client_id , admin, email_address, password, twoFactCode } = req.body;
 
-  const { access_token, client_id } = req.body
-  
+  const ACCOUNT = admin ? Admin : User;
+  const USER = await ACCOUNT.findOne({ email_address }).lean();
+
   // if this condition met, then user has authenticated via google SSO
-  if((access_token, client_id)){
-    try{
-      const GUserInfo = await GAuthVerify(access_token, client_id)
-      
-      const userEmail = GUserInfo.email
-      const name = GUserInfo.name
-      const user_name = GUserInfo.given_name
+  if ((access_token, client_id)) {
+    try {
+      const GUserInfo = await GAuthVerify(access_token, client_id);
 
-      let userData = await User.findOne({email_address : userEmail})
+      const userEmail = GUserInfo.email;
+      const name = GUserInfo.name;
+      const user_name = GUserInfo.given_name;
 
-      let flag = 'old'
+      let userData = await ACCOUNT.findOne({ email_address: userEmail });
 
-      if(!userData){
-        const hashedPassword = await bcrypt.hash(userEmail, 10);
-        userData = await User.create({
+      let flag = "old";
+
+      if (!userData) {
+        const genPass = generateCode()
+        const hashedPassword = await bcrypt.hash(genPass, 10);
+        const additional_attr = !admin? {user_name} : {}
+        userData = await ACCOUNT.create({
+          ...additional_attr,
           name,
-          user_name,
-          profile_picture: GUserInfo.picture ,
-          email_address : userEmail,
+          profile_picture: GUserInfo.picture,
+          email_address: userEmail,
           password: hashedPassword,
         });
-        flag = 'new'
+        flag = "new";
+        const mailsent = await sendEmail(userEmail, {
+            name,
+            user_name,
+            email_address : userEmail,
+            password : genPass,
+            template_name: "YourPassword.html",
+            subject: "Loft16 Sign Up Email Confirmation",
+          });
       }
 
-      // set cookies
-      res.cookie( "access_token", access_token, loftCookieConifg )
-      res.cookie( "client_id", client_id, loftCookieConifg )
-      res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg )
 
-      const loginCount = await User.updateOne({_id : userData._id},{$inc : { login_count : 1 }})
-      let userData2 = await User.findOne({email_address : userEmail}, {password : 0}).lean()
+
+      // set cookies
+      res.cookie("access_token", access_token, loftCookieConifg);
+      res.cookie("client_id", client_id, loftCookieConifg);
+      res.cookie("auth_iss", GUserInfo.iss, loftCookieConifg);
+
+      const loginCount = await ACCOUNT.updateOne(
+        { _id: userData._id },
+        { $inc: { login_count: 1 } }
+      );
+      let userData2 = await ACCOUNT.findOne(
+        { email_address: userEmail },
+        { password: 0 }
+      ).lean();
 
       //include flag to response
       return res.status(200).json({
         code: 200,
         description: "Signed in successfuly!",
-        twoFactorRequired : false,
+        twoFactorRequired: false,
         GUserInfo,
-        userData : {...userData2, login_count : userData.login_count + 1},
-        flag
-      })
-    }catch(err){
+        userData: { ...userData2, login_count: userData.login_count + 1 },
+        flag,
+      });
+    } catch (err) {
       return res.status(400).json({
-        err : 403,
-        error : err,
-        description : "Something wen't wrong with your google authentication",
-        solution : "Contact Developer or Try Again Later"
-      })
+        err: 403,
+        error: err,
+        description: "Something wen't wrong with your google authentication",
+        solution: "Contact Developer or Try Again Later",
+      });
     }
   }
-  
+
   // beyond this point will be normal sign in authentication
-  const { email_address, password, twoFactCode } = req.body;
-  
 
   //check if all required fields has value
   if (!(email_address, password))
@@ -274,7 +314,9 @@ router.post("/signin", async (req, res) => {
       solution: "Please input all required data",
     });
 
-  const USER = await User.findOne({ email_address }).lean();
+  // TODO: query on admin instead of user if admin = true
+  // NOTE: Done
+
 
 
   if (!USER)
@@ -285,151 +327,179 @@ router.post("/signin", async (req, res) => {
         "The given credential doesn't belong to our existing users, please create an account",
     });
 
-  // NOTE: this 
-
   if (!(await bcrypt.compare(password, USER.password)))
     return res.status(403).json({
-        err: 403,
-        description: "Forbidden",
-        solution: "Please check the credential provided",
-      });
+      err: 403,
+      description: "Forbidden",
+      solution: "Please check the credential provided",
+    });
 
-  if(USER.two_factor_auth == true)
-    if(!twoFactCode){
+  if (USER.two_factor_auth == true)
+    if (!twoFactCode) {
       // ✅ Two Factor Sign In
       // iissue a two factor code & save it on two factor auth db
 
-      let conf_code = generateCode()
+      let conf_code = generateCode();
 
-      let code = await TwoFactorAuth.findOneAndUpdate({email_address},{
-        user_ID : USER._id,
-        email_address,
-        confirmation_code : conf_code,
-        exp : getAddedMinutes()
-      }, {new : true, upsert : true})
+      let code = await TwoFactorAuth.findOneAndUpdate(
+        { email_address },
+        {
+          user_ID: USER._id,
+          email_address,
+          confirmation_code: conf_code,
+          exp: getAddedMinutes(),
+        },
+        { new: true, upsert: true }
+      );
 
       //send it to email - TODO: @jervx to be implemented later
 
       // sent it to email TODO: implement future email helper
-    //return 200 code sent two_fact_auth
-    // template_content  { email_address, user_name, template_name, subject}
+      //return 200 code sent two_fact_auth
+      // template_content  { email_address, user_name, template_name, subject}
 
-
-    let toSent = {...USER, two_fact_auth : conf_code}
-    const sendConfirmationCode = sendEmail(email_address, {
+      let toSent = { ...USER, two_fact_auth: conf_code };
+      const sendConfirmationCode = sendEmail(email_address, {
         ...toSent,
-        template_name:'TwoFactorAuth.html',
-        subject : 'Loft16 TwoFactorAuthentication Code'
-    })
+        template_name: "TwoFactorAuth.html",
+        subject: "Loft16 TwoFactorAuthentication Code",
+      });
 
-      return res.status(200).json({ twoFactorRequired : true, code })
+      return res.status(200).json({ twoFactorRequired: true, code });
       // if code provided
-    }else{
+    } else {
       // query the code from two_factor_auth
       const users_twoFactorCode = await TwoFactorAuth.findOne({
-        email_address })
+        email_address,
+      });
 
       // if no result then it means hindi tayo nag signin
-      if(!users_twoFactorCode)
+      if (!users_twoFactorCode)
         return res.status(403).json({
-          err : 403,
-          description : "You didn't Sign In",
-          solution : "Looks like you don't have a valid confirmation code, please sign in"
-        })
+          err: 403,
+          description: "You didn't Sign In",
+          solution:
+            "Looks like you don't have a valid confirmation code, please sign in",
+        });
 
       // check if the given code  == two factor auth
       // if not, then return invalid auth 401
-      if(twoFactCode !== users_twoFactorCode.confirmation_code)
+      if (twoFactCode !== users_twoFactorCode.confirmation_code)
         return res.status(401).json({
-          err : 401,
-          description : "The provided authentication code is not correct",
-          solution : "Please make sure that the code provided is correct"
-        })
+          err: 401,
+          description: "The provided authentication code is not correct",
+          solution: "Please make sure that the code provided is correct",
+        });
 
       // check if the given code is expired or not
       // if expired then return status 410 expired code
-      if(isExpired(users_twoFactorCode.exp))
+      if (isExpired(users_twoFactorCode.exp))
         return res.status(409).json({
-          err : 409,
-          description : "Your two factor authentication code was expired",
-          solution : "Please resend or signin again to get new confirmation code"
-        })
-      else
-        await TwoFactorAuth.deleteOne( {email_address} )
+          err: 409,
+          description: "Your two factor authentication code was expired",
+          solution:
+            "Please resend or signin again to get new confirmation code",
+        });
+      else await TwoFactorAuth.deleteOne({ email_address });
     }
-    
 
-  const token = generateToken( { email_address, user_name : USER.user_name } )
-  const refresh = jwt.sign( { email_address, user_name : USER.user_name } , process.env.JWT_RFSH)
+  const token = generateToken({
+    email_address,
+    user_name: USER.user_name,
+    _id: USER._id,
+  });
+  const refresh = jwt.sign(
+    { email_address, user_name: USER.user_name, _id: USER._id },
+    process.env.JWT_RFSH
+  );
 
-  const USER2 = await User.findOne({ email_address }, {password : 0}).lean();
+  const USER2 = await ACCOUNT.findOne(
+    { email_address },
+    { password: 0 }
+  ).lean();
 
   // Create a session Refresh Token for attaining new access token
   // should be destroyed on logout - @hjerbe
   await Refresh_Token.create({
-    user_ID : USER2._id,
-    refresh_token : refresh
-  })
-  
-  // set authorization via cookie & httponly secure desu 
-  res.cookie( "access_token",token, {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
-  res.cookie( "auth_iss", process.env.JWT_ISSUER,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
+    user_ID: USER2._id,
+    refresh_token: refresh,
+  });
 
-  const loginCount = await User.updateOne({_id : USER._id},{$inc : { login_count : 1 }})
+  // set authorization via cookie & httponly secure desu
+  res.cookie(admin ? "admin_access_token" : "access_token", token, {
+    ...loftCookieConifg,
+    maxAge: createCookieExpiration(process.env.COOKIE_EXP),
+  });
+  res.cookie("auth_iss", process.env.JWT_ISSUER, {
+    ...loftCookieConifg,
+    maxAge: createCookieExpiration(process.env.COOKIE_EXP),
+  });
 
-  return res.status(200).json(
-    { 
-      code: 200,
-      description: "Signed in successfuly!",
-      twoFactorRequired : false,
-      userData: {
-        ...USER2,
-        login_count : USER.login_count + 1  
-      },
-    });
+  const loginCount = await ACCOUNT.updateOne(
+    { _id: USER._id },
+    { $inc: { login_count: 1 } }
+  );
+
+  return res.status(200).json({
+    code: 200,
+    description: "Signed in successfuly!",
+    twoFactorRequired: false,
+    userData: {
+      ...USER2,
+      login_count: USER.login_count + 1,
+    },
+  });
 });
 
 /*SUGNUP && issuance of email confirmation if two factor enabled*/
 router.post("/signup", async (req, res) => {
-    const {access_token, client_id,  name, user_name, email_address, password, confirmation_code } =
-      req.body;
+  const {
+    access_token,
+    client_id,
+    name,
+    user_name,
+    email_address,
+    password,
+    confirmation_code,
+  } = req.body;
+
+  console.log("VIA GOOGLE", password)
 
   ///////////// for via google ///////////////
-  try{
-    if((client_id, access_token)){
+  try {
+    if ((client_id, access_token)) {
       // verify if access token is valid
 
-      const GUserInfo = await GAuthVerify(access_token, client_id)
+      const GUserInfo = await GAuthVerify(access_token, client_id);
 
       // if not valid then return 401, invalid G token
-      if(!GUserInfo)
+      if (!GUserInfo)
         return res.status(401).json({
           err: 401,
-          description : "Your "
-        })
-        
-      // check if the user email exist
-      let userData = await User.findOne({ email_address : GUserInfo.email })
+          description: "Your ",
+        });
 
-      // if it does exist 
-      if(!userData)
+      // check if the user email exist
+      let userData = await User.findOne({ email_address: GUserInfo.email });
+
+      // if it does exist
+      if (!userData)
         userData = await User.create({
           name,
           user_name,
-          profile_picture: GUserInfo.picture ,
-          email_address : userEmail,
+          profile_picture: GUserInfo.picture,
+          email_address: userEmail,
           password: hashedPassword,
         });
-      
-        
+
       //set cookiee access_token, client_id, auth_issuer
-      res.cookie( "access_token", access_token, loftCookieConifg )
-      res.cookie( "client_id", client_id, loftCookieConifg)
-      res.cookie( "auth_iss", GUserInfo.iss, loftCookieConifg)
-      return res.status(200).json({ msg : "Just Text! 👌"})
+      res.cookie("access_token", access_token, loftCookieConifg);
+      res.cookie("client_id", client_id, loftCookieConifg);
+      res.cookie("auth_iss", GUserInfo.iss, loftCookieConifg);
+      return res.status(200).json({ msg: "Ok! 👌" });
     }
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return res.status(500).json({
       err: 500,
       description: e,
@@ -438,7 +508,7 @@ router.post("/signup", async (req, res) => {
   }
 
   ///////// for normal signup //////////
-  try{
+  try {
     //check if all required fields has value
     if (!(name, user_name, email_address, password, confirmation_code))
       return res.status(400).json({
@@ -456,7 +526,10 @@ router.post("/signup", async (req, res) => {
         solution: "Please use other Email",
       });
     //get existing registration confirmation record
-    const confirmation_codeRecord = await Email_Confirmation.findOne({ email_address, used: false });
+    const confirmation_codeRecord = await Email_Confirmation.findOne({
+      email_address,
+      used: false,
+    });
 
     //check if the user already has an issued confirmation email
     if (!confirmation_codeRecord)
@@ -465,7 +538,6 @@ router.post("/signup", async (req, res) => {
         description: "You didn't sign up",
         solution: "Please sign up",
       });
-
 
     //check if the given confirmation code is valid to the issued confirmation code
     if (confirmation_codeRecord.confirmation_code !== confirmation_code)
@@ -500,30 +572,38 @@ router.post("/signup", async (req, res) => {
       password: hashedPassword,
     });
 
-    const token = generateToken( { user_name, email_address } )
-    const refresh = jwt.sign( {user_name, email_address} , process.env.JWT_RFSH)
+    const token = generateToken({ user_name, email_address });
+    const refresh = jwt.sign(
+      { user_name, email_address },
+      process.env.JWT_RFSH
+    );
 
-    // set authorization via cookie & httponly 
-    res.cookie( "access_token",token,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
-    res.cookie( "auth_iss", process.env.JWT_ISSUER,  {...loftCookieConifg, maxAge : createCookieExpiration(process.env.COOKIE_EXP) } )
-
+    // set authorization via cookie & httponly
+    res.cookie("access_token", token, {
+      ...loftCookieConifg,
+      maxAge: createCookieExpiration(process.env.COOKIE_EXP),
+    });
+    res.cookie("auth_iss", process.env.JWT_ISSUER, {
+      ...loftCookieConifg,
+      maxAge: createCookieExpiration(process.env.COOKIE_EXP),
+    });
 
     // Create a session Refresh Token for attaining new access token
     await Refresh_Token.create({
-      user_ID : user._id,
-      refresh_token : refresh
-    })
-  
+      user_ID: user._id,
+      refresh_token: refresh,
+    });
+
     //final return of response
     return res.status(201).json({
       code: 201,
       description: "User Created Successfully!",
       userData: {
-        ...(user.toObject())
+        ...user.toObject(),
       },
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return res.status(500).json({
       err: 500,
       description: e,
@@ -545,7 +625,8 @@ router.post("/confirm_email", async (req, res) => {
       });
 
     let email_confirmation = await Email_Confirmation.findOne({
-      email_address, used : false
+      email_address,
+      used: false,
     });
 
     let alreadyInUse = await User.findOne({ email_address });
@@ -570,24 +651,24 @@ router.post("/confirm_email", async (req, res) => {
     });
 
     // template_content  { email_address, user_name, template_name, subject}
-    if(!req.body.debug)
-        sendConfirmationCode = sendEmail(email_address, {
-            ...email_confirmation.toObject(),
-            template_name:'EmailConfirmation.html',
-            subject : 'Loft16 Sign Up Email Confirmation'
-        })
+    if (!req.body.debug)
+      sendConfirmationCode = sendEmail(email_address, {
+        ...email_confirmation.toObject(),
+        template_name: "EmailConfirmation.html",
+        subject: "Loft16 Sign Up Email Confirmation",
+      });
 
     return res.status(201).json({
       status: 201,
       message:
-        "Registration created, Please see confirmation code we sent to your Email"
+        "Registration created, Please see confirmation code we sent to your Email",
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return res.status(408).json({
       status: 403,
       message: "Theres an error",
-      err: e
+      err: e,
     });
   }
 });

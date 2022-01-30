@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   schema_v : { type : Number, default : 1, required : false },
   name : { type :  String, required : true},
-  profile_picture : {type : String, required : false, default : null},
+  profile_picture : {type : String, required : false, default : "https://cdn.discordapp.com/attachments/912411399458795593/936870864186642432/unknown.png"},
   user_name: { type: String, required : true },
   email_address : { type: String, unique : true, required : true },
   isVerified : { type: Boolean, default : true },

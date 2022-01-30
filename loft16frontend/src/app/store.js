@@ -3,13 +3,15 @@ import userReducer from "../Features/userSlice"
 import appReducer from "../Features/appSlice"
 import uiReducer from "../Features/uiSlice"
 import authReducer from '../Features/authSlice'
+import adminReducer from "../Features/adminSlice"
 
 export default configureStore({
   reducer: {
     user:userReducer,
     app:appReducer,
     ui: uiReducer,
-    auth : authReducer
+    auth : authReducer,
+    admin : adminReducer
   },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
       serializableCheck: false //{

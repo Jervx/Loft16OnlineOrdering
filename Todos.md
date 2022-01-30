@@ -40,23 +40,121 @@
 
 
 - [doing] User Order Detail View
-- [doing] Like an item
+- [doing] Like an item ( add field on user model )
+        likes [{ product_ID, product_name, thumb }]
         
 
 ### TODO: MAJOR PART SETTINGSS FINAL!!!!!
 - [x] Create the page for Settings
 - [x] load latest user settings
-- [] change photo is not upload photo only pre created graphics avatar
+- [x] change photo is not upload photo only pre created graphics avatar
 - [x] emails
 - [x] mobile numbers
-- [] add more shipping address
+- [x] add more shipping address
 
 
+
+
+### TODO: ON USER IF MORE TIME LEFT
+- [x] Notification Modal
+    - [] new field on user -> notifications{ id, title, type, message , link }
+- [x]
 
 
 
 ### TODO: ADMIN
+- [x] Admin panel
+    - [x] sign in first before loading the system
+- [x] Admin nav
+    - Quick Insights
+        backend
+            - total pending
+            - completed orders
+            - getAll product sort by total earnings
+        frontend
+            - adminSlice
+                {
 
+                }
+    - Product & Tags 
+        backend
+         ** Product Categories **
+            - add categorie model
+              {
+                  schema_v
+                  category_name
+                  associated_products[
+                      {
+                          product_ID,
+                          product_name,
+                          thumb
+                      }
+                  ]
+                  cat
+                  cby
+                  uat
+                  uby
+                  dat
+              }
+            - getAllCategories
+            - searchCategories
+            - addCategories
+
+            ** Product Management **
+
+            - getAllProduct
+            - updateProducts
+                mode 0 create, 1 update, -1 delete
+            
+
+    - pending orders 
+        backend 
+            ** Pending Orders **
+                - getAllPending
+                    if order id provided find specific,
+                    if not return all
+                - updatepending
+                    mode 0 accept, -1 reject
+             NOTE: When the chosen courier is not in courier options, then you cannot accept it anymore 
+             NOTE: When accepting, check if the user exist, if not, simply remove the order_in_progress entry & remove from order entry
+            
+            ** In Progress **
+                - getAllInProgress
+                    if order id provided find specific,
+                    if not return all
+                - updatepending
+                    mode 0 update, mode 1 complete(move to delivered)
+
+            ** Completed Orders **
+                - getAllCompleted
+                    if order_id provided find specific
+                    if not return all
+                - deleteCompleted
+                    if order_id and mode -1 provided
+                        then remove specific
+                    if not remove all data
+                
+    - courier options 
+        - getAllCourier
+        - updateCourier
+            mode 0 create, mode 1 update, mode -1 delete
+        
+    - admins 
+        - getAllAdmin
+        - updateAdmin
+            id
+            NOTE: if your role is not root, then you can't 
+            mode 0 create, mode 1 update, mode -1 delete(Only Root)
+        
+    - customers 
+        - getUser
+            - if email provided, then return specific
+            - if note return all
+        - updateUser
+            NOTE: You can only update password but not the info of the user
+            mode 0 create,
+            mode 1 update,
+            mode -1 
 
 
 

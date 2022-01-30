@@ -14,7 +14,7 @@ import API from "../../Helpers/api";
 import Informative from "../../Components/Modal/Informative";
 import HelperLabel from "../../Components/HelperLabel";
 import AvatarChoser from "../../Components/ModalComponent/AvatarChoser";
-import Footer from "../../Components/Footer"
+import Footer from "../../Components/Footer";
 
 import { Input, Label } from "@windmill/react-ui";
 
@@ -324,7 +324,7 @@ const AccountSetting = () => {
                 {userData.mobile_numbers.map((number, idx) => (
                   <div
                     key={idx}
-                    className="flex justify-between items-center px-4 py-2  shadow-md rounded-sm my-2"
+                    className="cursor-pointer hover:bg-gray-100  flex justify-between items-center px-4 py-2  shadow-md rounded-sm my-2"
                   >
                     <div className="flex items-center">
                       <BsFillTelephoneFill className="w-4 h-4 text-teal-600 cursor-pointer mr-4" />
@@ -395,7 +395,7 @@ const AccountSetting = () => {
                 {userData.recovery_emails.map((email, idx) => (
                   <div
                     key={idx}
-                    className="flex justify-between items-center px-4 py-2 bg-gray-50 shadow-md rounded-sm my-2"
+                    className="cursor-pointer hover:bg-gray-100 flex justify-between items-center px-4 py-2 bg-gray-50 shadow-md rounded-sm my-2"
                   >
                     <div className="flex items-center">
                       <MdEmail className="w-4 h-4 text-teal-600 cursor-pointer mr-4" />
@@ -477,7 +477,7 @@ const AccountSetting = () => {
                         })
                       );
                     }}
-                    className="flex justify-between items-center px-4 py-2 bg-gray-50 shadow-md rounded-sm my-2"
+                    className="cursor-pointer hover:bg-gray-100 flex justify-between items-center px-4 py-2 bg-gray-50 shadow-md rounded-sm my-2"
                   >
                     <div className="flex items-center">
                       <FaMapMarkerAlt className="w-4 h-4 text-teal-600 cursor-pointer mr-4" />
@@ -609,13 +609,17 @@ const AccountSetting = () => {
                   }
                 />
               </div>
-              <Label check className="mt-4" onClick={async () => {
-                    await API.post("/user/mytwofactorauth", {
-                      _id: userData._id,
-                      two_factor_auth : !userData.two_factor_auth,
-                    });
-                    await loadUserData();
-                  }}>
+              <Label
+                check
+                className="mt-4"
+                onClick={async () => {
+                  await API.post("/user/mytwofactorauth", {
+                    _id: userData._id,
+                    two_factor_auth: !userData.two_factor_auth,
+                  });
+                  await loadUserData();
+                }}
+              >
                 <Input type="checkbox" checked={userData.two_factor_auth} />
                 <span className="ml-2 text-gray-600">
                   Enable Two Factor Authentication

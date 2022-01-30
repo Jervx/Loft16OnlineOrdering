@@ -10,11 +10,14 @@ import Signin from "../Auth/Signin";
 import Signup from "../Auth/Signup";
 import RecoverAccount from "../Auth/RecoverAccount"
 import NotFound from "../NotFound";
+import SignAdmin from '../../Pages/Auth/SignAdmin'
+
 
 const AuthContainer = () => {
   return (
     <div>
         <Switch>
+            <Route exact path='/auth/admin_signin' component={SignAdmin}/>
           <Route exact path="/auth/signin" component={Signin}/>
           <Route exact path="/auth/signup" component={Signup}/>
           <Route exact path="/auth/recover" component={RecoverAccount}/>

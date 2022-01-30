@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter&family=Pacifico&family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
 @font-face {
     font-family: 'Moontime';
     src:  url('/src/assets/MoonTime.ttf') format('truetype')
@@ -36,7 +38,7 @@
 }
 
 .font-inter{
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter';
 }
 
 .font-roboto{

@@ -6,7 +6,7 @@ import AdminContainer from "./Pages/Admin/AdminContainer";
 import NotFound from "./Pages/NotFound";
 import AuthContainer from "./Pages/Auth/AuthContainer";
 import AccountProfile from "./Pages/User/AccountProfile";
-import AccountSettings from "./Pages/User/AccountSetting"
+import AccountSettings from "./Pages/User/AccountSetting";
 
 /* Protected Route */
 import ProtectedRoute from "./Components/ProtectedRoute";
@@ -22,36 +22,41 @@ import API from "./Helpers/api";
 /* Redux & Slices */
 import { useDispatch } from "react-redux";
 import { signin } from "./Features/userSlice";
-import FullPageLoader from "./Components/ProtectedLoader"
+import { adminSign } from "./Features/adminSlice";
+import FullPageLoader from "./Components/ProtectedLoader";
 
 /* Icon */
 
 const PublicContainer = lazy(() => import("./Pages/Public/PublicContainer"));
 
 function App() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const checkIfUserIsSaved = async () => {
       let savedUser = JSON.parse(localStorage.getItem("userData"));
-      if (!savedUser) return;
+      let savedAdmin = JSON.parse(localStorage.getItem("adminData"));
+
+      if (!savedUser && !savedAdmin) return;
       try {
-        const response = await API.get(`/user/mydetails/${savedUser._id}`);
-        dispatch(signin(response.data.userData));
+        const response = await API.get(
+          !savedAdmin
+            ? `/user/mydetails/${savedUser._id}`
+            : `/admin/mydetails/${savedAdmin._id}`
+        );
+        if (!savedAdmin) dispatch(signin(response.data.userData));
+        else dispatch(adminSign(response.data.adminData));
       } catch (error) {
+          console.log(error)
       }
     };
     checkIfUserIsSaved();
   });
 
-  console.log("Load APP")
+  console.log("Load APP");
 
   return (
-    <Suspense
-      fallback={
-        <FullPageLoader />
-      }
-    >
+    <Suspense fallback={<FullPageLoader />}>
       <Router>
         <Informative />
         <InputModal />

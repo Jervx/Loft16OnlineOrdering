@@ -291,11 +291,31 @@ const Signup = (props) => {
   });
 
   return (
-    <div className="flex items-center min-h-screen p-6 bg-white dark:bg-gray-900">
-      <div className="flex-1 h-full max-w-md mx-auto overflow-hidden bg-white rounded-lg dark:bg-gray-800">
-        <div className="flex flex-col overflow-y-auto ">
-          <main className="flex items-center justify-center p-6 sm:p-12 ">
-            <div className="w-full">
+    <div className="flex items-center min-h-screen p-6 dark:bg-gray-900 bg-gray-50">
+    {/*bg-gray-50*/}
+    <div className="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
+      {" "}
+      {/* shadow-xl */}
+      <div className="flex flex-col overflow-y-auto md:flex-row">
+        <div className="h-32 md:h-auto md:w-1/2">
+          <img
+            aria-hidden="true"
+            className="object-cover w-full h-full dark:hidden"
+            src={
+                "https://cdn.discordapp.com/attachments/912411399458795593/937315295683543050/pexels-photo-2660262.png"
+            }
+            alt="Loft Product"
+          />
+          <img
+            aria-hidden="true"
+            className="hidden object-cover w-full h-full dark:block"
+            src={
+                "https://cdn.discordapp.com/attachments/912411399458795593/937315295683543050/pexels-photo-2660262.png"
+            }
+            alt="Loft Product"
+          />
+        </div>
+        <main className="flex items-center justify-center p-6 sm:p-12 md:w-1/2"><div className="w-full">
               <h1 className="pacifico defTextCOlorGreen mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
                 Create Loft 16 Account
               </h1>
