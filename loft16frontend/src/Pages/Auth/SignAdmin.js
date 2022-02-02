@@ -26,7 +26,7 @@ import {
 /* API */
 import API from "../../Helpers/api";
 
-import AdminTwoFactorAuthConfirm from "../../Components/ModalComponent/AdminTwoFactorAuthConfirm";
+import AdminTwoFactorAuthConfirm from "../../Components/ModalComponent/Admin/AdminTwoFactorAuthConfirm";
 
 /* GLogin - OneTap and Login */ 
 import { GoogleLogin } from "react-google-login";

@@ -129,9 +129,9 @@
                         then remove specific
                     if not remove all data
                 
-    - courier options 
-        - getAllCourier
-        - updateCourier
+   [x] - courier options 
+       [x] - getAllCourier
+       [x] - updateCourier
             mode 0 create, mode 1 update, mode -1 delete
         
     - admins 

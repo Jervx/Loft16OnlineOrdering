@@ -7,11 +7,11 @@ import { HiLockClosed } from "react-icons/hi";
 import {
   setSignInTwoFactor,
   cleanSignInCredential,
-} from "../../Features/authSlice";
-import { closeInputModal, openAlertModal } from "../../Features/uiSlice";
+} from "../../../Features/authSlice";
+import { closeInputModal, openAlertModal } from "../../../Features/uiSlice";
 
-import API from "../../Helpers/api";
-import { adminSign } from "../../Features/adminSlice";
+import API from "../../../Helpers/api";
+import { adminSign } from "../../../Features/adminSlice";
 
 const AdminTwoFactorAuthConfirm = (props) => {
   const dispatch = useDispatch();

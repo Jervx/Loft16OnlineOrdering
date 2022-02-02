@@ -134,7 +134,7 @@ const Insights = () => {
                   <TableBody>
                     {!loadingData &&
                       topProducts.map((product, idx) => (
-                        <TableRow key={idx}>
+                        <TableRow key={idx} className="transition hover:bg-gray-100 duration-400">
                           <TableCell>
                             <Avatar
                               className="border-2 border-teal-600"
