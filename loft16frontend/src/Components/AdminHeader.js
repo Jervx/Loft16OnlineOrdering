@@ -7,23 +7,20 @@ import {
   Avatar,
   Button,
 } from "@windmill/react-ui";
-import { withRouter, Link, useLocation } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 /* Icons */
-import { BiSearch } from "react-icons/bi";
-import { AiFillFire, AiFillShopping, AiOutlineUser } from "react-icons/ai";
-import { BsGearFill } from "react-icons/bs";
-import { ImCart } from "react-icons/im";
-import { MdOutlineLogout, MdQuestionAnswer } from "react-icons/md";
-import { GoPackage } from "react-icons/go";
+import { AiOutlineUser } from "react-icons/ai";
+import { MdOutlineLogout } from "react-icons/md";
 
 /*redux */
 import { useSelector, useDispatch } from "react-redux";
-import { setUserSearch, setData } from "../Features/appSlice";
 
 /* userSlice */
-import { signout } from "../Features/userSlice";
+import { adminSign, adminOut } from "../Features/adminSlice";
 import { openNotifier } from "../Features/uiSlice";
+
+import Loader from "../Components/Loader"
 
 import API from "../Helpers/api";
 
@@ -38,80 +35,22 @@ const AdminHeader = (props) => {
   const appState = useSelector((state) => state.app.appState);
 
   const signOut = () => {
-    dispatch(signout());
-    props.history.push("/");
+    dispatch(adminOut());
+    props.history.push("/auth/admin_signin");
   };
 
-  const toggleMyCart = () => {
-    if (!adminData.hasUser) {
-      dispatch(
-        openNotifier({
-          title: "No User",
-          message: "Please Sign In First",
-          onAccept: () => {
-            history.push("/auth/signin");
-          },
-          acceptBtnText: "Sign In",
-          cancelBtnText: "No, Thanks",
-        })
-      );
-      return;
-    }
-
-    // else continue to cart page
-    history.push("/user/mycart");
-  };
-
-  const onSearchEnter = async (event) => {
-    if (event.key === "Enter") {
-      props.history.push("/products");
-      try {
-        const req = await API.post("/browse/getproduct", appState);
-        dispatch(setData({ data: req.data.products }));
-      } catch (e) {
-        console.log("ERR", e);
-      }
-    }
-  };
-
-  const loadAdminData = async () => {
-      
-  }
-
-  useEffect(() => {
-      loadAdminData()
-  }, []);
 
   return (
-    <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800 border-b-2 border-gray-200 md:px-6">
+    <header className="z-40 py-4 bg-white filter shadow-sm dark:bg-gray-800">
       <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
         <div className="flex items-center">
-          <Link
-            className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
-            to="/admin"
-          >
-            Loft 16
-          </Link>
-          <Link
-            to="/admin"
-            className="ml-4 font-extrabold text-xl text-teal-600"
-          >
-            ADMIN
-          </Link>
         </div>
 
         {/* User Avatar */}
-        {/* <ul className="flex items-center flex-shrink-0 space-x-6">
+        <ul className="flex items-center flex-shrink-0 space-x-6">
           <li className="relative">
-            {!adminData.hasUser ? (
-              <Button
-                className="rounded-xl defBackground focus:outline-none focus:ring hover:bg-green-500"
-                block
-                tag={Link}
-                to="/auth/signin"
-              >
-                Signin
-              </Button>
+            {!adminData ? (
+              <Loader />
             ) : (
               <button
                 className="rounded-full hover:bg-gray-100 border-2 focus:shadow-outline-purple focus:ring-2 focus:outline-none"
@@ -137,11 +76,12 @@ const AdminHeader = (props) => {
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}
             >
+                <h1 className="text-teal-700 mb-4 font-medium text-base">ADMIN</h1>
               <DropdownItem
                 className="dark:text-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-800 hover:text-green-600"
                 tag="a"
                 onClick={() => {
-                  props.history.push("/user/profile");
+                  props.history.push("/admin/profile");
                 }}
               >
                 {adminData ? (
@@ -149,38 +89,20 @@ const AdminHeader = (props) => {
                     <Avatar
                       className="mr-5"
                       src={
-                        adminData.userData.profile_picture
-                          ? adminData.userData.profile_picture
+                        adminData.profile_picture
+                          ? adminData.profile_picture
                           : "https://cdn.discordapp.com/attachments/912411399458795593/921097628446498887/36..04.jpg"
                       }
                       alt=""
                       aria-hidden="true"
                     />
-                    <h1>{adminData.user_name}</h1>
+                    <h1>{adminData.name}</h1>
                   </div>
                 ) : (
                   <></>
                 )}
               </DropdownItem>
-
-              <DropdownItem
-                className="dark:text-gray-200 text-gray-500 hover:text-green-600"
-                tag={Link}
-                to="/account"
-              >
-                <BsGearFill className="w-5 h-5 mr-5" aria-hidden="true" />
-                <span className=" font-normal">Settings</span>
-              </DropdownItem>
-              <DropdownItem
-                tag="a"
-                onClick={() => {
-                  props.history.push("/user/myorders");
-                }}
-                className="dark:text-gray-200 text-gray-500 hover:text-green-600"
-              >
-                <GoPackage className="w-5 h-5 mr-5 " aria-hidden="true" />
-                <span className=" font-normal">Orders</span>
-              </DropdownItem>
+              
               <DropdownItem
                 className="text-gray-500  dark:text-gray-200 hover:text-orange-600"
                 onClick={() =>
@@ -203,7 +125,7 @@ const AdminHeader = (props) => {
               </DropdownItem>
             </Dropdown>
           </li>
-        </ul> */}
+        </ul>
       </div>
     </header>
   );

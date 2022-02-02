@@ -27,9 +27,9 @@ import API from "../../Helpers/api";
 
 import TwoFactorAuthConfirm from "../../Components/ModalComponent/TwoFactorAuthConfirm";
 
-/* GLogin - OneTap and Login */ 
+/* GLogin - OneTap and Login */
 import { GoogleLogin } from "react-google-login";
-import googleOneTap from 'google-one-tap';
+import googleOneTap from "google-one-tap";
 
 /* GAssets */
 //import GLogo from "../../assets/google_signin_buttons/g_logo_transparent.svg";
@@ -38,15 +38,16 @@ import googleOneTap from 'google-one-tap';
 require("dotenv").config();
 
 const Singin = (props) => {
-  
   const CLID = process.env.REACT_APP_GCLIENTID;
-  const AUTO_SIGNIN = process.env.REACT_APP_AUTO_SIGN_IN
+  const AUTO_SIGNIN = process.env.REACT_APP_AUTO_SIGN_IN;
 
   const [email, setEmail] = useState("");
   const [passVis, setPassVis] = useState(false);
   const [password, setPassword] = useState("");
 
-  const togglePassVis = () => { setPassVis(!passVis); };
+  const togglePassVis = () => {
+    setPassVis(!passVis);
+  };
 
   const dispatch = useDispatch();
 
@@ -68,7 +69,7 @@ const Singin = (props) => {
         {
           email_address: email,
           password,
-          oauth: false
+          oauth: false,
         },
         { withCredentials: true }
       );
@@ -147,8 +148,8 @@ const Singin = (props) => {
       const response = await API.post(
         "/auth/signin",
         {
-          access_token : res.tokenId,
-          client_id : CLID
+          access_token: res.tokenId,
+          client_id: CLID,
         },
         { withCredentials: true }
       );
@@ -158,7 +159,6 @@ const Singin = (props) => {
       dispatch(cleanSignInCredential());
       localStorage.setItem("userData", JSON.stringify(userData));
       props.history.push("/");
-
     } catch (error) {
       dispatch(closeLoader());
       if (error.response) {
@@ -190,20 +190,19 @@ const Singin = (props) => {
 
   /* G One Tap */
   const GOnFailure = async (res) => {
-    console.log(res)
+    console.log(res);
   };
 
-  
   const options = {
     client_id: CLID, // required
     auto_select: AUTO_SIGNIN, // optional
     cancel_on_tap_outside: false, // optional
-    context: 'signin', // optional
+    context: "signin", // optional
   };
 
   googleOneTap(options, async (res) => {
     // Send response to server
-    console.log(res)
+    console.log(res);
     try {
       //dispatch save logindata
       dispatch(openLoader({ state: true, message: "checking.." }));
@@ -216,8 +215,8 @@ const Singin = (props) => {
       const response = await API.post(
         "/auth/signin",
         {
-          access_token : res.credential,
-          client_id : res.clientId
+          access_token: res.credential,
+          client_id: res.clientId,
         },
         { withCredentials: true }
       );
@@ -257,20 +256,30 @@ const Singin = (props) => {
   });
 
   return (
-    <div id="auth_signin" className="flex items-center min-h-screen p-6 dark:bg-gray-900 bg-gray-50">{/*bg-gray-50*/} 
-      <div className="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800"> {/* shadow-xl */}
+    <div
+      id="auth_signin"
+      className="flex items-center min-h-screen p-6 dark:bg-gray-900 bg-gray-50"
+    >
+      {/*bg-gray-50*/}
+      <div className="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
+        {" "}
+        {/* shadow-xl */}
         <div className="flex flex-col overflow-y-auto md:flex-row">
-        <div className="h-32 md:h-auto md:w-1/2">
+          <div className="h-32 md:h-auto md:w-1/2">
             <img
               aria-hidden="true"
               className="object-cover w-full h-full dark:hidden"
-              src={"https://cdn.discordapp.com/attachments/912411399458795593/937312520690077716/pexels-photo-4843914.png"}
+              src={
+                "https://cdn.discordapp.com/attachments/912411399458795593/937312520690077716/pexels-photo-4843914.png"
+              }
               alt="Loft Product"
             />
             <img
               aria-hidden="true"
               className="hidden object-cover w-full h-full dark:block"
-              src={"https://cdn.discordapp.com/attachments/912411399458795593/937312549664337920/pexels-photo-2562560.png"}
+              src={
+                "https://cdn.discordapp.com/attachments/912411399458795593/937312549664337920/pexels-photo-2562560.png"
+              }
               alt="Loft Product"
             />
           </div>
@@ -322,16 +331,26 @@ const Singin = (props) => {
                     Sign in with Google
                   </Button>
                 )}
-                cookiePolicy={"single_host_origin"} isSignedIn={false}/>
-                <p className="my-2 text-xs text-center  font-inter font-bold" style={{color : "#2A9E9A"}}>or</p>
+                cookiePolicy={"single_host_origin"}
+                isSignedIn={false}
+              />
+              <p
+                className="my-2 text-xs text-center  font-inter font-bold"
+                style={{ color: "#2A9E9A" }}
+              >
+                or
+              </p>
               <Label>
                 <span>Email</span>
                 <div className="flex relative w-full max-w-xl focus-within:text-teal-500">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <MdAlternateEmail className="w-4 h-4 text-teal-600" aria-hidden="true" />
+                    <MdAlternateEmail
+                      className="w-4 h-4 text-teal-600"
+                      aria-hidden="true"
+                    />
                   </div>
                   <Input
-                    className="mt-1 pl-8 text-teal-800 hover:border-gray-400  bg-gray-50"
+                    className="my-2 pl-8 rounded-lg border-0 bg-gray-50 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                     type="email"
                     placeholder=""
                     value={email}
@@ -345,10 +364,13 @@ const Singin = (props) => {
                 <span>Password</span>
                 <div className="flex relative w-full max-w-xl focus-within:text-teal-500">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <BsFillLockFill className="w-4 h-4 text-teal-500" aria-hidden="true" />
+                    <BsFillLockFill
+                      className="w-4 h-4 text-teal-500"
+                      aria-hidden="true"
+                    />
                   </div>
                   <Input
-                    className="mt-1 pl-8 text-teal-800 bg-gray-50 hover:border-gray-400  "
+                    className="my-2 pl-8 rounded-lg border-0 bg-gray-50 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                     type={!passVis ? "password" : "text"}
                     placeholder=""
                     onChange={(e) => {

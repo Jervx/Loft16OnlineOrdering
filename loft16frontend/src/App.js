@@ -32,8 +32,7 @@ const PublicContainer = lazy(() => import("./Pages/Public/PublicContainer"));
 function App() {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const checkIfUserIsSaved = async () => {
+const checkIfUserIsSaved = async () => {
       let savedUser = JSON.parse(localStorage.getItem("userData"));
       let savedAdmin = JSON.parse(localStorage.getItem("adminData"));
 
@@ -50,6 +49,8 @@ function App() {
           console.log(error)
       }
     };
+
+  useEffect(() => {
     checkIfUserIsSaved();
   });
 

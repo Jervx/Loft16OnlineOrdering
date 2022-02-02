@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { Button, Label, Input } from "@windmill/react-ui";
 import Loader from "../../Components/Loader";
+import HelperLabel from "../../Components/HelperLabel"
 
 import { BsFillLockFill } from "react-icons/bs";
 import { MdAlternateEmail } from "react-icons/md";
@@ -25,7 +26,7 @@ import {
 /* API */
 import API from "../../Helpers/api";
 
-import TwoFactorAuthConfirm from "../../Components/ModalComponent/TwoFactorAuthConfirm";
+import AdminTwoFactorAuthConfirm from "../../Components/ModalComponent/AdminTwoFactorAuthConfirm";
 
 /* GLogin - OneTap and Login */ 
 import { GoogleLogin } from "react-google-login";
@@ -86,7 +87,7 @@ const SignAdmin = (props) => {
         dispatch(
           openInputModal({
             title: "Verification Code",
-            component: <TwoFactorAuthConfirm />,
+            component: <AdminTwoFactorAuthConfirm />,
             onAccept: () => {},
             acceptBtnText: "Finish",
             cancelBtnText: "Cancel",
@@ -97,16 +98,12 @@ const SignAdmin = (props) => {
 
       dispatch(closeLoader());
 
-      // get user data
-      // dispatch signin
-      // dispatch clear signin
-      // history push / or home
       const adminData = response.data.userData;
-
-
+      console.log("signin before dispatch",adminData)
       dispatch(adminSign(adminData));
       dispatch(cleanSignInCredential());
       localStorage.setItem("adminData", JSON.stringify(adminData));
+
       props.history.push("/admin");
     } catch (error) {
       dispatch(closeLoader());
@@ -383,6 +380,13 @@ const SignAdmin = (props) => {
               >
                 Signin
               </Button>
+              <HelperLabel
+              className="mt-4 "
+                  isError={false}
+                  bg={"bg-teal-50"}
+                  txtbg={"text-teal-600"}
+                  msg={"If you forgot your credentials, please seek help from the store root admin"}
+                />
 
               {/* <hr className="my-8" />
 

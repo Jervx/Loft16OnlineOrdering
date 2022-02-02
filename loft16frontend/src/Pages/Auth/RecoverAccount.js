@@ -133,12 +133,13 @@ const RecoverAccount = (props) => {
               <div className="flex justify-center"></div>
               <Label>
                 <span>Email</span>
-                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <MdAlternateEmail className="w-4 h-4" aria-hidden="true" />
+                    <MdAlternateEmail className="w-4 h-4 text-teal-600" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8"
+                                        className="my-2 pl-8 rounded-lg border-0 bg-gray-50 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
+
                     type="email"
                     placeholder="email"
                     value={email}
@@ -151,14 +152,15 @@ const RecoverAccount = (props) => {
 
               <Label className="pt-4 hover:border-gray-400  ">
                 <span>New Password</span>
-                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
+                    <BsFillLockFill className="w-4 h-4 text-teal-600" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8 hover:border-gray-400  "
+                                        className="my-2 pl-8 rounded-lg border-0 bg-gray-50 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
+
                     type={!passVis ? "password" : "text"}
-                    placeholder=""
+                    placeholder="New Password"
                     onChange={(e) => {
                       setPassword(e.currentTarget.value);
                     }}
@@ -198,7 +200,7 @@ const RecoverAccount = (props) => {
 
               <p className="mt-4">
                 <Link
-                  className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  className="text-sm font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/signin"
                 >
                   Sign In
@@ -206,7 +208,7 @@ const RecoverAccount = (props) => {
               </p>
               <p className="mt-1">
                 <Link
-                  className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  className="text-sm font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/signup"
                 >
                   Sign Up

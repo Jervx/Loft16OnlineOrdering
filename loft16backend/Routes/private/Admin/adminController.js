@@ -7,7 +7,10 @@ const bcrypt = require("bcryptjs");
 const adminAuth = require("../../../middleware/adminAuth");
 const Corier = require("../../../models/Courier");
 const Admin = require("../../../models/Admin");
-
+const Product = require("../../../models/Product")
+const InProgress = require("../../../models/Orders_In_Progress")
+const Completed = require("../../../models/Completed_Orders");
+const Pendings = require("../../../models/Pending_Order")
 
 //admin account creation & 
 router.post("/updateAdmin", adminAuth, async (req, res) => {
@@ -74,6 +77,7 @@ router.post("/addCourier", adminAuth, async (req, res) => {
 
 router.get("/mydetails/:id", adminAuth, async (req, res) => {
     let _id = req.params.id;
+    console.log("ADMIN Detail request", _id)
     if (!_id)
       return res.status(400).json({
         err: 400,
@@ -93,5 +97,38 @@ router.get("/mydetails/:id", adminAuth, async (req, res) => {
       adminData,
     });
   });
+
+router.get("/insights", adminAuth, async(req,res)=>{
+    try {
+        let topProducts = await Product.find({generated_sale : { $gt : 0 }},{name : 1, likes : 1, generated_sale : 1, Images : 1 , total_item_sold : 1}).sort({generated_sale : -1})
+
+        let pendings = await Pendings.find({}).count()
+        let inprogress = await InProgress.find({}).count()
+        let completed = await Completed.find({}).count()
+        let products = await Product.find({}).count()
+        let available = await Product.find({total_stock : { $gt : 0}}).count()
+
+        // TODO: Left Over
+
+        res.status(200).json({
+            msg: "ok!", 
+            topProducts,
+            stats : {
+                total_pending_orders : pendings,
+                total_in_progress : inprogress,
+                total_completed : completed,
+                total_products : products,
+                total_available_products : available
+            }
+        });
+      } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status : 500,
+            description : "Internal Server Error",
+            solution : "Sorry but the server has an error, please try again later"
+        })
+      }
+})
 
 module.exports = router;

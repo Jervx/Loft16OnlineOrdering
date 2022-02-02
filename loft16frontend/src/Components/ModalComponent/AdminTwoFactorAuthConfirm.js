@@ -11,9 +11,9 @@ import {
 import { closeInputModal, openAlertModal } from "../../Features/uiSlice";
 
 import API from "../../Helpers/api";
-import { signin } from "../../Features/userSlice";
+import { adminSign } from "../../Features/adminSlice";
 
-const TwoFactorAuthConfirm = (props) => {
+const AdminTwoFactorAuthConfirm = (props) => {
   const dispatch = useDispatch();
   const signInData = useSelector((state) => state.auth.signin);
 
@@ -25,6 +25,7 @@ const TwoFactorAuthConfirm = (props) => {
           email_address: signInData.email_address,
           password: signInData.password,
           oauth: false,
+          admin: true,
         },
         { withCredentials: true }
       );
@@ -61,11 +62,11 @@ const TwoFactorAuthConfirm = (props) => {
       const response = await API.post("/auth/signin", signInData);
 
       const userData = response.data.userData;
-      localStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("adminData", JSON.stringify(userData));
       dispatch(cleanSignInCredential());
-      dispatch(signin(userData));
+      dispatch(adminSign(userData));
       dispatch(closeInputModal());
-      props.history.push("/");
+      props.history.push("/admin");
     } catch (error) {
       if (error.response) {
         //request was made but theres a response status code
@@ -115,9 +116,9 @@ const TwoFactorAuthConfirm = (props) => {
       </div>
       <div className="flex sm:justify-center md:justify-center">
         <Label className="pt-4 mt-2 w-full sm:w-7/12 md:w-7/12">
-          <div className="flex relative w-full max-w-xl focus-within:text-teal-700">
+          <div className="flex relative w-full max-w-xl focus-within:text-teal-500">
             <div className="absolute inset-y-0 flex items-center pl-2">
-              <HiLockClosed className=" w-4 h-4 text-teal-700" aria-hidden="true" />
+              <HiLockClosed className="transition w-4 h-4 text-teal-500" aria-hidden="true" />
             </div>
             <Input
               className="my-2 pl-8 mr-1 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
@@ -126,6 +127,11 @@ const TwoFactorAuthConfirm = (props) => {
               onChange={(e) => saveCode(e)}
             />
           </div>
+          {/* {!codeStatus && (
+            <Alert type="danger" className="mt-4 text-xs">
+              {codeError}
+            </Alert>
+          )} */}
           <div className="flex justify-center">
             <Button
               onClick={checkTwoFactorCode}
@@ -152,4 +158,4 @@ const TwoFactorAuthConfirm = (props) => {
   );
 };
 
-export default withRouter(TwoFactorAuthConfirm);
+export default withRouter(AdminTwoFactorAuthConfirm);

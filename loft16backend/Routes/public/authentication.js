@@ -229,7 +229,14 @@ router.delete("/signout", auth, async (req, res) => {});
 
 /*SIGNIN (manual, via Google SSO) */
 router.post("/signin", async (req, res) => {
-  const { access_token, client_id , admin, email_address, password, twoFactCode } = req.body;
+  const {
+    access_token,
+    client_id,
+    admin,
+    email_address,
+    password,
+    twoFactCode,
+  } = req.body;
 
   const ACCOUNT = admin ? Admin : User;
   const USER = await ACCOUNT.findOne({ email_address }).lean();
@@ -248,9 +255,19 @@ router.post("/signin", async (req, res) => {
       let flag = "old";
 
       if (!userData) {
-        const genPass = generateCode()
+
+        if(admin){
+            return res.status(404).json({
+                err: 404,
+                description: "You are not one of the Admin",
+                solution:
+                  "Loft 16 identified your email is not one of admins. Please use a valid admin account",
+              });
+        }
+
+        const genPass = generateCode();
         const hashedPassword = await bcrypt.hash(genPass, 10);
-        const additional_attr = !admin? {user_name} : {}
+        const additional_attr = !admin ? { user_name } : {};
         userData = await ACCOUNT.create({
           ...additional_attr,
           name,
@@ -260,16 +277,14 @@ router.post("/signin", async (req, res) => {
         });
         flag = "new";
         const mailsent = await sendEmail(userEmail, {
-            name,
-            user_name,
-            email_address : userEmail,
-            password : genPass,
-            template_name: "YourPassword.html",
-            subject: "Loft16 Sign Up Email Confirmation",
-          });
+          name,
+          user_name,
+          email_address: userEmail,
+          password: genPass,
+          template_name: "YourPassword.html",
+          subject: "Loft16 Sign Up Email Confirmation",
+        });
       }
-
-
 
       // set cookies
       res.cookie("access_token", access_token, loftCookieConifg);
@@ -317,14 +332,12 @@ router.post("/signin", async (req, res) => {
   // TODO: query on admin instead of user if admin = true
   // NOTE: Done
 
-
-
   if (!USER)
     return res.status(404).json({
       err: 404,
       description: "Account Not Found",
       solution:
-        "The given credential doesn't belong to our existing users, please create an account",
+        `The given credential doesn't belong to our existing ${admin? 'admins' : 'users'}, ${admin? ' please contact authorized loft 16 admin to create your admin account' :' please create an account' }`,
     });
 
   if (!(await bcrypt.compare(password, USER.password)))
@@ -352,13 +365,7 @@ router.post("/signin", async (req, res) => {
         { new: true, upsert: true }
       );
 
-      //send it to email - TODO: @jervx to be implemented later
-
-      // sent it to email TODO: implement future email helper
-      //return 200 code sent two_fact_auth
-      // template_content  { email_address, user_name, template_name, subject}
-
-      let toSent = { ...USER, two_fact_auth: conf_code };
+      let toSent = admin? { ...USER, user_name : USER.name, two_fact_auth: conf_code } : { ...USER, two_fact_auth: conf_code }  ;
       const sendConfirmationCode = sendEmail(email_address, {
         ...toSent,
         template_name: "TwoFactorAuth.html",
@@ -408,6 +415,7 @@ router.post("/signin", async (req, res) => {
     user_name: USER.user_name,
     _id: USER._id,
   });
+
   const refresh = jwt.sign(
     { email_address, user_name: USER.user_name, _id: USER._id },
     process.env.JWT_RFSH
@@ -463,7 +471,7 @@ router.post("/signup", async (req, res) => {
     confirmation_code,
   } = req.body;
 
-  console.log("VIA GOOGLE", password)
+  console.log("VIA GOOGLE", password);
 
   ///////////// for via google ///////////////
   try {

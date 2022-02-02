@@ -66,17 +66,12 @@
 - [x] Admin panel
     - [x] sign in first before loading the system
 - [x] Admin nav
-    - Quick Insights
+    - [x]Quick Insights
         backend
-            - total pending
-            - completed orders
-            - getAll product sort by total earnings
-        frontend
-            - adminSlice
-                {
-
-                }
-    - Product & Tags 
+           [x] - total pending
+           [x] - completed orders
+           [x] - getAll product sort by total earnings                }
+    - [x]Product & Tags 
         backend
          ** Product Categories **
             - add categorie model

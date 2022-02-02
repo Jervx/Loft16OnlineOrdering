@@ -16,24 +16,27 @@ import { FaEyeSlash, FaEye } from "react-icons/fa";
 
 /* Redux, Reducers */
 import { useDispatch, useSelector } from "react-redux";
-import { closeLoader, openInputModal, openAlertModal } from "../../Features/uiSlice";
+import {
+  closeLoader,
+  openInputModal,
+  openAlertModal,
+} from "../../Features/uiSlice";
 import { openLoader } from "../../Features/uiSlice";
 import {
-    partialRegistration,
-    setSignInCredential,
-    cleanSignInCredential,
-  } from "../../Features/authSlice";
-import {signin} from "../../Features/userSlice"
+  partialRegistration,
+  setSignInCredential,
+  cleanSignInCredential,
+} from "../../Features/authSlice";
+import { signin } from "../../Features/userSlice";
 
 /* API */
-import API from "../../Helpers/api"
+import API from "../../Helpers/api";
 
 /* GAuth identity */
 import { GoogleLogin } from "react-google-login";
-import googleOneTap from 'google-one-tap';
+import googleOneTap from "google-one-tap";
 
 const Signup = (props) => {
-
   const dispatch = useDispatch();
   const uiState = useSelector((state) => state.ui);
 
@@ -49,9 +52,7 @@ const Signup = (props) => {
   const [passVis, setPassVis] = useState(false);
   const [passVis2, setPassVis2] = useState(false);
 
-
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   //validate the form inputs
   const validate = () => {
@@ -81,18 +82,14 @@ const Signup = (props) => {
       return false;
     }
 
-    if (
-      !(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(
-        password
-      ))
-    ) {
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)) {
       setValidMsg(
         "Password should have 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number"
       );
       return false;
     }
 
-    setValidation(true)
+    setValidation(true);
     return true;
   };
 
@@ -107,11 +104,11 @@ const Signup = (props) => {
     }
 
     API.post("/auth/confirm_email", {
-        name,
-        user_name,
-        email_address,
-        password,
-      })
+      name,
+      user_name,
+      email_address,
+      password,
+    })
       .then((response) => {
         dispatch(closeLoader());
         dispatch(
@@ -136,38 +133,43 @@ const Signup = (props) => {
         dispatch(closeLoader());
         if (error.response) {
           //request was made but theres a response status code
-          dispatch(openAlertModal({
-            component : (<></>),
-            data : error.response.data
-          }))
-        
+          dispatch(
+            openAlertModal({
+              component: <></>,
+              data: error.response.data,
+            })
+          );
         } else if (error.request) {
           // The request was made but no response was received
-          dispatch(openAlertModal({
-            component : (<></>),
-            data : {
-              err: 500,
-              description: "Sorry, but we can't reach the server",
-              solution : "Please try again later"
-            }
-          }))
+          dispatch(
+            openAlertModal({
+              component: <></>,
+              data: {
+                err: 500,
+                description: "Sorry, but we can't reach the server",
+                solution: "Please try again later",
+              },
+            })
+          );
         } else {
           // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
+          console.log("Error", error.message);
         }
       });
-        
   };
 
   //Toggle password Visibility
-  const togglePassVis = () => { setPassVis(!passVis); };
+  const togglePassVis = () => {
+    setPassVis(!passVis);
+  };
 
   //Toggle retype pass Visibility2
-  const togglePassVis2 = () => { setPassVis2(!passVis2); };
-
+  const togglePassVis2 = () => {
+    setPassVis2(!passVis2);
+  };
 
   const CLID = process.env.REACT_APP_GCLIENTID;
-  const AUTO_SIGNIN = process.env.REACT_APP_AUTO_SIGN_IN
+  const AUTO_SIGNIN = process.env.REACT_APP_AUTO_SIGN_IN;
 
   const GOnSuccess = async (res) => {
     try {
@@ -175,15 +177,15 @@ const Signup = (props) => {
       dispatch(openLoader({ state: true, message: "checking.." }));
       dispatch(
         setSignInCredential({
-          email_address : email_address.toLowerCase(),
+          email_address: email_address.toLowerCase(),
           password,
         })
       );
       const response = await API.post(
         "/auth/signin",
         {
-          access_token : res.tokenId,
-          client_id : CLID
+          access_token: res.tokenId,
+          client_id: CLID,
         },
         { withCredentials: true }
       );
@@ -193,7 +195,6 @@ const Signup = (props) => {
       dispatch(cleanSignInCredential());
       localStorage.setItem("userData", JSON.stringify(userData));
       props.history.push("/");
-
     } catch (error) {
       dispatch(closeLoader());
       if (error.response) {
@@ -225,19 +226,19 @@ const Signup = (props) => {
 
   /* G One Tap */
   const GOnFailure = async (res) => {
-    console.log(res)
+    console.log(res);
   };
 
   const options = {
     client_id: CLID, // required
     auto_select: AUTO_SIGNIN, // optional
     cancel_on_tap_outside: false, // optional
-    context: 'signin', // optional
+    context: "signin", // optional
   };
 
   googleOneTap(options, async (res) => {
     // Send response to server
-    console.log(res)
+    console.log(res);
     try {
       //dispatch save logindata
       dispatch(openLoader({ state: true, message: "checking.." }));
@@ -250,8 +251,8 @@ const Signup = (props) => {
       const response = await API.post(
         "/auth/signin",
         {
-          access_token : res.credential,
-          client_id : res.clientId
+          access_token: res.credential,
+          client_id: res.clientId,
         },
         { withCredentials: true }
       );
@@ -292,30 +293,31 @@ const Signup = (props) => {
 
   return (
     <div className="flex items-center min-h-screen p-6 dark:bg-gray-900 bg-gray-50">
-    {/*bg-gray-50*/}
-    <div className="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
-      {" "}
-      {/* shadow-xl */}
-      <div className="flex flex-col overflow-y-auto md:flex-row">
-        <div className="h-32 md:h-auto md:w-1/2">
-          <img
-            aria-hidden="true"
-            className="object-cover w-full h-full dark:hidden"
-            src={
+      {/*bg-gray-50*/}
+      <div className="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
+        {" "}
+        {/* shadow-xl */}
+        <div className="flex flex-col overflow-y-auto md:flex-row">
+          <div className="h-32 md:h-auto md:w-1/2">
+            <img
+              aria-hidden="true"
+              className="object-cover w-full h-full dark:hidden"
+              src={
                 "https://cdn.discordapp.com/attachments/912411399458795593/937315295683543050/pexels-photo-2660262.png"
-            }
-            alt="Loft Product"
-          />
-          <img
-            aria-hidden="true"
-            className="hidden object-cover w-full h-full dark:block"
-            src={
+              }
+              alt="Loft Product"
+            />
+            <img
+              aria-hidden="true"
+              className="hidden object-cover w-full h-full dark:block"
+              src={
                 "https://cdn.discordapp.com/attachments/912411399458795593/937315295683543050/pexels-photo-2660262.png"
-            }
-            alt="Loft Product"
-          />
-        </div>
-        <main className="flex items-center justify-center p-6 sm:p-12 md:w-1/2"><div className="w-full">
+              }
+              alt="Loft Product"
+            />
+          </div>
+          <main className="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
+            <div className="w-full">
               <h1 className="pacifico defTextCOlorGreen mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
                 Create Loft 16 Account
               </h1>
@@ -363,16 +365,18 @@ const Signup = (props) => {
                     Sign Up with Google
                   </Button>
                 )}
-                cookiePolicy={"single_host_origin"} isSignedIn={false}/>
+                cookiePolicy={"single_host_origin"}
+                isSignedIn={false}
+              />
               <div className="mt-4 flex">
                 <Label>
                   <span>Name*</span>
-                  <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                  <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                     <div className="absolute inset-y-0 flex items-center pl-2">
-                      <RiUser6Fill className="w-4 h-4" aria-hidden="true" />
+                      <RiUser6Fill className="w-4 h-4 text-teal-600" aria-hidden="true" />
                     </div>
                     <Input
-                      className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
+                      className="my-2 pl-8 mr-1 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                       type="text"
                       placeholder="name"
                       value={name}
@@ -384,12 +388,12 @@ const Signup = (props) => {
                 </Label>
                 <Label>
                   <span>Username*</span>
-                  <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                  <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                     <div className="absolute inset-y-0 flex items-center pl-2">
-                      <CgUserlane className="w-4 h-4" aria-hidden="true" />
+                      <CgUserlane className="w-4 h-4 text-teal-600" aria-hidden="true" />
                     </div>
                     <Input
-                      className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
+                      className="my-2 pl-8 ml-1 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                       type="text"
                       placeholder="username"
                       value={user_name}
@@ -402,12 +406,12 @@ const Signup = (props) => {
               </div>
               <Label className="pt-4">
                 <span>Email*</span>
-                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <MdAlternateEmail className="w-4 h-4" aria-hidden="true" />
+                    <MdAlternateEmail className="w-4 h-4 text-teal-600" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
+                    className="my-2 pl-8 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                     type="email"
                     placeholder="Email"
                     value={email_address}
@@ -419,12 +423,12 @@ const Signup = (props) => {
               </Label>
               <Label className="pt-4 hover:border-gray-400  ">
                 <span>Password *</span>
-                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
+                    <BsFillLockFill className="w-4 h-4 text-teal-600" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8 hover:border-gray-400  "
+                    className="my-2 pl-8 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                     type={!passVis ? "password" : "text"}
                     placeholder=""
                     onChange={(e) => {
@@ -446,12 +450,12 @@ const Signup = (props) => {
               </Label>
               <Label className="pt-4">
                 <span>Confirm Password*</span>
-                <div className="flex relative w-full max-w-xl focus-within:text-purple-500">
+                <div className="flex relative w-full max-w-xl focus-within:text-teal-600">
                   <div className="absolute inset-y-0 flex items-center pl-2">
-                    <BsFillLockFill className="w-4 h-4" aria-hidden="true" />
+                    <BsFillLockFill className="w-4 h-4 text-teal-600" aria-hidden="true" />
                   </div>
                   <Input
-                    className="mt-1 pl-8 hover:border-gray-400  bg-gray-50"
+                    className="my-2 pl-8 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                     type={!passVis2 ? "password" : "text"}
                     placeholder=""
                     onChange={(e) => {
@@ -487,20 +491,9 @@ const Signup = (props) => {
                 Sign Up
               </Button>
 
-              {/* <hr className="my-8" />
-
-              <Button block layout="outline">
-                <BsGithub className="w-4 h-4 mr-2" aria-hidden="true" />
-                Github
-              </Button>
-              <Button className="mt-4" block layout="outline">
-                <BsTwitter className="w-4 h-4 mr-2" aria-hidden="true" />
-                Twitter
-              </Button> */}
-
               <p className="mt-4">
                 <Link
-                  className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  className="text-sm cursor-pointer font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/recover"
                 >
                   Recover Account
@@ -508,7 +501,7 @@ const Signup = (props) => {
               </p>
               <p className="mt-1">
                 <Link
-                  className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  className="text-sm cursor-pointer font-medium text-blue-600 dark:text-purple-400 hover:underline"
                   to="/auth/signin"
                 >
                   Sign In

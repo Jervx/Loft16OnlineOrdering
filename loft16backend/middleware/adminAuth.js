@@ -3,11 +3,14 @@ const config = process.env;
 const GAuthVerify = require('../helper/GAuthVerify')
 const Admin = require('../models/Admin')
 
+const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const verifyAdminToken = async (req, res, next) => {
   let token = req.cookies.admin_access_token
   let client_id = req.cookies.client_id
   let auth_iss = req.cookies.auth_iss
+
+  await snooze(1000)
 
   // console.log("--------COOKIES AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
   if(auth_iss)

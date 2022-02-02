@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
 
-const Products = () => {
+const Admins = () => {
   const adminData = useSelector((state) => state.admin.adminData);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -27,7 +27,7 @@ const Products = () => {
       ) : (
         <div>
           <h1 className="text-teal-900 mx-9 mt-14 font-medium text-3xl">
-            Products
+            Admins
           </h1>
           <section className=" body-font"></section>
         </div>
@@ -36,4 +36,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default Admins;
