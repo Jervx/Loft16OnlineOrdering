@@ -7,17 +7,22 @@ import API from "../../Helpers/api";
 const Admins = () => {
   const adminData = useSelector((state) => state.admin.adminData);
   const [loadingData, setLoadingData] = useState(true);
+  const [unmounted, setUnmounted] = useState(false)
 
   const loadSomething = async () => {
     if (adminData) {
       try {
         const response = await API.get("/admin/insights");
+        if(unmounted) return
       } catch (e) {}
     }
   };
 
   useEffect(() => {
     loadSomething();
+    return ()=>{
+        setUnmounted(true)
+    }
   }, [adminData]);
 
   return (

@@ -12,6 +12,7 @@ import { signin, signout } from "../../Features/userSlice";
 import { openNotifier } from "../../Features/uiSlice";
 
 import { openAlertModal, openInputModal } from "../../Features/uiSlice";
+import { parseDate } from "../../Helpers/uitils"
 
 const ArrivedOrders = () => {
   const userData = useSelector((state) => state.user.userData);
@@ -181,14 +182,7 @@ const ArrivedOrders = () => {
                           <p className="px-5 text-xs py-2">
                             This order was cancelled on
                             <span className="font-medium">
-                              {" "}
-                              {new Date(cancelled.dat).toLocaleString("en-us", {
-                                month: "long",
-                              }) +
-                                " " +
-                                new Date(cancelled.dat).getDate() +
-                                ", " +
-                                new Date(cancelled.dat).getFullYear()}
+                            {" "}{ parseDate(cancelled.dat)}
                             </span>
                           </p>
                           <p className="px-5 text-xs py-2">

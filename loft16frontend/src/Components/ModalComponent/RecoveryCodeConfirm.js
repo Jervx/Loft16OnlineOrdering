@@ -15,8 +15,6 @@ const RecoveryCodeConfirm = (props) => {
   const recoveryState = useSelector((state) => state.auth.recovery);
   const dispatch = useDispatch();
 
-  // TODO: ResendCode Logic
-
   const saveCode = (e) => {
     let recovery_code = e.target.value;
     dispatch(setRecoveryCode({ recovery_code }));
@@ -29,7 +27,7 @@ const RecoveryCodeConfirm = (props) => {
   
         const userData = response.data.userData
 
-      localStorage.setItem("userData", JSON.stringify(userData));
+        localStorage.setItem("userData", JSON.stringify(userData));
   
         dispatch(clearRecovery())
         dispatch(signin(userData))

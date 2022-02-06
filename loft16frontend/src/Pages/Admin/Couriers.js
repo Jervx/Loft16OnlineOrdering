@@ -20,6 +20,7 @@ import {
   openAlertModal,
 } from "../../Features/uiSlice";
 
+
 import CourierCreator from "../../Components/ModalComponent/Admin/CourierCreator";
 import HelperLabel from "../../Components/HelperLabel";
 
@@ -56,13 +57,13 @@ const Couriers = () => {
     },
   ]);
 
-  const [unmounted, setUnmounted] = useState(false)
+  const [unmounted, setUnmounted] = useState(false);
 
   const loadSomething = async () => {
     if (adminData) {
       try {
         const response = await API.get("/admin/couriers");
-        if(unmounted) return
+        if (unmounted) return;
         setCouriers(response.data.Couriers);
         setLoadingData(false);
       } catch (e) {}
@@ -108,9 +109,9 @@ const Couriers = () => {
 
   useEffect(() => {
     loadSomething();
-    return ()=>{
-        setUnmounted(true)
-    }
+    return () => {
+      setUnmounted(true);
+    };
   }, [adminData]);
 
   return (
@@ -156,105 +157,109 @@ const Couriers = () => {
             New Courier
           </Button>
 
-          <section className="text-gray-600 body-font">
-            <div className="container px-5 py-14 mx-auto">
-              <div
-                className={`flex flex-wrap w-full -mx-1 -my-8 ${
-                  loadingData && "filter blur-sm animate-pulse"
-                }`}
-              >
-                {couriers.map((courier, idx) => (
-                  <div
+          <section className="text-gray-600 body-font mx-4 my-8">
+            <div
+              className="container px-5 py-14 mx-auto"
+              className={`flex flex-wrap w-full -mx-1 -my-8 ${
+                loadingData && "filter blur-sm animate-pulse"
+              }`}
+            >
+              {couriers.map((courier, idx) => (
+                <div
                   key={idx}
-                    onClick={() => {
-                      dispatch(
-                        openInputModal({
-                          title: "",
-                          component: (
-                            <CourierCreator
-                              mode={1}
-                              gcourier={courier}
-                              onSave={loadSomething}
-                              _id={adminData._id}
-                            />
-                          ),
-                          onAccept: () => {},
-                          acceptBtnText: "Save",
-                          cancelBtnText: "Cancel",
-                        })
-                      );
-                    }}
-                    className="relative cursor-pointer transform-gpu shadow-lg hover:scale-105 transition duration-100 text-teal-500 bg-white rounded-lg xl:w-1/4 md:w-1/2 my-2 w-full px-8 py-6 border-gray-200 border-opacity-60"
-                  >
-                    <div className="absolute flex space-x-1 right-4">
-                      <RiCloseLine
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch(
-                            openNotifier({
-                              title: "Remove Courier?",
-                              message: `You are about to remove ${courier.courier_name} from couriers`,
-                              onAccept: () => {
-                                deleteAddress(adminData.id, courier, -1);
-                              },
-                              acceptBtnText: "Yes, Remove It",
-                              cancelBtnText: "Cancel",
-                            })
-                          );
-                        }}
-                        className="cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
-                      />
-                    </div>
-                    <h2
-                      className={`text-lg mb-4 sm:text-xl text-gray-500 font-medium title-font ${
-                        loadingData && "bg-teal-500 rounded-md"
-                      }`}
-                    >
-                      {courier.courier_name}
-                    </h2>
-                    <div className="flex space-x-4 my-2 text-sm">
-                      <FaTruckLoading />
-                      <p
-                        className={`${
-                          loadingData && "w-1/4 h-4 bg-teal-500 rounded-md"
+                  key={idx}
+                  onClick={() => {
+                    dispatch(
+                      openInputModal({
+                        title: "",
+                        component: (
+                          <CourierCreator
+                            mode={1}
+                            gcourier={courier}
+                            onSave={loadSomething}
+                            _id={adminData._id}
+                          />
+                        ),
+                        onAccept: () => {},
+                        acceptBtnText: "Save",
+                        cancelBtnText: "Cancel",
+                      })
+                    );
+                  }}
+                  className={`w-full md:w-1/2 xl:w-1/3`}
+                >
+                  <div className="mb-4 mx-1">
+                    <div className="relative cursor-pointer py-6 border-gray-200 border-opacity-60 transform-gpu hover:scale-105 transition duration-100 text-teal-500 shadow-lg rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">
+                      <div className="absolute flex space-x-1 right-4">
+                        <RiCloseLine
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch(
+                              openNotifier({
+                                title: "Remove Courier?",
+                                message: `You are about to remove ${courier.courier_name} from couriers`,
+                                onAccept: () => {
+                                  deleteAddress(adminData.id, courier, -1);
+                                },
+                                acceptBtnText: "Yes, Remove It",
+                                cancelBtnText: "Cancel",
+                              })
+                            );
+                          }}
+                          className="cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
+                        />
+                      </div>
+                      <h2
+                        className={`text-lg mb-4 sm:text-xl text-gray-500 font-medium title-font ${
+                          loadingData && "bg-teal-500 rounded-md"
                         }`}
                       >
-                        <span className="font-medium">
-                          {nShorter(courier.total_delivered_orders, 1)}{" "}
-                        </span>{" "}
-                        Delivered Orders
-                      </p>
-                    </div>
-                    <div className="flex space-x-4 my-2 text-sm">
-                      <IoMdCall />
-                      <p
-                        className={`${
-                          loadingData && "w-1/2 h-4 bg-teal-500 rounded-md"
-                        }`}
-                      >
-                        {courier.courier_contact}
-                      </p>
-                    </div>
-                    <div className="flex space-x-4 my-2 text-sm">
-                      <MdEmail />
-                      <p
-                        className={`${
-                          loadingData && "w-full h-4 bg-teal-500 rounded-md"
-                        }`}
-                      >
-                        {courier.courier_email}
-                      </p>
+                        {courier.courier_name}
+                      </h2>
+                      <div className="flex space-x-4 my-2 text-sm">
+                        <FaTruckLoading />
+                        <p
+                          className={`${
+                            loadingData && "w-1/4 h-4 bg-teal-500 rounded-md"
+                          }`}
+                        >
+                          <span className="font-medium">
+                            {nShorter(courier.total_delivered_orders, 1)}{" "}
+                          </span>{" "}
+                          Delivered Orders
+                        </p>
+                      </div>
+                      <div className="flex space-x-4 my-2 text-sm">
+                        <IoMdCall />
+                        <p
+                          className={`${
+                            loadingData && "w-1/2 h-4 bg-teal-500 rounded-md"
+                          }`}
+                        >
+                          {courier.courier_contact}
+                        </p>
+                      </div>
+                      <div className="flex space-x-4 my-2 text-sm">
+                        <MdEmail />
+                        <p
+                          className={`${
+                            loadingData && "w-full h-4 bg-teal-500 rounded-md"
+                          }`}
+                        >
+                          {courier.courier_email}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div>
-                {!loadingData && couriers.length === 0 && (
-                  <p className="my-4 text-xs text-red-400 text-center">
-                    There's no couriers
-                  </p>
-                )}
-              </div>
+                </div>
+              ))}
+            </div>
+            <div>
+              {!loadingData && couriers.length === 0 && (
+                <p className="my-4 text-xs text-red-400 text-center">
+                  There's no couriers
+                </p>
+              )}
             </div>
           </section>
 

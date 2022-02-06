@@ -8,7 +8,7 @@ const verifyToken = async (req, res, next) => {
   let client_id = req.cookies.client_id
   let auth_iss = req.cookies.auth_iss
 
-  // console.log("--------COOKIES AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
+  console.log("--------COOKIES USER AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
   if(auth_iss)
     if(auth_iss === process.env.GIssuer){
       try{

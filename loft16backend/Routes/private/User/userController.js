@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const mongoose = require("mongoose");
 let ObjectId = require("mongoose").Types.ObjectId;
+const { ehandler } = require("../../../helper/utils")
 
 const User = require("../../../models/User");
 const auth = require("../../../middleware/auth");
@@ -48,12 +49,7 @@ router.post("/removeCancelled", auth, async (req, res) => {
       description: "Record removed",
     });
   } catch (e) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", e);
+    ehandler(e,res)
   }
 });
 
@@ -77,12 +73,7 @@ router.post("/removeCompleted", auth, async (req, res) => {
       description: "Record removed",
     });
   } catch (e) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", e);
+    ehandler(e,res)
   }
 });
 
@@ -136,12 +127,7 @@ router.post("/cancelOrder", auth, async (req, res) => {
       message: "Order Cancelled Successfuly",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", e);
+    ehandler(e,res)
   }
 });
 
@@ -200,12 +186,7 @@ router.post("/placeOrder", auth, async (req, res) => {
       message: "Order Placed!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -234,12 +215,7 @@ router.post("/mynumber", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -268,12 +244,7 @@ router.post("/mynumber", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -293,12 +264,7 @@ router.post("/mybasics", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -330,12 +296,7 @@ router.post("/mypassword", async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -355,12 +316,7 @@ router.post("/mytwofactorauth", async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -404,18 +360,21 @@ router.post("/myaddress", auth, async (req, res) => {
         { _id },
         { $set: { "shipping_address.default_address": -1 } }
       );
+    else
+        if(userData.shipping_address.default_address < 0)
+        await User.updateOne(
+            { _id },
+            { $set : {
+                "shipping_address.default_address" : 0
+            }}
+        )
 
     res.status(201).json({
       status: 201,
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -435,12 +394,7 @@ router.post("/changeAvatar", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -469,12 +423,7 @@ router.post("/myrecovery", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", err);
+   ehandler(err,res)
   }
 });
 
@@ -497,12 +446,7 @@ router.post("/updatecart", auth, async (req, res) => {
       ...result,
     });
   } catch (e) {
-    res.status(500).json({
-      status: 500,
-      description: "internal server error",
-      solution: "Please contact server admin or try again later",
-    });
-    console.log("ERR", e);
+    ehandler(e,res)
   }
 });
 

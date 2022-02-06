@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-// TODO: Fill Products name, categories[string], description, variants [{name, stock, price}], 
 const productSchema = new mongoose.Schema({
     schema_v : { type : Number, default : 1, required : false },
     name : { type : String , unique : true , required : true},

@@ -46,7 +46,6 @@ const Product = require("./models/Product")
 app.post('/createProduct', async(req,res) => {
     const product_data = req.body
 const mongoose = require('mongoose')
-// TODO: Fill Products name, Images[String], categories[string], description, variants [{name, stock, price}], 
 
     let total_stock = 0
     product_data.variants.forEach((variant) => { total_stock += variant.stock })

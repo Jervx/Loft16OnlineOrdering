@@ -19,3 +19,18 @@ export const nShorter = (num, digits) => {
     ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol
     : "0";
 };
+
+export const numberWithCommas = (x) => {
+  x = x.toFixed(2);
+  return x.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+export const parseDate = (date) => {
+  let thisDate = new Date(date);
+
+  let wordDate = `${thisDate.toLocaleString("en-us", {
+    month: "short",
+  })} ${thisDate.getDate()}, ${thisDate.getFullYear()}`;
+
+  return wordDate
+};

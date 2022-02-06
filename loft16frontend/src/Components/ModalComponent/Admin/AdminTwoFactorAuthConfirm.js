@@ -95,7 +95,6 @@ const AdminTwoFactorAuthConfirm = (props) => {
     }
   };
 
-  // TODO: ResendCode Logic
 
   const saveCode = (e) => {
     dispatch(setSignInTwoFactor({ twoFactCode: e.target.value }));

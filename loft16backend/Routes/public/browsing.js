@@ -6,7 +6,6 @@ const User = require("../../models/User");
 const Courier = require("../../models/Courier");
 let ObjectId = require("mongoose").Types.ObjectId;
 
-// NOTE: Loft16 Getting hot product
 router.get("/gethotproducts", async (req, res) => {
   try {
     const hotProducts = await Product.find({ is_hot: true }).sort({ cat: 1 });
@@ -20,7 +19,6 @@ router.get("/gethotproducts", async (req, res) => {
   }
 });
 
-// NOTE: Loft16 getproduct
 router.post("/getproduct", async (req, res) => {
   const itemName = req.body.userSearch;
   const filters = req.body.filter;
@@ -60,7 +58,6 @@ router.post("/getproduct", async (req, res) => {
   });
 });
 
-// NOTE: Get Couriers
 router.get("/getCouriers", async (req, res) => {
   try {
     const COURIERS = await Courier.find(
@@ -83,7 +80,6 @@ router.get("/getCouriers", async (req, res) => {
   }
 });
 
-// NOTE: DONE
 router.get("/getproductdetail/:id", async (req, res) => {
   try {
     const _id = req.params.id;

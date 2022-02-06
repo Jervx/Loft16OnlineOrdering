@@ -32,23 +32,32 @@ const PublicContainer = lazy(() => import("./Pages/Public/PublicContainer"));
 function App() {
   const dispatch = useDispatch();
 
-const checkIfUserIsSaved = async () => {
-      let savedUser = JSON.parse(localStorage.getItem("userData"));
-      let savedAdmin = JSON.parse(localStorage.getItem("adminData"));
+  const checkIfUserIsSaved = async () => {
+    let savedUser = JSON.parse(localStorage.getItem("userData"));
+    let savedAdmin = JSON.parse(localStorage.getItem("adminData"));
 
-      if (!savedUser && !savedAdmin) return;
-      try {
-        const response = await API.get(
-          !savedAdmin
-            ? `/user/mydetails/${savedUser._id}`
-            : `/admin/mydetails/${savedAdmin._id}`
-        );
-        if (!savedAdmin) dispatch(signin(response.data.userData));
-        else dispatch(adminSign(response.data.adminData));
-      } catch (error) {
-          console.log(error)
+    if (!savedUser && !savedAdmin) return;
+
+    try {
+      if (savedUser) {
+        const userResponse = await API.get(`/user/mydetails/${savedUser._id}`);
+        dispatch(signin(userResponse.data.userData));
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      if (savedAdmin) {
+        const adminResponse = await API.get(
+          `/admin/mydetails/${savedAdmin._id}`
+        );
+        dispatch(adminSign(adminResponse.data.adminData));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     checkIfUserIsSaved();

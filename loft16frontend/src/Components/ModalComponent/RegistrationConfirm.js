@@ -24,7 +24,6 @@ const RegistrationConfirm = (props) => {
   const [codeStatus, setCodeStatus] = useState(true);
   const [codeError, setCodeError] = useState("");
 
-  // TODO: ResendCode Logic
   const resend = () => {
     API.post("/auth/confirm_email", auth )
       .then((response) => {

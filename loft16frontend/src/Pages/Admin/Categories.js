@@ -1,33 +1,121 @@
 import React, { useState, useEffect } from "react";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  openInputModal,
+  openAlertModal,
+  openNotifier,
+} from "../../Features/uiSlice";
 import ProtectedLoader from "../../Components/ProtectedLoader";
 
-import API from "../../Helpers/api";
-import { nShorter } from "../../Helpers/uitils"
+import { RiCloseLine } from "react-icons/ri";
 
-import { Button, Input, Table, TableBody, TableRow, TableHeader, TableCell, TableContainer} from "@windmill/react-ui";
+import API from "../../Helpers/api";
+import { nShorter } from "../../Helpers/uitils";
+
+import {
+  Button,
+  Input,
+  Table,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+  TableContainer,
+} from "@windmill/react-ui";
+
 import HelperLabel from "../../Components/HelperLabel";
+import CategoryCreator from "../../Components/ModalComponent/Admin/CategoryCreator";
 
 const Categories = () => {
   const adminData = useSelector((state) => state.admin.adminData);
+  const dispatch = useDispatch();
+
   const [loadingData, setLoadingData] = useState(true);
+  const [unmounted, setUnmounted] = useState(false)
   const [categories, setCategories] = useState([]);
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState("");
+  const [searching, setSearching] = useState(false);
+
+  const performSearch = async () => {
+    try {
+      if (search.length === 0) {
+        setCategories([])
+        setLoadingData(true);
+        loadSomething();
+        setSearching(false);
+        return;
+      }
+      setCategories([])
+      setLoadingData(true);
+      setSearching(true);
+      const response = await API.post("/admin/searchCategory", {
+        category_name: search,
+      });
+      setCategories(response.data.categories);
+      setLoadingData(false);
+    } catch (e) {
+      catchHandler(e);
+    }
+  };
+
+  const catchHandler = (e) => {
+    if (e.response) {
+      dispatch(
+        openAlertModal({
+          component: <></>,
+          data: e.response.data,
+        })
+      );
+    } else if (e.request) {
+      dispatch(
+        openAlertModal({
+          component: <></>,
+          data: {
+            err: 500,
+            description: "Sorry, but we can't reach the server",
+            solution: "Please try again later",
+          },
+        })
+      );
+    } else {
+      console.log("Error", e.message);
+    }
+  };
+
+  const deleteCategory = async (_id, oldCategory, mode) => {
+    try {
+      const update = await API.post("/admin/updateCategories", {
+        _id,
+        category: {},
+        oldCategory,
+        mode,
+      });
+    } catch (e) {
+      catchHandler(e);
+    }
+  };
 
   const loadSomething = async () => {
     if (adminData) {
       try {
+        setLoadingData(true)
         const response = await API.get("/admin/categories");
+        if(unmounted) return
         setCategories(response.data.categories);
         setLoadingData(false);
+        setSearching(false);
+        setSearch('')
       } catch (e) {}
     }
   };
 
   useEffect(() => {
     loadSomething();
+    return ()=>{
+        setUnmounted(true)
+    }
   }, [adminData]);
 
   return (
@@ -54,21 +142,21 @@ const Categories = () => {
               className="rounded-md "
               disabled={loadingData}
               onClick={() => {
-                //   dispatch(
-                //     openInputModal({
-                //       title: "",
-                //       component: (
-                //         <CourierCreator
-                //           mode={0}
-                //           onSave={loadSomething}
-                //           _id={adminData._id}
-                //         />
-                //       ),
-                //       onAccept: () => {},
-                //       acceptBtnText: "Save",
-                //       cancelBtnText: "Cancel",
-                //     })
-                //   );
+                dispatch(
+                  openInputModal({
+                    title: "",
+                    component: (
+                      <CategoryCreator
+                        mode={0}
+                        onSave={loadSomething}
+                        _id={adminData._id}
+                      />
+                    ),
+                    onAccept: () => {},
+                    acceptBtnText: "Save",
+                    cancelBtnText: "Cancel",
+                  })
+                );
               }}
             >
               New Category
@@ -81,72 +169,139 @@ const Categories = () => {
                   aria-label="New Number"
                   value={search}
                   onChange={(e) => {
-                      setSearch(e.target.value)
+                    setSearch(e.target.value);
                   }}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
-                        // TODO: Search
+                      // TODO: Search
+                      performSearch()
                     }
                   }}
                 />
               </div>
-
-              <Button disabled={loadingData} className="rounded-lg h-full w-2/12" onClick={() => {}}>
+              <Button
+                disabled={loadingData}
+                className="px-4 w-2/6 rounded-md h-full"
+                onClick={() => {
+                    performSearch()
+                }}
+              >
                 Search
               </Button>
             </div>
           </div>
+          {!loadingData && searching && (
+            <p className="my-8 text-center text-sm text-blue-700">
+              {categories.length} Search Result
+            </p>
+          )}
           <section className="mx-4 body-font">
-          <TableContainer>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableCell>Category Name</TableCell>
-                      <TableCell>Associated Products</TableCell>
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableCell>Category Name</TableCell>
+                    <TableCell>Associated Products</TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {!loadingData &&
+                    categories.map((category, idx) => (
+                      <TableRow
+                        onClick={() => {
+                          dispatch(
+                            openInputModal({
+                              title: "",
+                              component: (
+                                <CategoryCreator
+                                  mode={1}
+                                  onSave={loadSomething}
+                                  _id={adminData._id}
+                                  gcategory={category}
+                                />
+                              ),
+                              onAccept: () => {},
+                              acceptBtnText: "Save",
+                              cancelBtnText: "Cancel",
+                            })
+                          );
+                        }}
+                        key={idx}
+                        className="cursor-pointer transition hover:bg-gray-100 duration-400"
+                      >
+                        <TableCell className="text-teal-900 ">
+                          {category.category_name}
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-gray-500">
+                            <span className=" font-medium">
+                              {nShorter(category.associated_products.length, 1)}
+                            </span>
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <RiCloseLine
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dispatch(
+                                openNotifier({
+                                  title: "Remove Category",
+                                  message: (
+                                    <>
+                                      {`You are about to remove "${category.category_name}", are you sure to remove this category?`}
+                                      <div className="mx-8 my-4">
+                                        <HelperLabel
+                                          bg={"bg-gray-100"}
+                                          txtbg={"text-teal-700"}
+                                          isError={false}
+                                          msg={
+                                            "Product associated with this category will not be updated/remove."
+                                          }
+                                        />
+                                        <HelperLabel
+                                          bg={"bg-gray-100"}
+                                          txtbg={"text-teal-700"}
+                                          isError={false}
+                                          msg={
+                                            "User cannot search this category anymore"
+                                          }
+                                        />
+                                      </div>
+                                    </>
+                                  ),
+                                  onAccept: () => {
+                                    deleteCategory(adminData.id, category, -1);
+                                  },
+                                  acceptBtnText: "Yes, Remove it",
+                                  cancelBtnText: "Cancel",
+                                })
+                              );
+                            }}
+                            className="cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  { loadingData && (
+                    <TableRow className="transition filter blur-sm animate-pulse hover:bg-gray-100 duration-400">
+                      <TableCell className="text-teal-900 ">---</TableCell>
+                      <TableCell>
+                        <p className="text-gray-500">
+                          <span className=" font-medium">---</span>
+                        </p>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {!loadingData &&
-                      categories.map((category, idx) => (
-                        <TableRow key={idx} className="transition hover:bg-gray-100 duration-400">
-                          
-                          <TableCell className="text-teal-900 ">
-                            {category.category_name}
-                          </TableCell>
-                          <TableCell>
-                            <p className="text-gray-500">
-                              <span className=" font-medium">
-                                {nShorter(category.associated_products.length, 1)}
-                              </span>
-                            </p>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    {loadingData && (
-                      <TableRow className="transition filter blur-sm animate-pulse hover:bg-gray-100 duration-400">
-                          
-                          <TableCell className="text-teal-900 ">
-                            ---
-                          </TableCell>
-                          <TableCell>
-                            <p className="text-gray-500">
-                              <span className=" font-medium">
-                               ---
-                              </span>
-                            </p>
-                          </TableCell>
-                        </TableRow>
-                    )} 
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <div>
-                { !loadingData && categories.length === 0 && (
-                  <p className="my-4 text-xs text-red-400 text-center">
-                    There's no categories
-                  </p>
-                )}
-              </div>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <div>
+              {!loadingData && !searching && categories.length === 0 && (
+                <p className="my-4 text-xs text-red-400 text-center">
+                  There's no categories
+                </p>
+              )}
+            </div>
           </section>
         </div>
       )}

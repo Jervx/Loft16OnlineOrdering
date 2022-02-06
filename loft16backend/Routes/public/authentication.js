@@ -329,9 +329,6 @@ router.post("/signin", async (req, res) => {
       solution: "Please input all required data",
     });
 
-  // TODO: query on admin instead of user if admin = true
-  // NOTE: Done
-
   if (!USER)
     return res.status(404).json({
       err: 404,
@@ -563,7 +560,6 @@ router.post("/signup", async (req, res) => {
         solution: "Please resend or signup again",
       });
 
-    //TODO: SYNC Check If Confirmation Code Expired
 
     //if everything goes right, the registration entry confirmation code will be cleared from
     //loft 16 confirmation code collections
