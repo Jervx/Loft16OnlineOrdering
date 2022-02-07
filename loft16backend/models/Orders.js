@@ -14,7 +14,7 @@ const order = new mongoose.Schema({
     is_payed : {type : Boolean, default : false},
     payed_amount : { type : Number, default : 0 },
   
-    order_status : {type : Number, default : 0}, // 0 pending, 1 processing, 2 on the way, 3 delivered, -1 cancelled
+    order_status : {type : Number, default : 0}, // 0 pending, 1 processing, 2 shipped, 3 delivered, -1 cancelled
     reason : {type : String, default : ""},
     courier : {type : {} , required : true},
     items : {type : [] , required : true},

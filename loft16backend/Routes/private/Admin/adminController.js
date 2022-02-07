@@ -82,6 +82,48 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
   }
 });
 
+
+// admin route pages data reqsts ---------------------------
+router.get("/insights", adminAuth, async (req, res) => {
+  try {
+    let topProducts = await Product.find(
+      { generated_sale: { $gt: 0 } },
+      { name: 1, likes: 1, generated_sale: 1, Images: 1, total_item_sold: 1 }
+    ).sort({ generated_sale: -1 });
+
+    let pendings = await Pendings.find({}).count();
+    let inprogress = await InProgress.find({}).count();
+    let completed = await Completed.find({}).count();
+    let products = await Product.find({}).count();
+    let available = await Product.find({ total_stock: { $gt: 0 } }).count();
+
+    res.status(200).json({
+      msg: "ok!",
+      topProducts,
+      stats: {
+        total_pending_orders: pendings,
+        total_in_progress: inprogress,
+        total_completed: completed,
+        total_products: products,
+        total_available_products: available,
+      },
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
+// couriers page & actions ---------------------------
+router.get("/couriers", adminAuth, async (req, res) => {
+  try {
+    const couriers = await Courier.find({ dat: null });
+
+    res.status(200).json({ msg: "ok!", Couriers: couriers });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
 router.post("/updateCourier", adminAuth, async (req, res) => {
   try {
     const { _id, courier, oldCourier, mode } = req.body;
@@ -185,6 +227,21 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
       message,
       description,
       solution,
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
+
+// categories page & actions ---------------------------
+router.get("/categories", adminAuth, async (req, res) => {
+  try {
+    const categories = await Categories.find({});
+
+    res.status(200).json({
+      message: "ok!",
+      categories,
     });
   } catch (err) {
     ehandler(err, res);
@@ -312,85 +369,8 @@ router.post("/updateCategories", adminAuth, async (req, res) => {
   }
 });
 
-router.post("/searchPendingOrders", adminAuth, async (req, res) => {
-  try {
-    let propertiesToFind = req.body;
 
-    let pendings = await Pendings.find({
-      ...propertiesToFind,
-    });
-
-    let toFind = [];
-
-    pendings.forEach((ids, idx) => {
-      toFind.push(ids.order_ID);
-    });
-
-    pendings = await Orders.find({ _id: toFind });
-
-    res.status(200).json({
-      message: "ok!",
-      pendings,
-    });
-  } catch (err) {
-    ehandler(err, res);
-  }
-});
-
-// admin route pages data reqsts
-router.get("/insights", adminAuth, async (req, res) => {
-  try {
-    let topProducts = await Product.find(
-      { generated_sale: { $gt: 0 } },
-      { name: 1, likes: 1, generated_sale: 1, Images: 1, total_item_sold: 1 }
-    ).sort({ generated_sale: -1 });
-
-    let pendings = await Pendings.find({}).count();
-    let inprogress = await InProgress.find({}).count();
-    let completed = await Completed.find({}).count();
-    let products = await Product.find({}).count();
-    let available = await Product.find({ total_stock: { $gt: 0 } }).count();
-
-    res.status(200).json({
-      msg: "ok!",
-      topProducts,
-      stats: {
-        total_pending_orders: pendings,
-        total_in_progress: inprogress,
-        total_completed: completed,
-        total_products: products,
-        total_available_products: available,
-      },
-    });
-  } catch (err) {
-    ehandler(err, res);
-  }
-});
-
-router.get("/couriers", adminAuth, async (req, res) => {
-  try {
-    const couriers = await Courier.find({ dat: null });
-
-    res.status(200).json({ msg: "ok!", Couriers: couriers });
-  } catch (err) {
-    ehandler(err, res);
-  }
-});
-
-router.get("/categories", adminAuth, async (req, res) => {
-  try {
-    const categories = await Categories.find({});
-
-    res.status(200).json({
-      message: "ok!",
-      categories,
-    });
-  } catch (err) {
-    ehandler(err, res);
-  }
-});
-
-// pending page & actions
+// pending page & actions ---------------------------
 router.get("/pendings", adminAuth, async (req, res) => {
   try {
     let pendings = [];
@@ -461,7 +441,7 @@ router.post("/updatePending", adminAuth, async (req, res) => {
             "variants.name": item.variant,
           },
           {
-            $inc: { "variants.$.stock": -item.qty, total_stock : -item.qty },
+            $inc: { "variants.$.stock": -item.qty, total_stock: -item.qty },
           }
         );
       });
@@ -585,84 +565,112 @@ router.post("/updatePending", adminAuth, async (req, res) => {
   }
 });
 
+router.post("/searchPendingOrders", adminAuth, async (req, res) => {
+  try {
+    let propertiesToFind = req.body;
 
-// in progress page & actions
+    let pendings = await Pendings.find({
+      ...propertiesToFind,
+    });
+
+    let toFind = [];
+
+    pendings.forEach((ids, idx) => {
+      toFind.push(ids.order_ID);
+    });
+
+    pendings = await Orders.find({ _id: toFind });
+
+    res.status(200).json({
+      message: "ok!",
+      pendings,
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
+
+// in progress page & actions ---------------------------
 router.get("/inProgress", adminAuth, async (req, res) => {
-    try{
-        let inProgress = [];
-    
-        inProgress = await InProgress.aggregate([
-          {
-            $lookup: {
-              from: "users",
-              localField: "user_ID",
-              foreignField: "_id",
-              as: "user_profile",
-            },
+  try {
+    let inProgress = [];
+
+    inProgress = await InProgress.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_ID",
+          foreignField: "_id",
+          as: "user_profile",
+        },
+      },
+      { $unwind: "$user_profile" },
+      {
+        $lookup: {
+          from: "orders",
+          localField: "order_ID",
+          foreignField: "_id",
+          as: "order_detailed_version",
+        },
+      },
+      { $unwind: "$order_detailed_version" },
+    ]);
+
+    let profiles = [];
+
+    res.status(200).json({
+      message: "ok!",
+      inProgress,
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
+router.post("/updateInProgress", adminAuth, async (req, res) => {
+  try {
+    const { _id, mode, entry, status } = req.body;
+
+    // mode === 0 mark as complete
+    if (mode === 0) {
+    } else {
+      // mode === 1
+
+      // update user in_progress order status to status
+
+      const updateUser = await User.updateOne(
+        {
+          _id: entry.user_ID,
+          "in_progress.order_ID": entry.order_ID,
+        },
+        {
+          $set: {
+            "in_progress.$.order_status": status,
           },
-          { $unwind: "$user_profile" },
-          {
-            $lookup: {
-              from: "orders",
-              localField: "order_ID",
-              foreignField: "_id",
-              as: "order_detailed_version",
-            },
-          },
-          { $unwind: "$order_detailed_version" },
-        ]);
-    
-        let profiles = [];
-    
-        res.status(200).json({
-          message: "ok!",
-          inProgress,
-        });
-    }catch(err){
-        ehandler(err,res)
-    }
-})
-
-router.post("/updateInProgress", adminAuth, async(req,res) => {
-    try{
-        
-        const { _id, mode, entry ,status } = req.body
-        
-        // mode === 0 mark as complete
-        if(mode === 0){
-
-        }else{
-            // mode === 1 
-            
-            // update user in_progress order status to status
-
-            const updateUser = await User.updateOne({
-                _id : entry.user_ID,
-                "in_progress.order_ID" : entry.order_ID
-              },{
-                $set : {
-                  "in_progress.$.order_status" : status
-                }
-              })
-
-            const updateOrder = await Orders.updateOne({
-                _id : entry.order_ID
-            },{
-                $set : {
-                    order_status : status,
-                    uby : new ObjectId(_id),
-                    uat : new Date()
-                }
-            })
         }
+      );
 
-
-        res.status(201).json({
-            message : "ok!"
-        })
-    }catch(err){
-        ehandler(err,res)
+      const updateOrder = await Orders.updateOne(
+        {
+          _id: entry.order_ID,
+        },
+        {
+          $set: {
+            order_status: status,
+            uby: new ObjectId(_id),
+            uat: new Date(),
+          },
+        }
+      );
     }
-})
+
+    res.status(201).json({
+      message: "ok!",
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
 
 module.exports = router;

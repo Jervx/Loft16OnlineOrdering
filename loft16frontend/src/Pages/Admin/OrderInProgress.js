@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { openInputModal } from "../../Features/uiSlice"
+
+
 import ProtectedLoader from "../../Components/ProtectedLoader";
+import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails"
+
 import API from "../../Helpers/api";
 
 import { Avatar, Button, Dropdown, DropdownItem } from "@windmill/react-ui";
@@ -15,6 +20,8 @@ import { numberWithCommas, parseDate } from "../../Helpers/uitils";
 
 const OrderInProgress = () => {
   const adminData = useSelector((state) => state.admin.adminData);
+  const dispatch = useDispatch()
+
   const [loadingData, setLoadingData] = useState(true);
   const [unmounted, setUnmounted] = useState(false);
 
@@ -51,7 +58,7 @@ const OrderInProgress = () => {
         status,
         entry,
       });
-
+      console.log("Done Updating", response.data);
       loadSomething();
     } catch (e) {}
   };
@@ -86,10 +93,10 @@ const OrderInProgress = () => {
                       key={idx}
                       className={`w-full md:w-1/2 xl:w-1/3 ${
                         specificUpdate === idx && "filter blur-sm animate-pulse"
-                      }`}
+                      } `}
                     >
                       <div className="mb-4 mx-1">
-                        <div className="shadow-lg rounded-2xl p-4 bg-white dark:bg-gray-700 w-full">
+                        <div className={`shadow-lg rounded-2xl p-4 bg-white dark:bg-gray-700 w-full ${order.order_detailed_version.order_status === 1 && 'border border-orange-400'}`}>
                           <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center">
                               <Avatar
@@ -117,6 +124,7 @@ const OrderInProgress = () => {
                             </div>
                             <div className="relative flex space-x-2">
                               <button
+                                disabled={specificUpdate === idx}
                                 onClick={() => {
                                   setChosenIdx(idx);
                                 }}
@@ -125,7 +133,7 @@ const OrderInProgress = () => {
                                 <BsThreeDotsVertical className="h-full w-full " />
                               </button>
                               <Dropdown
-                                className="filter shadow-xl border p-5"
+                                className="absolute filter shadow-xl border p-5"
                                 align="right"
                                 isOpen={chosenIdx === idx}
                                 onClose={() => {
@@ -175,41 +183,14 @@ const OrderInProgress = () => {
                                   </span>
                                 </DropdownItem>
                               </Dropdown>
-                              {/* <button
-                                className="text-gray-200 "
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  dispatch(
-                                    openInputModal({
-                                      title: "Checkout Details",
-                                      component: (
-                                        <CancelOrderForm
-                                          entry={order}
-                                          onRemove={updatePendingOrder}
-                                        />
-                                      ),
-                                      onAccept: () => {},
-                                      acceptBtnText: "Place Order",
-                                      cancelBtnText: "Cancel",
-                                    })
-                                  );
-                                }}
-                              >
-                                <TiCancel className="text-orange-200 hover:text-orange-400 h-8 w-8" />
-                              </button>
-                            */}
                             </div>
                           </div>
                           <div className="flex items-center justify-between mb-4 space-x-12">
-                            {/* <span className="px-2 py-1 flex items-center font-semibold text-xs rounded-md text-gray-500 bg-gray-200">
-                              {order.order_detailed_version.order_status === 1? "Processing" : "Shipped"}
-                            </span> */}
-
                             <span
-                              className={`px-2 py-1 flex items-center font-semibold text-xs rounded-md ${
+                              className={`px-2 filter shadow-md py-1 flex items-center font-semibold text-xs rounded-md ${
                                 order.order_detailed_version.order_status === 1
-                                  ? "bg-purple-400 text-gray-50"
-                                  : "bg-green-400 text-white"
+                                  ? "bg-orange-400 text-gray-50"
+                                  : "bg-teal-600 text-white"
                               }`}
                             >
                               Status :
@@ -224,7 +205,11 @@ const OrderInProgress = () => {
                             </span>
                           </div>
                           <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                            <div className="w-full h-full text-center text-xs text-white bg-purple-400 rounded-full"></div>
+                            <div className={`w-full h-full text-center text-xs text-white ${
+                                order.order_detailed_version.order_status === 1
+                                  ? "bg-orange-400 text-gray-50"
+                                  : "bg-teal-600 text-white"
+                              } rounded-full`}></div>
                           </div>
                           <div className="flex items-center justify-between my-4 space-x-4">
                             <span className="px-2 py-1 flex items-center text-md rounded-md text-teal-500 bg-green-50">
@@ -242,18 +227,28 @@ const OrderInProgress = () => {
                               </p>
                             </span>
                           </div>
+                          <p className="my-2 text-xs text-gray-600">Order ID : <span className="font-medium text-gray-900">{order.order_ID}</span></p>
 
-                          {/* <Button className="bg-teal-400 text-white w-full rounded-md">
-                            Mark As Delivered
-                          </Button> */}
-                          {/* <div className="flex items-center justify-start my-4 space-x-4">
-                            <span className="px-4 py-2 flex items-center text-xs rounded-md font-semibold text-green-500 bg-green-50">
-                              Accept
-                            </span>
-                            <span className="px-4 py-2 flex items-center text-xs rounded-md text-blue-500 font-semibold bg-blue-100">
-                              Decline
-                            </span>
-                          </div> */}
+                          <Button
+                            onClick={() => {
+                              dispatch(
+                                openInputModal({
+                                  title: "Checkout Details",
+                                  component: (
+                                    <ViewOrderDetails
+                                        order={order}
+                                    />
+                                  ),
+                                  onAccept: () => {},
+                                  acceptBtnText: "Place Order",
+                                  cancelBtnText: "Cancel",
+                                })
+                              );
+                            }}
+                            className="bg-teal-400 text-white w-full rounded-md"
+                          >
+                            View Details
+                          </Button>
                         </div>
                       </div>
                     </div>

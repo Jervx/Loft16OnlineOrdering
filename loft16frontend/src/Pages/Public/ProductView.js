@@ -31,7 +31,7 @@ const ProductView = () => {
   const [loading, setLoading] = useState(true);
   const [productDetail, setProductDetail] = useState();
 
-  const [selectedVariant, setSelectedVariant] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState({});
 
   const [QTY, setQTY] = useState(1);
 
@@ -47,7 +47,7 @@ const ProductView = () => {
     cart.forEach((cart_item, idx) => {
       if (
         cart_item.product_ID === item.product_ID &&
-        cart_item.variant === productDetail.variants[selectedVariant].name
+        cart_item.variant === selectedVariant.name
       )
         found = {
           idx,
@@ -78,8 +78,8 @@ const ProductView = () => {
           product_ID: prod_id,
           product_name: productDetail.name,
           qty: QTY,
-          variant: productDetail.variants[selectedVariant].name,
-          variant_price: productDetail.variants[selectedVariant].price,
+          variant: selectedVariant.name,
+          variant_price: selectedVariant.price,
           rated: false,
         },
         _cur_user.cart.items
@@ -90,13 +90,13 @@ const ProductView = () => {
 
         let qty_in_cart = doesExist.cart_item.qty + QTY;
 
-        if (qty_in_cart > productDetail.variants[selectedVariant].stock) {
+        if (qty_in_cart > selectedVariant.stock) {
           dispatch(
             openAlertModal({
               component: <Informative />,
               data: {
                 description: "Sorry failed to add",
-                solution: `You already have ${doesExist.cart_item.qty} on your cart, adding qty of ${QTY} will exceed the current stock of ${productDetail.variants[selectedVariant].stock}. Please change the quantity`,
+                solution: `You already have ${doesExist.cart_item.qty} on your cart, adding qty of ${QTY} will exceed the current stock of ${selectedVariant.stock}. Please change the quantity`,
               },
             })
           );
@@ -122,8 +122,8 @@ const ProductView = () => {
             product_ID: prod_id,
             product_name: productDetail.name,
             qty: qty_in_cart,
-            variant: productDetail.variants[selectedVariant].name,
-            variant_price: productDetail.variants[selectedVariant].price,
+            variant: selectedVariant.name,
+            variant_price: selectedVariant.price,
             rated: false,
           },
         });
@@ -153,8 +153,8 @@ const ProductView = () => {
           product_ID: prod_id,
           product_name: productDetail.name,
           qty: QTY,
-          variant: productDetail.variants[selectedVariant].name,
-          variant_price: productDetail.variants[selectedVariant].price,
+          variant: selectedVariant.name,
+          variant_price: selectedVariant.price,
           rated: false,
         },
       });
@@ -188,7 +188,7 @@ const ProductView = () => {
   };
 
   const checkIfQtyGivenValid = () => {
-    return productDetail.variants[selectedVariant].stock < QTY || QTY <= 0 ;
+    return selectedVariant.stock < QTY || QTY <= 0 ;
   };
 
   const chechkIsNew = (date1) => {
@@ -226,6 +226,7 @@ const ProductView = () => {
       const resp = await API.get(`/browse/getproductdetail/${prod_id}`);
       let proddata = resp.data.productData;
       setProductDetail(proddata);
+      setSelectedVariant(proddata.variants[0])
       setLoading(false);
     } catch (e) {
       console.log(e);
@@ -280,33 +281,20 @@ const ProductView = () => {
                   ) : (
                     <></>
                   )}
-                  {/* {productDetail.total_stock !== 0 ? (
-                    <Badge className="rounded-full px-4 mr-2 defBackground-nohover text-white p-2  leading-none flex items-center">
-                      In Stock
-                      <AiFillCheckCircle className="ml-2"></AiFillCheckCircle>
-                    </Badge>
-                  ) : (
-                    <Badge
-                      type="danger"
-                      className="rounded-full px-4 mr-2 text-white p-2  leading-none flex items-center"
-                    >
-                      No stock
-                      <AiFillCloseCircle className="ml-2"></AiFillCloseCircle>
-                    </Badge>
-                  )} */}
+                  
                 </div>
                 <div className="flex items-center">
                   <div className="flex justify-center my-4 mr-4 rounded-2xl bg-gray-100">
                     <h3 className="defText-Col-2 px-4 py-4 mx-8 text-4xl">
                       <span className="font-light text-xl mr-2">PhP</span>
-                      {productDetail.variants[selectedVariant].price}
+                      { selectedVariant.price }
                     </h3>
                   </div>
                   <div>
-                    {productDetail.variants[selectedVariant].stock !== 0 ? (
+                    {selectedVariant.stock !== 0 ? (
                       <div className="flex items-center">
                         <BsCheckCircle className="h-6 w-6 text-teal-400 mr-2" />
-                        {productDetail.variants[selectedVariant].stock} items in
+                        {selectedVariant.stock} items in
                         stock
                       </div>
                     ) : (
@@ -347,8 +335,11 @@ const ProductView = () => {
                   {productDetail.variants.map((variant, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setSelectedVariant(idx)}
-                      className={selectVariant(idx)}
+                      onClick={() => {
+                          setSelectedVariant(variant)
+                          console.log(variant, idx, "Set")
+                        }}
+                      className={selectVariant(variant)}
                     >
                       {variant.name}
                     </button>

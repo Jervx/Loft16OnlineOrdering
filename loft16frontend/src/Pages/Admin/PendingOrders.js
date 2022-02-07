@@ -5,16 +5,16 @@ import { openInputModal, closeInputModal } from "../../Features/uiSlice";
 
 import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
-import { numberWithCommas } from "../../Helpers/uitils";
+import { numberWithCommas, parseDate } from "../../Helpers/uitils";
 
-import { RiTruckFill } from "react-icons/ri";
-
-import { Avatar, Button } from "@windmill/react-ui";
+import { Avatar, Button, Dropdown, DropdownItem } from "@windmill/react-ui";
 import HelperLabel from "../../Components/HelperLabel";
 import CancelOrderForm from "../../Components/ModalComponent/Admin/CancelOrderForm";
+import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails"
 
-import { BsCheckCircleFill } from "react-icons/bs";
-import { TiCancel } from "react-icons/ti";
+import { RiTruckFill } from "react-icons/ri";
+import { GiAirplaneArrival } from "react-icons/gi"
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 const PendingOrders = () => {
   const adminData = useSelector((state) => state.admin.adminData);
@@ -35,6 +35,7 @@ const PendingOrders = () => {
         setPendings(response.data.pendings);
         setLoadingData(false);
         setSpecificUpdate(-1);
+        console.log("Reset & Reloaded");
       } catch (e) {}
     }
   };
@@ -131,51 +132,95 @@ const PendingOrders = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="relative flex space-x-2">
                               <button
-                                onClick={() =>
-                                  updatePendingOrder(order, 0, "", idx)
-                                }
-                                className="relative border p-1 h-8 w-8 hover:text-teal-500 text-teal-400 border-teal-200 rounded-full"
+                                onClick={() => setChosenIdx(idx)}
+                                className="relative flex  p-1 h-7 w-7 hover:text-teal-800 text-teal-500 "
                               >
-                                <BsCheckCircleFill className="h-full w-full " />
+                                <BsThreeDotsVertical className="h-full w-full " />
                               </button>
-                              <button
-                                className="text-gray-200 "
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  dispatch(
-                                    openInputModal({
-                                      title: "Checkout Details",
-                                      component: (
-                                        <CancelOrderForm
-                                          entry={order}
-                                          record_index={idx}
-                                          onRemove={updatePendingOrder}
-                                        />
-                                      ),
-                                      onAccept: () => {},
-                                      acceptBtnText: "Place Order",
-                                      cancelBtnText: "Cancel",
-                                    })
-                                  );
+                              <Dropdown
+                                className="filter shadow-xl border p-5"
+                                align="right"
+                                isOpen={chosenIdx === idx}
+                                onClose={() => {
+                                  setChosenIdx(-1);
                                 }}
                               >
-                                <TiCancel className="text-orange-200 hover:text-orange-400 h-8 w-8" />
-                              </button>
+                                <div>
+                                  <p className="text-left font-medium text-lg mb-3">
+                                    Update Status
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    updatePendingOrder(order, 0, "", idx)
+                                  }
+                                  className="flex items-center w-full px-4 py-1 text-sm rounded-md text-white bg-teal-500 border border-transparent active:bg-teal-700 hover:bg-teal-600 focus:ring focus:ring-teal-300"
+                                >
+                                  <GiAirplaneArrival
+                                    className="w-5 h-5 mr-5"
+                                    aria-hidden="true"
+                                  />
+                                  <span className="font-normal py-2">
+                                    Accept
+                                  </span>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    dispatch(
+                                      openInputModal({
+                                        title: "Checkout Details",
+                                        component: (
+                                          <CancelOrderForm
+                                            entry={order}
+                                            record_index={idx}
+                                            onRemove={updatePendingOrder}
+                                          />
+                                        ),
+                                        onAccept: () => {},
+                                        acceptBtnText: "Place Order",
+                                        cancelBtnText: "Cancel",
+                                      })
+                                    );
+                                  }}
+                                  className="mt-2 flex items-center w-full px-4 py-1 text-sm rounded-md text-white bg-red-400 border border-transparent active:bg-red-500 hover:bg-red-500 focus:ring focus:ring-red-300"
+                                >
+                                  <GiAirplaneArrival
+                                    className="w-5 h-5 mr-5"
+                                    aria-hidden="true"
+                                  />
+                                  <span className="font-normal py-2">
+                                    Decline
+                                  </span>
+                                </button>
+                              </Dropdown>
                             </div>
                           </div>
                           <div className="flex items-center justify-between mb-4 space-x-12">
-                            <span className="px-2 py-1 flex items-center font-semibold text-xs rounded-md text-gray-500 bg-gray-200">
-                              Pending Order
+                            <span
+                              className={`px-2 filter shadow-md py-1 flex items-center font-semibold text-xs rounded-md ${
+                                order.order_detailed_version.order_status === 0
+                                  ? "bg-yellow-400 text-gray-50"
+                                  : "bg-teal-600 text-white"
+                              }`}
+                            >
+                              Status :
+                              {order.order_detailed_version.order_status === 0
+                                ? " Waiting Approval"
+                                : " Shipped"}
                             </span>
 
-                            <span className="px-2 py-1 flex w-36 items-center text-xs rounded-md font-semibold text-yellow-400 bg-teal-100">
-                              PLACED ON : 18 JUN
+                            <span className="uppercase px-2 py-1 flex w-36 items-center text-xs rounded-md font-semibold text-yellow-400 bg-teal-100">
+                              Placed :{" "}
+                              {parseDate(order.order_detailed_version.cat)}
                             </span>
                           </div>
                           <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                            <div className="w-full h-full text-center text-xs text-white bg-purple-400 rounded-full"></div>
+                            <div
+                              className={`w-full h-full text-center text-xs text-white bg-yellow-400 rounded-full `}
+                            ></div>
                           </div>
                           <div className="flex items-center justify-between my-4 space-x-4">
                             <span className="px-2 py-1 flex items-center text-md rounded-md text-teal-500 bg-green-50">
@@ -193,18 +238,32 @@ const PendingOrders = () => {
                               </p>
                             </span>
                           </div>
-
-                          <Button className="bg-teal-400 text-white w-full rounded-md">
-                            View Order Details
+                          <p className="my-2 text-xs text-gray-600">
+                            Order ID :{" "}
+                            <span className="font-medium text-teal-800">
+                              {order.order_ID}
+                            </span>
+                          </p>
+                          <Button
+                            onClick={() => {
+                              dispatch(
+                                openInputModal({
+                                  title: "Checkout Details",
+                                  component: (
+                                    <ViewOrderDetails
+                                        order={order}
+                                    />
+                                  ),
+                                  onAccept: () => {},
+                                  acceptBtnText: "Place Order",
+                                  cancelBtnText: "Cancel",
+                                })
+                              );
+                            }}
+                            className="bg-teal-400 text-white w-full rounded-md"
+                          >
+                            View Details
                           </Button>
-                          {/* <div className="flex items-center justify-start my-4 space-x-4">
-                          <span className="px-4 py-2 flex items-center text-xs rounded-md font-semibold text-green-500 bg-green-50">
-                            Accept
-                          </span>
-                          <span className="px-4 py-2 flex items-center text-xs rounded-md text-blue-500 font-semibold bg-blue-100">
-                            Decline
-                          </span>
-                        </div> */}
                         </div>
                       </div>
                     </div>
