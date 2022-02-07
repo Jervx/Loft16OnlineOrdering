@@ -91,9 +91,9 @@
                   uby
                   dat
               }
-            - getAllCategories
-            - searchCategories
-            - addCategories
+           [x] - getAllCategories
+           [doing] - searchCategories
+           [doing] - addCategories
 
             ** Product Management **
 

@@ -43,7 +43,18 @@ router.get("/mydetails/:id", adminAuth, async (req, res) => {
   });
 });
 
-//admin account creation &
+// TODO: product page & actions
+router.post("/updateproducts", adminAuth, async (req, res) => {
+  try {
+
+    
+
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+// admin account creation &
 router.post("/updateAdmin", adminAuth, async (req, res) => {
   try {
     const { mode, info, isChangedPass } = req.body;
@@ -81,7 +92,6 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
     ehandler(err, res);
   }
 });
-
 
 // admin route pages data reqsts ---------------------------
 router.get("/insights", adminAuth, async (req, res) => {
@@ -233,7 +243,6 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
   }
 });
 
-
 // categories page & actions ---------------------------
 router.get("/categories", adminAuth, async (req, res) => {
   try {
@@ -368,7 +377,6 @@ router.post("/updateCategories", adminAuth, async (req, res) => {
     ehandler(err, res);
   }
 });
-
 
 // pending page & actions ---------------------------
 router.get("/pendings", adminAuth, async (req, res) => {
@@ -589,7 +597,6 @@ router.post("/searchPendingOrders", adminAuth, async (req, res) => {
     ehandler(err, res);
   }
 });
-
 
 // in progress page & actions ---------------------------
 router.get("/inProgress", adminAuth, async (req, res) => {

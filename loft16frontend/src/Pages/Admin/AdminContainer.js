@@ -58,8 +58,6 @@ const AdminContainer = (props) => {
 
   return (
       <div className={`flex  h-screen bg-gray-50 dark:bg-gray-900 `}>
-        {/* admin sidebar navigation */}
-        {/* <div className="filter fixed top-8 drop-shadow-xl flex flex-col w-64 left-0 pr-4 bg-white h-screen border-r"> */}
         <aside className="z-30 flex-shrink-0 px-4 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 lg:block">
           <div className="flex items-center my-6">
             <Link
