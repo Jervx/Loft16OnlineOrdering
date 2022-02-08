@@ -10,7 +10,7 @@ const completed_orders = new mongoose.Schema({
     courier : { type : {} , required : true},
     cat: { type: Date, default: Date.now },
     uat: { type: Date, default: Date.now },
-    uby: {type : mongoose.ObjectId, default : null},
+    uby: { type : mongoose.ObjectId, default : null},
     dat: { type: Date, default: null },
 });
 

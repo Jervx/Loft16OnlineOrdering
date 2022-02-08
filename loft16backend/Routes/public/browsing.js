@@ -4,6 +4,8 @@ const router = express.Router();
 const Product = require("../../models/Product");
 const User = require("../../models/User");
 const Courier = require("../../models/Courier");
+const Categories = require("../../models/Categories")
+
 let ObjectId = require("mongoose").Types.ObjectId;
 
 router.get("/gethotproducts", async (req, res) => {
@@ -118,5 +120,14 @@ router.get("/getproductdetail/:id", async (req, res) => {
     });
   }
 });
+
+router.get("/getCategories", async(req,res) =>{
+    const categories = await Categories.find({});
+
+    res.status(200).json({
+      message: "ok!",
+      categories,
+    });
+})
 
 module.exports = router;

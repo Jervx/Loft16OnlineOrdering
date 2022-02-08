@@ -46,9 +46,6 @@ router.get("/mydetails/:id", adminAuth, async (req, res) => {
 // TODO: product page & actions
 router.post("/updateproducts", adminAuth, async (req, res) => {
   try {
-
-    
-
   } catch (e) {
     ehandler(e, res);
   }
@@ -575,19 +572,34 @@ router.post("/updatePending", adminAuth, async (req, res) => {
 
 router.post("/searchPendingOrders", adminAuth, async (req, res) => {
   try {
-    let propertiesToFind = req.body;
-
-    let pendings = await Pendings.find({
-      ...propertiesToFind,
-    });
+    let { order_ID } = req.body;
+    let pendings = await Pendings.aggregate([
+      {
+        $match: {
+          order_ID: new ObjectId(order_ID),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_ID",
+          foreignField: "_id",
+          as: "user_profile",
+        },
+      },
+      { $unwind: "$user_profile" },
+      {
+        $lookup: {
+          from: "orders",
+          localField: "order_ID",
+          foreignField: "_id",
+          as: "order_detailed_version",
+        },
+      },
+      { $unwind: "$order_detailed_version" },
+    ]);
 
     let toFind = [];
-
-    pendings.forEach((ids, idx) => {
-      toFind.push(ids.order_ID);
-    });
-
-    pendings = await Orders.find({ _id: toFind });
 
     res.status(200).json({
       message: "ok!",
@@ -637,10 +649,91 @@ router.get("/inProgress", adminAuth, async (req, res) => {
 
 router.post("/updateInProgress", adminAuth, async (req, res) => {
   try {
-    const { _id, mode, entry, status } = req.body;
+    const { _id, mode, entry, status, entry_sm } = req.body;
+
+    const PRESENT = await InProgress.findOne({ order_ID: entry_sm.order_ID });
+
+    if (!PRESENT)
+      return res.status(404).json({
+        status: 404,
+        message: "Not Found",
+        description: "This order has been removed",
+        solution: "Reload Page",
+      });
 
     // mode === 0 mark as complete
     if (mode === 0) {
+      const NewCompletedEntry = await Completed.create({
+        ...entry_sm,
+        uat: new Date(),
+        uby: new ObjectId(_id),
+      });
+
+      const ITEMS = entry.order_detailed_version.items;
+
+      console.log("Step 1 ");
+
+      ITEMS.forEach(async (item, idx) => {
+        const updateProduct = await Product.updateOne(
+          {
+            _id: item.product_ID,
+          },
+          {
+            $inc: {
+              total_item_sold: item.qty,
+              generated_sale: item.qty * item.variant_price,
+            },
+          }
+        );
+      });
+
+      console.log("Step 2");
+
+      const updateUser = await User.updateOne(
+        {
+          _id: entry_sm.user_ID,
+        },
+        {
+          $pull: {
+            in_progress: { order_ID: entry_sm.order_ID },
+          },
+          $inc: {
+            n_completed_orders: 1,
+            n_completed_transaction: 1,
+          },
+          $push: {
+            past_transactions: {
+              order_ID: new ObjectId(entry_sm.oder_ID),
+              n_items: entry.n_items,
+              total_cost: entry.total_cost,
+              courier: entry.courier.courier_name,
+              cat: new Date(),
+            }
+          }
+        }
+      );
+
+      console.log("Step 3");
+
+      const updateOrder = await Orders.updateOne(
+        {
+          _id: entry_sm.order_ID,
+        },
+        {
+          $set: {
+            uat: new Date(),
+            order_status: status,
+          },
+        }
+      );
+
+      console.log("Step 4");
+
+      const deleteEntry = await InProgress.deleteOne({
+        order_ID: entry_sm.order_ID,
+      });
+
+      console.log("Step 5");
     } else {
       // mode === 1
 
@@ -679,5 +772,53 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
     ehandler(err, res);
   }
 });
+
+router.post("/searchInProgress", adminAuth, async (req, res) => {
+  try {
+    let { order_ID } = req.body;
+    let pendings = await InProgress.aggregate([
+      {
+        $match: {
+          order_ID: new ObjectId(order_ID),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_ID",
+          foreignField: "_id",
+          as: "user_profile",
+        },
+      },
+      { $unwind: "$user_profile" },
+      {
+        $lookup: {
+          from: "orders",
+          localField: "order_ID",
+          foreignField: "_id",
+          as: "order_detailed_version",
+        },
+      },
+      { $unwind: "$order_detailed_version" },
+    ]);
+
+    let toFind = [];
+
+    res.status(200).json({
+      message: "ok!",
+      pendings,
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
+// completed orders page & actions ----------------------
+
+router.get("/completed", adminAuth, async (req, res) => {});
+
+router.post("/updateCompleted", adminAuth, async (req, res) => {});
+
+router.post("/searchCompleted", adminAuth, async (req, res) => {});
 
 module.exports = router;

@@ -35,6 +35,8 @@ const Products = () => {
   const [vlby, setvlby] = useState(0);
   const [srtby, setsrtby] = useState(0);
 
+  const [categories, setCategories] = useState([]);
+
   const setFilterScope = (scope) => {
     dispatch(
       setFilter({
@@ -103,8 +105,17 @@ const Products = () => {
       ? "bg-gray-100 text-gray-800 font-medium px-4 py-2 hover:bg-gray-100 rounded-xl mx-2"
       : " px-4 py-2 hover:bg-gray-100 rounded-xl mx-2 ";
 
+  const getCategories = async () => {
+    try {
+      console.log("Req");
+      const response = await API.get("/browse/getCategories");
+      setCategories(response.data.categories);
+    } catch (err) {}
+  };
+
   useEffect(() => {
     getProducts();
+    getCategories();
   }, []);
 
   // for sorting of product results
@@ -256,24 +267,15 @@ const Products = () => {
           >
             All
           </button>
-          <button
-            onClick={() => setFilterScope("accessories")}
-            className={amIFilter("accessories")}
-          >
-            Accessories
-          </button>
-          <button
-            onClick={() => setFilterScope("wood sign")}
-            className={amIFilter("wood sign")}
-          >
-            Wood Sign
-          </button>
-          <button
-            onClick={() => setFilterScope("Metal Sign")}
-            className={amIFilter("Metal sign")}
-          >
-            Metal Sign
-          </button>
+          {categories.map((category, idx) => (
+            <button
+              key={idx}
+              onClick={() => setFilterScope(category.category_name)}
+              className={amIFilter(category.category_name)}
+            >
+              {category.category_name}
+            </button>
+          ))}
         </div>
       </div>
       {loading ? (

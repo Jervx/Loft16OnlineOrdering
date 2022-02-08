@@ -7,13 +7,13 @@ import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
 import { numberWithCommas, parseDate } from "../../Helpers/uitils";
 
-import { Avatar, Button, Dropdown, DropdownItem } from "@windmill/react-ui";
+import { Avatar, Button, Dropdown, Input} from "@windmill/react-ui";
 import HelperLabel from "../../Components/HelperLabel";
 import CancelOrderForm from "../../Components/ModalComponent/Admin/CancelOrderForm";
-import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails"
+import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails";
 
 import { RiTruckFill } from "react-icons/ri";
-import { GiAirplaneArrival } from "react-icons/gi"
+import { GiAirplaneArrival } from "react-icons/gi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 const PendingOrders = () => {
@@ -24,6 +24,9 @@ const PendingOrders = () => {
 
   const [chosenIdx, setChosenIdx] = useState(-1);
   const [specificUpdate, setSpecificUpdate] = useState(-1);
+  
+  const [search, setSearch] = useState("");
+  const [searching, setSearching] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -37,6 +40,31 @@ const PendingOrders = () => {
         setSpecificUpdate(-1);
         console.log("Reset & Reloaded");
       } catch (e) {}
+    }
+  };
+
+
+  const performSearch = async () => {
+    try {
+      if (search.length === 0) {
+        setPendings([])
+        setLoadingData(true);
+        loadSomething();
+        setSearching(false);
+        return;
+      }
+      setPendings([])
+      setLoadingData(true);
+      setSearching(true);
+      
+      const response = await API.post("/admin/searchPendingOrders", {
+        order_ID : search,
+      });
+
+      setPendings(response.data.pendings);
+      setLoadingData(false);
+    } catch (e) {
+      
     }
   };
 
@@ -90,7 +118,36 @@ const PendingOrders = () => {
               }
             />
           </div>
-          <hr className="my-10 mx-8 border-gray-200 dark:border-gray-700" />
+          <div className="w-full mx-4 mt-8 md:w-1/2 md:mx-8">
+            <div className=" flex items-center ">
+              <div className="relative w-full mr-3 text-green-900 h-full  focus-within:text-green-700 ">
+                <Input
+                  className="rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-500 hover:text-gray-700 focus:text-gray-700"
+                  placeholder="Order ID"
+                  aria-label="search"
+                  onChange={(e) => {
+                    setSearch(e.target.value)
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      // TODO: Search
+                      performSearch()
+                    }
+                  }}
+                />
+              </div>
+              <Button
+                disabled={loadingData}
+                className="px-4 w-2/6 rounded-md h-full"
+                onClick={() => {
+                    performSearch()
+                }}
+              >
+                Search
+              </Button>
+            </div>
+          </div>
+          <hr className="my-6 mx-8 border-gray-200 dark:border-gray-700" />
           <section className="body-font">
             <div className=" pb-24 pt-2 md:pt-0 md:pr-0 md:pl-0">
               {loadingData && <ProtectedLoader />}
@@ -249,11 +306,7 @@ const PendingOrders = () => {
                               dispatch(
                                 openInputModal({
                                   title: "Checkout Details",
-                                  component: (
-                                    <ViewOrderDetails
-                                        order={order}
-                                    />
-                                  ),
+                                  component: <ViewOrderDetails order={order} />,
                                   onAccept: () => {},
                                   acceptBtnText: "Place Order",
                                   cancelBtnText: "Cancel",
@@ -273,7 +326,7 @@ const PendingOrders = () => {
               <div>
                 {!loadingData && pendings.length === 0 && (
                   <p className="my-4 text-xs text-red-400 text-center">
-                    There's no pending orders
+                    { !searching ? "There's no pending orders" : "No matching order found" }
                   </p>
                 )}
               </div>

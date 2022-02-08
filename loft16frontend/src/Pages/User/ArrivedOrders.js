@@ -13,6 +13,8 @@ import { openNotifier } from "../../Features/uiSlice";
 
 import { openAlertModal, openInputModal } from "../../Features/uiSlice";
 
+import { parseDate } from "../../Helpers/uitils";
+
 const ArrivedOrders = () => {
   const userData = useSelector((state) => state.user.userData);
   const dispatch = useDispatch();
@@ -180,18 +182,8 @@ const ArrivedOrders = () => {
                           <p className="px-5 text-xs py-2">
                             This order was delivered on
                             <span className="font-medium">
-                              {" "}
-                              {new Date(
-                                completed.completed_date
-                              ).toLocaleString("en-us", {
-                                month: "long",
-                              }) +
-                                " " +
-                                new Date(completed.completed_date).getDate() +
-                                ", " +
-                                new Date(
-                                  completed.completed_date
-                                ).getFullYear()}
+                                {" "}
+                              {parseDate(completed.cat)}
                             </span>
                           </p>
                         </div>

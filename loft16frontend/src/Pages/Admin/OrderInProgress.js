@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { openInputModal } from "../../Features/uiSlice"
-
+import { openInputModal, openAlertModal } from "../../Features/uiSlice";
 
 import ProtectedLoader from "../../Components/ProtectedLoader";
-import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails"
+import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails";
+import Informative from "../../Components/Modal/Informative";
 
 import API from "../../Helpers/api";
 
-import { Avatar, Button, Dropdown, DropdownItem } from "@windmill/react-ui";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  Input,
+} from "@windmill/react-ui";
 
 import { RiTruckFill } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -20,7 +26,7 @@ import { numberWithCommas, parseDate } from "../../Helpers/uitils";
 
 const OrderInProgress = () => {
   const adminData = useSelector((state) => state.admin.adminData);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [loadingData, setLoadingData] = useState(true);
   const [unmounted, setUnmounted] = useState(false);
@@ -29,6 +35,9 @@ const OrderInProgress = () => {
 
   const [chosenIdx, setChosenIdx] = useState(-1);
   const [specificUpdate, setSpecificUpdate] = useState(-1);
+
+  const [search, setSearch] = useState("");
+  const [searching, setSearching] = useState(false);
 
   const loadSomething = async () => {
     if (adminData) {
@@ -43,6 +52,28 @@ const OrderInProgress = () => {
     }
   };
 
+  const performSearch = async () => {
+    try {
+      if (search.length === 0) {
+        setInProgress([]);
+        setLoadingData(true);
+        loadSomething();
+        setSearching(false);
+        return;
+      }
+      setInProgress([]);
+      setLoadingData(true);
+      setSearching(true);
+
+      const response = await API.post("/admin/searchInProgress", {
+        order_ID: search,
+      });
+
+      setInProgress(response.data.pendings);
+      setLoadingData(false);
+    } catch (e) {}
+  };
+
   const updateInProgress = async (entry, mode, status, idx) => {
     try {
       if (entry.order_detailed_version.order_status === status) {
@@ -52,15 +83,37 @@ const OrderInProgress = () => {
 
       setSpecificUpdate(idx);
       setChosenIdx(-1);
+
+      let entry_sm = { ...entry };
+
+      delete entry_sm.user_profile;
+      delete entry_sm.order_detailed_version;
+
       const response = await API.post("/admin/updateInProgress", {
         _id: adminData._id,
         mode,
         status,
         entry,
+        entry_sm,
       });
-      console.log("Done Updating", response.data);
+      if (!searching) loadSomething();
+      else {
+        performSearch();
+        setSpecificUpdate(-1);
+      }
+    } catch (e) {
       loadSomething();
-    } catch (e) {}
+      console.log(e);
+      dispatch(
+        openAlertModal({
+          component: <Informative />,
+          data: {
+            description: "Failed",
+            solution: e.response.data.solution,
+          },
+        })
+      );
+    }
   };
 
   useEffect(() => {
@@ -79,7 +132,35 @@ const OrderInProgress = () => {
           <h1 className="text-teal-900 mx-9 mt-14 font-medium text-3xl">
             Orders In Progress
           </h1>
-
+          <div className="w-full mx-4 mt-8 md:w-1/2 md:mx-8">
+            <div className=" flex items-center ">
+              <div className="relative w-full mr-3 text-green-900 h-full  focus-within:text-green-700 ">
+                <Input
+                  className="rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-500 hover:text-gray-700 focus:text-gray-700"
+                  placeholder="Order ID"
+                  aria-label="search"
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      // TODO: Search
+                      performSearch();
+                    }
+                  }}
+                />
+              </div>
+              <Button
+                disabled={loadingData}
+                className="px-4 w-2/6 rounded-md h-full"
+                onClick={() => {
+                  performSearch();
+                }}
+              >
+                Search
+              </Button>
+            </div>
+          </div>
           <hr className="my-10 mx-8 border-gray-200 dark:border-gray-700" />
           <section className="body-font">
             <div className=" pb-24 pt-2 md:pt-0 md:pr-0 md:pl-0">
@@ -96,7 +177,12 @@ const OrderInProgress = () => {
                       } `}
                     >
                       <div className="mb-4 mx-1">
-                        <div className={`shadow-lg rounded-2xl p-4 bg-white dark:bg-gray-700 w-full ${order.order_detailed_version.order_status === 1 && 'border border-orange-400'}`}>
+                        <div
+                          className={`shadow-lg rounded-2xl p-4 bg-white dark:bg-gray-700 w-full ${
+                            order.order_detailed_version.order_status === 1 &&
+                            "border border-orange-400"
+                          }`}
+                        >
                           <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center">
                               <Avatar
@@ -173,7 +259,12 @@ const OrderInProgress = () => {
                                     set as Shipped
                                   </span>
                                 </DropdownItem>
-                                <DropdownItem className="p-5 bg-teal-500 text-white ">
+                                <DropdownItem
+                                  onClick={() =>
+                                    updateInProgress(order, 0, 3, idx)
+                                  }
+                                  className="p-5 bg-teal-500 text-white "
+                                >
                                   <GiAirplaneArrival
                                     className="w-5 h-5 mr-5"
                                     aria-hidden="true"
@@ -205,11 +296,13 @@ const OrderInProgress = () => {
                             </span>
                           </div>
                           <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                            <div className={`w-full h-full text-center text-xs text-white ${
+                            <div
+                              className={`w-full h-full text-center text-xs text-white ${
                                 order.order_detailed_version.order_status === 1
                                   ? "bg-orange-400 text-gray-50"
                                   : "bg-teal-600 text-white"
-                              } rounded-full`}></div>
+                              } rounded-full`}
+                            ></div>
                           </div>
                           <div className="flex items-center justify-between my-4 space-x-4">
                             <span className="px-2 py-1 flex items-center text-md rounded-md text-teal-500 bg-green-50">
@@ -227,18 +320,19 @@ const OrderInProgress = () => {
                               </p>
                             </span>
                           </div>
-                          <p className="my-2 text-xs text-gray-600">Order ID : <span className="font-medium text-gray-900">{order.order_ID}</span></p>
+                          <p className="my-2 text-xs text-gray-600">
+                            Order ID :{" "}
+                            <span className="font-medium text-gray-900">
+                              {order.order_ID}
+                            </span>
+                          </p>
 
                           <Button
                             onClick={() => {
                               dispatch(
                                 openInputModal({
                                   title: "Checkout Details",
-                                  component: (
-                                    <ViewOrderDetails
-                                        order={order}
-                                    />
-                                  ),
+                                  component: <ViewOrderDetails order={order} />,
                                   onAccept: () => {},
                                   acceptBtnText: "Place Order",
                                   cancelBtnText: "Cancel",
@@ -255,6 +349,15 @@ const OrderInProgress = () => {
                   ))}
                 </div>
               )}
+              <div>
+                {!loadingData && inProgress.length === 0 && (
+                  <p className="my-4 text-xs text-red-400 text-center">
+                    {!searching
+                      ? "There's no pending orders"
+                      : "No matching order found"}
+                  </p>
+                )}
+              </div>
             </div>
           </section>
         </div>
