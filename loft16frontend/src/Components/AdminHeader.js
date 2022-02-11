@@ -17,12 +17,14 @@ import { MdOutlineLogout } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 
 /* userSlice */
-import { adminSign, adminOut } from "../Features/adminSlice";
+import { adminOut } from "../Features/adminSlice";
 import { openNotifier } from "../Features/uiSlice";
 
 import Loader from "../Components/Loader"
 
-import API from "../Helpers/api";
+
+import {openInputModal} from "../Features/uiSlice"
+import AdminProfile from "../Components/ModalComponent/Admin/AdminProfile"
 
 const AdminHeader = (props) => {
   const { history } = props;
@@ -81,8 +83,18 @@ const AdminHeader = (props) => {
                 className="dark:text-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-800 hover:text-green-600"
                 tag="a"
                 onClick={() => {
-                  props.history.push("/admin/profile");
-                }}
+                    dispatch(
+                      openInputModal({
+                        title: "",
+                        component: (
+                          <AdminProfile admin_id={adminData._id} />
+                        ),
+                        onAccept: () => {},
+                        acceptBtnText: "Save",
+                        cancelBtnText: "Cancel",
+                      })
+                    );
+                  }}
               >
                 {adminData ? (
                   <div className="flex items-center">

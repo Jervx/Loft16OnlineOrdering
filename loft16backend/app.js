@@ -34,6 +34,7 @@ app.use((req, res, next) => {
 const authenticationRoute = require('./Routes/public/authentication')
 const userController = require('./Routes/private/User/userController')
 const browsing = require('./Routes/public/browsing')
+const loftServer = require('./Routes/loftServer')
 
 const adminController = require('./Routes/private/Admin/adminController')
 
@@ -41,6 +42,11 @@ app.use('/auth', authenticationRoute)
 app.use('/user', userController)
 app.use('/browse', browsing)
 app.use('/admin', adminController)
+
+app.use('/loftServer', loftServer)
+
+//serving product images
+app.use('/static', express.static('static'))
 
 const Product = require("./models/Product")
 app.post('/createProduct', async(req,res) => {

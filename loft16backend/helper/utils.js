@@ -1,3 +1,6 @@
+const ObjectId = require('mongoose').Types.ObjectId;
+
+
 const ehandler = (err, res) => {
     console.log(err);
     res.status(500).json({
@@ -7,4 +10,13 @@ const ehandler = (err, res) => {
     });
 }
 
-module.exports = { ehandler }
+function checkObjectId(id){
+    if(ObjectId.isValid(id)){
+        if((String)(new ObjectId(id)) === id)
+            return true;
+        return false;
+    }
+    return false;
+}
+
+module.exports = { ehandler, checkObjectId }

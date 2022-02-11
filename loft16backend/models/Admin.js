@@ -10,6 +10,7 @@ const adminSchema = new mongoose.Schema({
   role : {type : String, default : "Admin"},
   login_count : {type : Number, default : 0},
   password : {type : String, required : true},
+  action_count : { type : Number, default : 0},
   two_factor_auth : {type: Boolean, default : false},
   cat : {type : Date, default : Date.now},
   uat : {type : Date, default : null},

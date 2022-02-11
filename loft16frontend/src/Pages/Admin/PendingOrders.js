@@ -13,8 +13,8 @@ import CancelOrderForm from "../../Components/ModalComponent/Admin/CancelOrderFo
 import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails";
 
 import { RiTruckFill } from "react-icons/ri";
-import { GiAirplaneArrival } from "react-icons/gi";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { BsThreeDotsVertical, BsFillCheckCircleFill } from "react-icons/bs";
+import { TiCancel } from "react-icons/ti"
 
 const PendingOrders = () => {
   const adminData = useSelector((state) => state.admin.adminData);
@@ -46,7 +46,7 @@ const PendingOrders = () => {
 
   const performSearch = async () => {
     try {
-      if (search.length === 0) {
+      if (search.length === 0 && !search.length === 24) {
         setPendings([])
         setLoadingData(true);
         loadSomething();
@@ -146,6 +146,9 @@ const PendingOrders = () => {
                 Search
               </Button>
             </div>
+            {
+                 (search.length !== 0 && search.length !== 24) && <HelperLabel msg="Order ID Must Contain 24 Characters" isError={false} bg={'bg-red-50'} txtbg={'text-red-400'} />
+            }
           </div>
           <hr className="my-6 mx-8 border-gray-200 dark:border-gray-700" />
           <section className="body-font">
@@ -215,7 +218,7 @@ const PendingOrders = () => {
                                   }
                                   className="flex items-center w-full px-4 py-1 text-sm rounded-md text-white bg-teal-500 border border-transparent active:bg-teal-700 hover:bg-teal-600 focus:ring focus:ring-teal-300"
                                 >
-                                  <GiAirplaneArrival
+                                  <BsFillCheckCircleFill
                                     className="w-5 h-5 mr-5"
                                     aria-hidden="true"
                                   />
@@ -244,7 +247,7 @@ const PendingOrders = () => {
                                   }}
                                   className="mt-2 flex items-center w-full px-4 py-1 text-sm rounded-md text-white bg-red-400 border border-transparent active:bg-red-500 hover:bg-red-500 focus:ring focus:ring-red-300"
                                 >
-                                  <GiAirplaneArrival
+                                  <TiCancel
                                     className="w-5 h-5 mr-5"
                                     aria-hidden="true"
                                   />

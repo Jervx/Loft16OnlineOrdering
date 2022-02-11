@@ -4,6 +4,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter&family=Pacifico&family=Roboto&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap');
 
 @font-face {
     font-family: 'Moontime';
@@ -39,6 +40,10 @@
 
 .font-inter{
     font-family: 'Inter';
+}
+
+.font-quicksand{
+    font-family: 'Quicksand', sans-serif;
 }
 
 .font-roboto{

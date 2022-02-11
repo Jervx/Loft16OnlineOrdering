@@ -247,7 +247,7 @@ const Orders = () => {
                         <div className="flex">
                           <p className="rounded-lg filter drop-shadow-md bg-blue-200 mt-2 px-5 py-2 text-xs">
                             {in_progress.order_status === 1
-                              ? "Processed"
+                              ? "Processing"
                               : "Shipped"}
                           </p>
                         </div>

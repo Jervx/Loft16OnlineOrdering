@@ -2,20 +2,35 @@ import React, { useState, useEffect } from "react";
 import { FaBullseye } from "react-icons/fa";
 
 import { useSelector } from "react-redux";
+
 import ProtectedLoader from "../../Components/ProtectedLoader";
+import HelperLabel from "../../Components/HelperLabel";
+
+import { useDispatch } from "react-redux";
+
+import { openInputModal } from "../../Features/uiSlice";
+import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDetails";
+
 import API from "../../Helpers/api";
 
-import { Avatar, Button, Dropdown, DropdownItem, Input } from "@windmill/react-ui";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  Input,
+} from "@windmill/react-ui";
 
 import { RiTruckFill } from "react-icons/ri";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { GiHandTruck, GiAirplaneArrival } from "react-icons/gi";
-import { FaShippingFast } from "react-icons/fa";
+import { BsThreeDotsVertical, BsFillTrashFill } from "react-icons/bs";
 
 import { numberWithCommas, parseDate } from "../../Helpers/uitils";
 
 const DeliveredOrders = () => {
   const adminData = useSelector((state) => state.admin.adminData);
+
+  const dispatch = useDispatch();
+
   const [loadingData, setLoadingData] = useState(true);
   const [unmounted, setUnmounted] = useState(false);
 
@@ -27,13 +42,16 @@ const DeliveredOrders = () => {
   const [search, setSearch] = useState("");
   const [searching, setSearching] = useState(false);
 
-  
-
   const loadSomething = async () => {
     if (adminData) {
       try {
-        const response = await API.get("/admin/insights");
-        if(unmounted) return
+        const response = await API.get("/admin/completed");
+        if (unmounted) return;
+        setDelivered(response.data.completed);
+        console.log("Loaded");
+        setChosenIdx(-1);
+        setSpecificUpdate(-1);
+        setLoadingData(false);
       } catch (e) {}
     }
   };
@@ -41,31 +59,30 @@ const DeliveredOrders = () => {
   const performSearch = async () => {
     try {
       if (search.length === 0) {
-
         setLoadingData(true);
-        loadSomething();
         setSearching(false);
+        loadSomething();
         return;
       }
 
       setLoadingData(true);
       setSearching(true);
-      
-      const response = await API.post("/admin/searchInProgress", {
-        order_ID : search,
+
+      const response = await API.post("/admin/searchCompleted", {
+        order_ID: search,
       });
 
+      setDelivered(response.data.completed);
+
       setLoadingData(false);
-    } catch (e) {
-      
-    }
+    } catch (e) {}
   };
 
   useEffect(() => {
     loadSomething();
-    return ()=>{
-        setUnmounted(true)
-    }
+    return () => {
+      setUnmounted(true);
+    };
   }, [adminData]);
 
   return (
@@ -77,14 +94,55 @@ const DeliveredOrders = () => {
           <h1 className="text-teal-900 mx-9 mt-14 font-medium text-3xl">
             Delivered Orders
           </h1>
+          <div className="w-full mx-4 mt-8 md:w-1/2 md:mx-8">
+            <div className=" flex items-center ">
+              <div className="relative w-full mr-3 text-green-900 h-full  focus-within:text-green-700 ">
+                <Input
+                  className="rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-500 hover:text-gray-700 focus:text-gray-700"
+                  placeholder="Order ID"
+                  aria-label="search"
+                  disabled={loadingData}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      // TODO: Search
+                      performSearch();
+                    }
+                  }}
+                />
+              </div>
+              <Button
+                disabled={loadingData}
+                className="px-4 w-2/6 rounded-md h-full"
+                onClick={() => {
+                  performSearch();
+                }}
+              >
+                Search
+              </Button>
+            </div>
+            {search.length !== 0 && search.length !== 24 && (
+              <HelperLabel
+                msg="Order ID Must Contain 24 Characters"
+                isError={false}
+                bg={"bg-red-50"}
+                txtbg={"text-red-400"}
+              />
+            )}
+          </div>
+          <hr className="my-10 mx-8 border-gray-200 dark:border-gray-700" />
           <section className="body-font">
             <div className=" pb-24 pt-2 md:pt-0 md:pr-0 md:pl-0">
-              
+              {loadingData && <ProtectedLoader />}
+              {!loadingData && (
                 <div
                   className={`my-8 px-4 flex w-full flex-col flex-wrap sm:flex-row`}
                 >
-                  
+                  {delivered.map((item, idx) => (
                     <div
+                      key={idx}
                       className={`w-full md:w-1/2 xl:w-1/3 ${
                         -1 === 1 && "filter blur-sm animate-pulse"
                       } `}
@@ -96,31 +154,31 @@ const DeliveredOrders = () => {
                               <Avatar
                                 className="rounded-xl relative p-2 bg-blue-100"
                                 size="large"
-                                src={''}
+                                src={item.user_profile.profile_picture}
                               />
                               <div className="flex flex-col">
                                 <span className="font-bold text-md text-black dark:text-white ml-2">
                                   <span className="font-normal">From </span>
-                                  {'jerb'}
+                                  {item.user_profile.user_name}
                                 </span>
                                 <span className="text-sm text-gray-500 dark:text-white ml-2">
-                                  {'jerb'}
+                                  {item.user_profile.email_address}
                                 </span>
                                 <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-white ml-2">
                                   <span className="font-medium">via</span>
                                   <RiTruckFill className="text-teal-900 mx-2" />
                                   <span className="font-medium">
                                     {" "}
-                                    {'jerb'}
+                                    {item.courier.courier_name}
                                   </span>
                                 </div>
                               </div>
                             </div>
                             <div className="relative flex space-x-2">
                               <button
-                                disabled={true}
+                                disabled={specificUpdate === idx}
                                 onClick={() => {
-                                  
+                                  setChosenIdx(idx);
                                 }}
                                 className="relative flex  p-1 h-7 w-7 hover:text-teal-800 text-teal-500 "
                               >
@@ -129,9 +187,9 @@ const DeliveredOrders = () => {
                               <Dropdown
                                 className="absolute filter shadow-xl border p-5"
                                 align="right"
-                                isOpen={false}
+                                isOpen={chosenIdx === idx}
                                 onClose={() => {
-
+                                  setChosenIdx(-1);
                                 }}
                               >
                                 <div>
@@ -140,12 +198,10 @@ const DeliveredOrders = () => {
                                   </p>
                                 </div>
                                 <DropdownItem
-                                  onClick={() =>
-                                    {}
-                                  }
-                                  className="dark:text-gray-200 text-gray-500 hover:text-purple-600"
+                                  onClick={() => {}}
+                                  className="dark:text-gray-200 text-gray-500 hover:text-red-600"
                                 >
-                                  <GiHandTruck
+                                  <BsFillTrashFill
                                     className="w-5 h-5 mr-5"
                                     aria-hidden="true"
                                   />
@@ -153,35 +209,32 @@ const DeliveredOrders = () => {
                                     Delete Record
                                   </span>
                                 </DropdownItem>
-                                
                               </Dropdown>
                             </div>
                           </div>
                           <div className="flex items-center justify-between mb-4 space-x-12">
-                            <span
-                              className="px-2 filter shadow-md py-1 flex text-white items-center font-semibold text-xs rounded-md bg-green-500"
-                            >
+                            <span className="px-2 filter shadow-md py-1 flex text-white items-center font-semibold text-xs rounded-md bg-green-500">
                               Delivered
                             </span>
 
                             <div className="space-y-2">
-                            <span className="uppercase px-2 py-1 flex w-36 items-center text-xs rounded-md font-semibold text-yellow-400 bg-teal-100">
-                              Placed :{" "}
-                              {parseDate(new Date())}
-                            </span>
-                            <span className="uppercase px-2 py-1 flex w-36 items-center text-xs rounded-md font-semibold text-green-500 bg-teal-100">
-                              Finish :{" "}
-                              {parseDate(new Date())}
-                            </span>
+                              <span className="uppercase px-2 py-1 flex w-36 items-center text-xs rounded-md font-semibold text-yellow-400 bg-teal-100">
+                                Placed :{" "}
+                                {parseDate(item.order_detailed_version.cat)}
+                              </span>
+                              <span className="uppercase px-2 py-1 flex w-36 items-center text-xs rounded-md font-semibold text-green-500 bg-teal-100">
+                                Finish :{" "}
+                                {parseDate(item.order_detailed_version.uat)}
+                              </span>
                             </div>
                           </div>
                           <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                            <div className="w-full h-full text-center text-xs text-white bg-teal-600 rounded"></div>
+                            <div className="w-full h-full text-center text-xs text-white bg-green-500 rounded"></div>
                           </div>
                           <div className="flex items-center justify-between my-4 space-x-4">
                             <span className="px-2 py-1 flex items-center text-md rounded-md text-teal-500 bg-green-50">
                               <span className="mr-2 text-teal-600 dark:text-white font-bold">
-                                {'jerb'}
+                                {item.n_items}
                               </span>
                               Items
                             </span>
@@ -189,23 +242,24 @@ const DeliveredOrders = () => {
                               <p className=" text-teal-700">
                                 ₱{" "}
                                 <span className="">
-                                  {numberWithCommas(12.50)}
+                                  {numberWithCommas(item.total_cost)}
                                 </span>
                               </p>
                             </span>
                           </div>
-                          <p className="my-2 text-xs text-gray-600">Order ID : <span className="font-medium text-gray-900">{'2gasg23'}</span></p>
+                          <p className="my-2 text-xs text-gray-600">
+                            Order ID :{" "}
+                            <span className="font-medium text-gray-900">
+                              {item.order_ID}
+                            </span>
+                          </p>
 
-                          {/* <Button
+                          <Button
                             onClick={() => {
                               dispatch(
                                 openInputModal({
                                   title: "Checkout Details",
-                                  component: (
-                                    <ViewOrderDetails
-                                        order={order}
-                                    />
-                                  ),
+                                  component: <ViewOrderDetails order={item} />,
                                   onAccept: () => {},
                                   acceptBtnText: "Place Order",
                                   cancelBtnText: "Cancel",
@@ -215,15 +269,19 @@ const DeliveredOrders = () => {
                             className="bg-teal-400 text-white w-full rounded-md"
                           >
                             View Details
-                          </Button> */}
+                          </Button>
                         </div>
                       </div>
                     </div>
+                  ))}
                 </div>
+              )}
               <div>
                 {!loadingData && delivered.length === 0 && (
                   <p className="my-4 text-xs text-red-400 text-center">
-                    { !searching ? "There's no pending orders" : "No matching order found" }
+                    {!searching
+                      ? "There's no completed orders"
+                      : "No matching order found"}
                   </p>
                 )}
               </div>

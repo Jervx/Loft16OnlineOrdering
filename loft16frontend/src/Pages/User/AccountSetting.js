@@ -531,9 +531,6 @@ const AccountSetting = () => {
                     onChange={(e) => {
                       setNewPassword(e.target.value);
                     }}
-                    onKeyDown={(event) => {
-                      //if (event.key === "Enter") updateNumber(0, newNumber);
-                    }}
                   />
                   {hidden ? (
                     <FaEyeSlash

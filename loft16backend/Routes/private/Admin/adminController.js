@@ -15,10 +15,9 @@ const Pendings = require("../../../models/Pending_Order");
 const Categories = require("../../../models/Categories");
 const User = require("../../../models/User");
 
-const { ehandler } = require("../../../helper/utils");
+const { ehandler, checkObjectId } = require("../../../helper/utils");
 
 let ObjectId = require("mongoose").Types.ObjectId;
-const Orders_In_Progress = require("../../../models/Orders_In_Progress");
 
 router.get("/mydetails/:id", adminAuth, async (req, res) => {
   let _id = req.params.id;
@@ -52,43 +51,6 @@ router.post("/updateproducts", adminAuth, async (req, res) => {
 });
 
 // admin account creation &
-router.post("/updateAdmin", adminAuth, async (req, res) => {
-  try {
-    const { mode, info, isChangedPass } = req.body;
-
-    if (mode === 0) {
-      const hashedPassword = await bcrypt.hash(info.password, 10);
-
-      const adminData = await Admin.create({
-        ...info,
-        password: hashedPassword,
-      });
-    } else if (mode === 1) {
-      let hashed = info.password;
-
-      if (isChangedPass) hashed = await bcrypt.hash(info.password, 10);
-
-      const updateData = await Admin.updateOne(
-        {
-          _id: info._id,
-        },
-        {
-          $set: { ...info, password: hashed },
-        }
-      );
-    } else {
-      const deleteData = await Admin.deleteOne({
-        _id: info._id,
-      });
-    }
-
-    res.status(201).json({
-      message: "Ok!",
-    });
-  } catch (e) {
-    ehandler(err, res);
-  }
-});
 
 // admin route pages data reqsts ---------------------------
 router.get("/insights", adminAuth, async (req, res) => {
@@ -573,6 +535,13 @@ router.post("/updatePending", adminAuth, async (req, res) => {
 router.post("/searchPendingOrders", adminAuth, async (req, res) => {
   try {
     let { order_ID } = req.body;
+
+    if (!checkObjectId(order_ID))
+      return res.status(200).json({
+        message: "ok",
+        pendings: [],
+      });
+
     let pendings = await Pendings.aggregate([
       {
         $match: {
@@ -671,8 +640,6 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
 
       const ITEMS = entry.order_detailed_version.items;
 
-      console.log("Step 1 ");
-
       ITEMS.forEach(async (item, idx) => {
         const updateProduct = await Product.updateOne(
           {
@@ -687,15 +654,13 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
         );
       });
 
-      console.log("Step 2");
-
       const updateUser = await User.updateOne(
         {
           _id: entry_sm.user_ID,
         },
         {
           $pull: {
-            in_progress: { order_ID: entry_sm.order_ID },
+            in_progress: { order_ID: new ObjectId(entry_sm.order_ID) },
           },
           $inc: {
             n_completed_orders: 1,
@@ -708,12 +673,10 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
               total_cost: entry.total_cost,
               courier: entry.courier.courier_name,
               cat: new Date(),
-            }
-          }
+            },
+          },
         }
       );
-
-      console.log("Step 3");
 
       const updateOrder = await Orders.updateOne(
         {
@@ -727,28 +690,30 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
         }
       );
 
-      console.log("Step 4");
-
       const deleteEntry = await InProgress.deleteOne({
         order_ID: entry_sm.order_ID,
       });
-
-      console.log("Step 5");
     } else {
-      // mode === 1
-
       // update user in_progress order status to status
 
       const updateUser = await User.updateOne(
         {
-          _id: entry.user_ID,
-          "in_progress.order_ID": entry.order_ID,
+          _id: new ObjectId(entry.user_ID),
+          "in_progress.order_ID": new ObjectId(entry.order_ID),
         },
         {
           $set: {
             "in_progress.$.order_status": status,
           },
         }
+      );
+
+      console.log(
+        updateUser,
+        "Setting status to ",
+        status,
+        entry.user_ID,
+        entry.order_ID
       );
 
       const updateOrder = await Orders.updateOne(
@@ -776,7 +741,14 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
 router.post("/searchInProgress", adminAuth, async (req, res) => {
   try {
     let { order_ID } = req.body;
-    let pendings = await InProgress.aggregate([
+
+    if (!checkObjectId(order_ID))
+      return res.status(200).json({
+        message: "ok",
+        inprogress: [],
+      });
+
+    let inprogress = await InProgress.aggregate([
       {
         $match: {
           order_ID: new ObjectId(order_ID),
@@ -806,7 +778,7 @@ router.post("/searchInProgress", adminAuth, async (req, res) => {
 
     res.status(200).json({
       message: "ok!",
-      pendings,
+      inprogress,
     });
   } catch (err) {
     ehandler(err, res);
@@ -815,10 +787,184 @@ router.post("/searchInProgress", adminAuth, async (req, res) => {
 
 // completed orders page & actions ----------------------
 
-router.get("/completed", adminAuth, async (req, res) => {});
+router.get("/completed", adminAuth, async (req, res) => {
+  try {
+    let completed = [];
+
+    completed = await Completed.aggregate([
+      { $match: { dat: null } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_ID",
+          foreignField: "_id",
+          as: "user_profile",
+        },
+      },
+      { $unwind: "$user_profile" },
+      {
+        $lookup: {
+          from: "orders",
+          localField: "order_ID",
+          foreignField: "_id",
+          as: "order_detailed_version",
+        },
+      },
+      { $unwind: "$order_detailed_version" },
+    ]);
+
+    res.status(200).json({
+      message: "ok!",
+      completed,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
 
 router.post("/updateCompleted", adminAuth, async (req, res) => {});
 
-router.post("/searchCompleted", adminAuth, async (req, res) => {});
+router.post("/searchCompleted", adminAuth, async (req, res) => {
+  try {
+    const { order_ID } = req.body;
+
+    if (!checkObjectId(order_ID))
+      return res.status(200).json({
+        message: "ok",
+        completed: [],
+      });
+
+    const completed = await Completed.aggregate([
+      {
+        $match: { order_ID: new ObjectId(order_ID) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_ID",
+          foreignField: "_id",
+          as: "user_profile",
+        },
+      },
+      { $unwind: "$user_profile" },
+      {
+        $lookup: {
+          from: "orders",
+          localField: "order_ID",
+          foreignField: "_id",
+          as: "order_detailed_version",
+        },
+      },
+      { $unwind: "$order_detailed_version" },
+    ]);
+
+    res.status(200).json({
+      message: "ok",
+      completed,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+// admins page & actions ---------------------------------
+router.get("/admins", adminAuth, async (req, res) => {
+  try {
+    const admins = await Admin.find({});
+
+    res.status(200).json({
+      message: "ok",
+      admins,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+router.post("/loadAdminData", adminAuth, async (req, res) => {
+  try {
+    const { _id } = req.body;
+    const adminData = await Admin.findOne({
+      _id,
+    });
+
+    res.status(200).json({
+      message: "ok!",
+      adminData,
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
+});
+
+router.post("/updateAdmin", adminAuth, async (req, res) => {
+  try {
+    const { _id, mode, info, isChangedPass } = req.body;
+    //name, email_address, role, password
+
+    if (mode === 0) {
+      const hashedPassword = await bcrypt.hash(info.password, 10);
+
+      const adminData = await Admin.create({
+        ...info,
+        password: hashedPassword,
+        uby: new ObjectId(_id),
+      });
+    } else if (mode === 1) {
+      let hashed = info.password;
+
+      let additional = {};
+
+      if (isChangedPass) {
+        console.log("Password Changing");
+        additional.password = await bcrypt.hash(info.password, 10);
+      }
+
+      const updateData = await Admin.updateOne(
+        {
+          _id: info._id,
+        },
+        {
+          $set: {
+            ...info,
+            ...additional,
+            uby: new ObjectId(_id),
+            uat: new Date(),
+          },
+        }
+      );
+    } else {
+      const deleteData = await Admin.deleteOne({
+        _id: info._id,
+      });
+    }
+
+    res.status(201).json({
+      message: "Ok!",
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+
+
+// user page & actions -----------------------------------
+router.get("/users", adminAuth, async(req,res)=>{
+    try{
+        const users = await User.find({},{ password : 0 })
+
+        res.status(200).json({
+            message : 'ok!',
+            users
+        })
+    }catch(e){
+        ehandler(e,res)
+    }
+})
+
+router.post("/uploadProfile", adminAuth, async(req,res)=> {
+    
+})
 
 module.exports = router;

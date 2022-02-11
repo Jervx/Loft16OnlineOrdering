@@ -102,8 +102,8 @@ const Products = () => {
 
   const amIFilter = (myscope) =>
     scope.toLowerCase() === myscope.toLowerCase()
-      ? "bg-gray-100 text-gray-800 font-medium px-4 py-2 hover:bg-gray-100 rounded-xl mx-2"
-      : " px-4 py-2 hover:bg-gray-100 rounded-xl mx-2 ";
+      ? "transition duration-500 bg-gray-100 text-gray-600 font-medium px-4 py-2 hover:bg-gray-50 rounded-md mx-2"
+      : "transition duration-500 px-4 py-2 hover:bg-gray-100  rounded-sm mx-2 ";
 
   const getCategories = async () => {
     try {
@@ -286,56 +286,54 @@ const Products = () => {
             <div className="flex flex-wrap -m-4">
               {appState.data.map((prod, idx) => (
                 <div className="lg:w-1/4 md:w-1/2 p-4 w-full" key={idx}>
-                  <Link to={`/productdetail/${prod._id}`}>
-                    <img
-                      className="h-60 rounded-lg cursor-pointer w-full object-cover object-center mb-4"
-                      src={prod.Images[0]}
-                      alt="content"
-                    />
-                  </Link>
-                  <h1 className="text-lg font-inter font-semibold defText-Col-2">
-                    {prod.name}
-                  </h1>
-                  <p className="text-xs mt-2">{prod.categories[0]}</p>
-                  <div className="flex justify-between mt-3">
-                    <div className="flex items-center">
-                      {prod.total_stock !== 0 ? (
-                        <Badge className="rounded-full px-4 mr-2 defBackground-nohover text-white p-2  leading-none flex items-center">
-                          In Stock
-                          <AiFillCheckCircle className="ml-2"></AiFillCheckCircle>
-                        </Badge>
-                      ) : (
-                        <Badge
-                          type="danger"
-                          className="rounded-full px-4 mr-2 text-white p-2  leading-none flex items-center"
-                        >
-                          No stock
-                          <AiFillCloseCircle className="ml-2"></AiFillCloseCircle>
-                        </Badge>
-                      )}
-
-                      {true ? (
-                        <AiOutlineHeart className="transition duration-200 text-red-200 hover:text-red-500 w-7 h-7 cursor-pointer" />
-                      ) : (
-                        <AiFillHeart className="text-red-400 w-7 h-7 cursor-pointer" />
-                      )}
+                  <div className="mx-8 ">
+                    <Link to={`/productdetail/${prod._id}`}>
+                      <img
+                        className="h-60 cursor-pointer w-full rounded-md object-cover object-center mb-2"
+                        src={prod.Images[0]}
+                        alt="content"
+                      />
+                    </Link>
+                    <h1 className="text-base font-quicksand font-normal defText-Col-2">
+                      {prod.name}
+                    </h1>
+                    <p className="text-xs italic text-gray-500 mt-1">
+                      {prod.categories[0]}
+                    </p>
+                    <div className="flex justify-between mt-2">
+                      <div className="flex items-center">
+                        {prod.total_stock !== 0 ? (
+                          <Badge className="rounded-full px-4 mr-2 bg-teal-500 p-2  leading-none flex items-center">
+                            <p className="text-white">In Stock</p>
+                            <AiFillCheckCircle className="ml-2"></AiFillCheckCircle>
+                          </Badge>
+                        ) : (
+                          <Badge
+                            type="danger"
+                            className="rounded-full px-4 mr-2 text-white p-2  leading-none flex items-center"
+                          >
+                            <p className="text-red-400">Out Of Stock</p>
+                            <AiFillCloseCircle className="ml-2 text-red-400"></AiFillCloseCircle>
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="font-inter font-quicksand defText-Col-2 text-xl">
+                        <span className="font-extralight text-lg">Php</span>{" "}
+                        {prod.variants[0].price}
+                      </p>
                     </div>
-                    <p className="font-inter defText-Col-2 text-xl">
-                      <span className="font-semibold text-lg">Php</span>{" "}
-                      {prod.variants[0].price}
-                    </p>
-                  </div>
-                  <div className="flex mt-4 text-gray-400 mb-16 items-center">
-                    <BsFillClockFill className="w-3 h-3  mr-2"></BsFillClockFill>
-                    <p className="text-xs">
-                      {new Date(prod.uat).toLocaleString("en-us", {
-                        month: "long",
-                      }) +
-                        " " +
-                        new Date(prod.uat).getDate() +
-                        ", " +
-                        new Date(prod.uat).getFullYear()}
-                    </p>
+                    {/* <div className="flex mt-4 text-gray-400 mb-16 items-center">
+                      <BsFillClockFill className="w-3 h-3  mr-2"></BsFillClockFill>
+                      <p className="text-xs">
+                        {new Date(prod.uat).toLocaleString("en-us", {
+                          month: "long",
+                        }) +
+                          " " +
+                          new Date(prod.uat).getDate() +
+                          ", " +
+                          new Date(prod.uat).getFullYear()}
+                      </p>
+                    </div> */}
                   </div>
                 </div>
               ))}

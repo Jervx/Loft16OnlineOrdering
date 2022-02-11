@@ -96,7 +96,7 @@ const Header = (props) => {
             }
           >
             <AiFillFire className="w-6 h-6 pr-2" aria-hidden="true" />
-            <p className="hidden font-medium md:block transition duration-200 ease-linear">
+            <p className="hidden md:block transition duration-200 ease-linear">
               What's Hot
             </p>
           </h3>
@@ -108,7 +108,7 @@ const Header = (props) => {
             }
           >
             <AiFillShopping className="w-6 h-6 pr-2" aria-hidden="true" />
-            <p className="hidden font-medium md:block transition duration-200 ease-linear">
+            <p className="hidden md:block transition duration-200 ease-linear">
               Products
             </p>
           </h3>
@@ -120,7 +120,7 @@ const Header = (props) => {
             }
           >
             <MdQuestionAnswer className="w-6 h-6 pr-2" aria-hidden="true" />
-            <p className="hidden font-medium md:block transition duration-200 ease-linear">
+            <p className="hidden md:block transition duration-200 ease-linear">
               FAQs
             </p>
           </h3>

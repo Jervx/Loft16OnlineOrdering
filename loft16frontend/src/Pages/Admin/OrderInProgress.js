@@ -8,6 +8,7 @@ import ViewOrderDetails from "../../Components/ModalComponent/Admin/ViewOrderDet
 import Informative from "../../Components/Modal/Informative";
 
 import API from "../../Helpers/api";
+import HelperLabel from "../../Components/HelperLabel";
 
 import {
   Avatar,
@@ -54,13 +55,13 @@ const OrderInProgress = () => {
 
   const performSearch = async () => {
     try {
-      if (search.length === 0) {
-        setInProgress([]);
-        setLoadingData(true);
-        loadSomething();
-        setSearching(false);
-        return;
-      }
+        if (search.length === 0) {
+            setLoadingData(true);
+            setSearching(false);
+            loadSomething();
+            return;
+          }
+
       setInProgress([]);
       setLoadingData(true);
       setSearching(true);
@@ -69,7 +70,7 @@ const OrderInProgress = () => {
         order_ID: search,
       });
 
-      setInProgress(response.data.pendings);
+      setInProgress(response.data.inprogress);
       setLoadingData(false);
     } catch (e) {}
   };
@@ -139,6 +140,7 @@ const OrderInProgress = () => {
                   className="rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-500 hover:text-gray-700 focus:text-gray-700"
                   placeholder="Order ID"
                   aria-label="search"
+                  disabled={loadingData}
                   onChange={(e) => {
                     setSearch(e.target.value);
                   }}
@@ -160,6 +162,9 @@ const OrderInProgress = () => {
                 Search
               </Button>
             </div>
+            {
+                (search.length !== 0 && search.length !== 24) && <HelperLabel msg="Order ID Must Contain 24 Characters" isError={false} bg={'bg-red-50'} txtbg={'text-red-400'} />
+            }
           </div>
           <hr className="my-10 mx-8 border-gray-200 dark:border-gray-700" />
           <section className="body-font">

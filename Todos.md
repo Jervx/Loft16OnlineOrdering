@@ -74,7 +74,7 @@
     - [x]Product & Tags 
         backend
          ** Product Categories **
-            - add categorie model
+           [x] - add categorie model
               {
                   schema_v
                   category_name
@@ -92,36 +92,38 @@
                   dat
               }
            [x] - getAllCategories
-           [doing] - searchCategories
-           [doing] - addCategories
+           [x] - searchCategories
+           [x] - addCategories
 
             ** Product Management **
 
-            - getAllProduct
-            - updateProducts
-                mode 0 create, 1 update, -1 delete
+//TODO: Product Page MAJOR
+[] Product page
+    - getAllProduct
+    - updateProducts
+        mode 0 create, 1 update, -1 delete
             
 
-    - pending orders 
+    [x] - pending orders 
         backend 
             ** Pending Orders **
-                - getAllPending
+            [x]    - getAllPending
                     if order id provided find specific,
                     if not return all
-                - updatepending
+            [x]    - updatepending
                     mode 0 accept, -1 reject
              NOTE: When the chosen courier is not in courier options, then you cannot accept it anymore 
              NOTE: When accepting, check if the user exist, if not, simply remove the order_in_progress entry & remove from order entry
             
             ** In Progress **
-                - getAllInProgress
+            [x]    - getAllInProgress
                     if order id provided find specific,
                     if not return all
-                - updatepending
+             [x]   - updatepending
                     mode 0 update, mode 1 complete(move to delivered)
 
             ** Completed Orders **
-                - getAllCompleted
+             [x]   - getAllCompleted
                     if order_id provided find specific
                     if not return all
                 - deleteCompleted
@@ -133,7 +135,8 @@
        [x] - getAllCourier
        [x] - updateCourier
             mode 0 create, mode 1 update, mode -1 delete
-        
+
+//TODO: Admin Page
     - admins 
         - getAllAdmin
         - updateAdmin
@@ -141,6 +144,7 @@
             NOTE: if your role is not root, then you can't 
             mode 0 create, mode 1 update, mode -1 delete(Only Root)
         
+//TODO: User Page
     - customers 
         - getUser
             - if email provided, then return specific

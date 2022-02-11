@@ -38,7 +38,7 @@ const ViewOrderDetails = ({ order }) => {
           </div>
           <div className="flex items-center space-x-2 my-4 text-gray-50">
             <p>
-              This order will be delivered by{" "}
+              This order { order.order_detailed_version.order_status === 3? ' was ' : ' will be '} delivered by{" "}
               <span className="font-bold italic">
                 {order.order_detailed_version.courier.courier_name}
               </span>
