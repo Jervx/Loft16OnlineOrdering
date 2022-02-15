@@ -4,11 +4,17 @@ import API from "../../../Helpers/api";
 import ProtectedLoader from "../../../Components/ProtectedLoader";
 
 import { GoPrimitiveDot } from "react-icons/go";
-import { MdEmail, MdOutlineClose } from "react-icons/md";
+import { MdFileUpload, MdEmail, MdOutlineClose } from "react-icons/md";
 import { FaKey, FaEyeSlash, FaEye } from "react-icons/fa";
 import { BsFillTelephoneFill } from "react-icons/bs";
 
-import { Button, Input, Label } from "@windmill/react-ui";
+import {
+  Button,
+  Input,
+  Label,
+  Dropdown,
+  DropdownItem,
+} from "@windmill/react-ui";
 import HelperLabel from "../../HelperLabel";
 
 import { useDispatch } from "react-redux";
@@ -24,6 +30,7 @@ const AdminProfile = ({
 }) => {
   const dispatch = useDispatch();
 
+
   const [loadingData, setLoadingData] = useState(true);
   const [adminData, setAdminData] = useState();
   const [unmounted, setUnmounted] = useState(false);
@@ -34,6 +41,11 @@ const AdminProfile = ({
   const [newNumber, setNewNumber] = useState("");
   const [newName, setNewName] = useState("");
 
+  const [image, setImage] = useState();
+  const [fileName, setFileName] = useState("");
+
+  const [profile_picture, setProfilePicture] = useState("");
+
   const loadAdminData = async () => {
     try {
       const response = await API.post("/admin/loadAdminData", {
@@ -41,17 +53,18 @@ const AdminProfile = ({
       });
       setAdminData(response.data.adminData);
       setNewName(response.data.adminData.name);
+      setProfilePicture(response.data.adminData.profile_picture);
       setLoadingData(false);
     } catch (e) {
-        dispatch(
-            openAlertModal({
-              component: <Informative />,
-              data: {
-                description: "Sorry, but we can't update right now",
-                solution: `Please try again later.. Description : ${e}`,
-              },
-            })
-          );
+      dispatch(
+        openAlertModal({
+          component: <Informative />,
+          data: {
+            description: "Sorry, but we can't update right now",
+            solution: `Please try again later.. Description : ${e}`,
+          },
+        })
+      );
     }
   };
 
@@ -93,6 +106,22 @@ const AdminProfile = ({
     } catch (e) {}
   };
 
+  const changeImage = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("profile_picture", image);
+      formData.append("path", "profile");
+      formData.append("_id", adminData._id);
+      console.log(formData);
+      const response = await API.post("/admin/uploadAdminProfile", formData);
+      setFileName("");
+      onUpdateSomething();
+      loadAdminData();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     loadAdminData();
   }, []);
@@ -105,18 +134,56 @@ const AdminProfile = ({
           <div className="flex flex-col items-center">
             <div
               className="relative w-full h-48 bg-no-repeat bg-cover "
-              style={{ backgroundImage: `url(${adminData.profile_picture})` }}
+              style={{ backgroundImage: `url(${profile_picture})` }}
             >
               <div className=" flex items-center justify-center w-full h-full backdrop-filter backdrop-blur-xl">
                 <img
-                  className="border  filter shadow-xl absolute -bottom-16 object-cover w-48 h-48 rounded-full "
-                  src={adminData.profile_picture}
+                  className=" border  filter shadow-xl absolute -bottom-16 object-cover w-48 h-48 rounded-full "
+                  src={profile_picture}
                   alt=""
                 />
               </div>
             </div>
-
-            <h1 className="mt-20 font-quicksand text-3xl font-medium text-gray-700 capitalize dark:text-white">
+            { !uneditable ? (
+              <>
+                {fileName.length === 0 && (
+                  <label className="relative mt-20 mb-2 w-5/12 ">
+                    <input
+                      className="w-full opacity-0"
+                      type="file"
+                      accept="image/png, image/gif, image/jpeg"
+                      onChange={(e) => {
+                        setImage(e.target.files[0]);
+                        setFileName(e.target.files[0].name);
+                        setProfilePicture(
+                          URL.createObjectURL(e.target.files[0])
+                        );
+                      }}
+                    />
+                    <div className="transition duration-150 w-full absolute top-0 z-10 px-4 py-2 text-sm border cursor-pointer bg-gray-50 border-dashed hover:border-transparent hover:bg-teal-500 hover:text-white flex items-center justify-center rounded-md">
+                      <MdFileUpload className="mr-5" />
+                      <span>Change Photo</span>
+                    </div>
+                  </label>
+                )}
+                {fileName.length !== 0 && (
+                  <div className="relative mt-20 my-2">
+                    <button
+                      onClick={() => {
+                        changeImage();
+                      }}
+                      className=" animate-pulse transition duration-150 w-full px-4 py-2 text-sm border cursor-pointer bg-teal-500 border-dashed hover:border-transparent hover:bg-teal-600 text-white flex items-center justify-center rounded-md"
+                    >
+                      <MdFileUpload className="mr-5" />
+                      <span>Save</span>
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+                <label className="relative mt-20 mb-2 w-5/12 "></label>
+            )}
+            <h1 className="mt-3 font-quicksand text-3xl font-medium text-gray-700 capitalize dark:text-white">
               {adminData.name}
             </h1>
 
@@ -142,9 +209,7 @@ const AdminProfile = ({
                 bg={"bg-red-100"}
                 txtbg={"text-red-700"}
                 isError={false}
-                msg={
-                  "Only root admin has the permission to edit other admin"
-                }
+                msg={"Only root admin has the permission to edit other admin"}
               />
               <HelperLabel
                 bg={"bg-gray-100"}
@@ -166,7 +231,7 @@ const AdminProfile = ({
                     setNewName(e.target.value);
                   }}
                   value={newName}
-                  className="w-full mt-2 px-2 py-1 text-gray-700 bg-white border rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  className="w-full mt-2 px-2 py-1 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-200 focus:border-blue-400 focus:ring-blue-300 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                   type="text"
                 />
               </div>
@@ -180,9 +245,8 @@ const AdminProfile = ({
                     ...adminData,
                     name: newName,
                   });
-                  setNewName("");
                   await loadAdminData();
-                  onUpdateSomething()
+                  onUpdateSomething();
                 }}
               >
                 Save
@@ -553,7 +617,7 @@ const AdminProfile = ({
               <Input
                 type="checkbox"
                 disabled={uneditable}
-                onChange={()=>{}}
+                onChange={() => {}}
                 checked={adminData.two_factor_auth}
               />
               <span className="ml-2 text-gray-600">

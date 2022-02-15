@@ -12,7 +12,7 @@ const verifyAdminToken = async (req, res, next) => {
 
   await snooze(1000)
 
-  // console.log("--------COOKIES ADMIN AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
+  console.log("--------COOKIES ADMIN AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
   if (auth_iss)
     if (auth_iss === process.env.GIssuer) {
       try {

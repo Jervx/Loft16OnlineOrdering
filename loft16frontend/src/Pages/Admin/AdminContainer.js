@@ -129,7 +129,7 @@ const AdminContainer = (props) => {
                 />
                 <Route exact path="/admin/couriers" component={Couriers} />
                 <Route exact path="/admin/admins" component={Admins} />
-                <Route exact path="/admin/users" component={Users} />
+                {/* <Route exact path="/admin/users" component={Users} /> */}
 
                 <Route path="*" component={NotFound} />
               </Switch>

@@ -40,7 +40,7 @@ const AccountProfile = (props) => {
         <ProtectedLoader />
       ) : (
         <>
-          <div className="mx-8 mt-8 mb-0 md:flex justify-center items-center">
+          <div className="mx-8 mt-24 mb-0 md:flex justify-center items-center">
             <img
               className="border-8 rounded-full w-2/12 h-2/12 md:w-1/12 md:h-1/12"
               alt="pic"

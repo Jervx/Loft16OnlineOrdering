@@ -24,6 +24,7 @@ const AdminCreator = ({ onUpdateSomething, editor_id }) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
+
   const saveAdmin = async () => {
     try{
 

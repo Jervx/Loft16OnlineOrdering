@@ -5,6 +5,9 @@ const cors = require('cors')
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+
+
 
 
 app.use(express.json());
@@ -13,8 +16,10 @@ app.use(express.urlencoded({extended:true}))
 const corsConfig = {
     origin: true,
     credentials: true,
-  };
-  
+};
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
@@ -43,10 +48,13 @@ app.use('/user', userController)
 app.use('/browse', browsing)
 app.use('/admin', adminController)
 
-app.use('/loftServer', loftServer)
+app.use('/static', loftServer)
 
 //serving product images
-app.use('/static', express.static('static'))
+app.use('/static/profile', express.static('./static/profile'))
+app.use('/static/product', express.static('./static/product'))
+app.use('/static/assets', express.static('./static/assets'))
+
 
 const Product = require("./models/Product")
 app.post('/createProduct', async(req,res) => {

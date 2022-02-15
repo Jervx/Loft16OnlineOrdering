@@ -13,7 +13,7 @@ const myTheme = {
       "border-red-600 dark:bg-gray-700 focus:border-red-400 dark:focus:border-red-400 focus:ring focus:ring-red-200 dark:focus:ring-red-200",
   },
   backdrop: {
-    base: "filter backdrop-filter backdrop-blur-sm fixed inset-0 z-40 flex items-end bg-black bg-opacity-20 sm:items-center sm:justify-center",
+    base: " filter backdrop-filter backdrop-blur-sm fixed inset-0 z-40 flex items-end bg-black bg-opacity-20 sm:items-center sm:justify-center",
   },
   link: {
     base: "text-gray-600 dark:text-gray-400 focus:outline-none border border-transparent",

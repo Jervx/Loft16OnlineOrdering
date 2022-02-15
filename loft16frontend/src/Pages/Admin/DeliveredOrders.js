@@ -144,7 +144,7 @@ const DeliveredOrders = () => {
                     <div
                       key={idx}
                       className={`w-full md:w-1/2 xl:w-1/3 ${
-                        -1 === 1 && "filter blur-sm animate-pulse"
+                        specificUpdate === 1 && "filter blur-sm animate-pulse"
                       } `}
                     >
                       <div className="mb-4 mx-1">
@@ -198,7 +198,10 @@ const DeliveredOrders = () => {
                                   </p>
                                 </div>
                                 <DropdownItem
-                                  onClick={() => {}}
+                                  onClick={async () => {
+                                    const response = await API.post( "/admin/deleteCompleted", { order_ID: item.order_ID } );
+                                    loadSomething();
+                                  }}
                                   className="dark:text-gray-200 text-gray-500 hover:text-red-600"
                                 >
                                   <BsFillTrashFill

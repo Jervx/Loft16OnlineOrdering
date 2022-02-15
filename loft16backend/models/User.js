@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   recovery_emails : { type: Array, default : []},
   mobile_numbers : { type: Array, default : []},
   login_count : {type : Number, default : 0},
+  to_rate : { type : Array, default : []},
   password : {type : String, required : true},
   password_change_date : {type : Date, default : Date.now},
   two_factor_auth : {type: Boolean, default : false},

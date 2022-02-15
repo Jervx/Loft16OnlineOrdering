@@ -77,8 +77,8 @@ const Header = (props) => {
   useEffect(() => {}, []);
 
   return (
-    <header className="HHeader z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800 border-b-2 border-gray-200 md:px-6">
-      <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
+    <header className="HHeader fixed bg-white top-0 w-full z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800 border-b-2 border-gray-200 md:px-6">
+      <div className=" container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
         <a
           className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
           href="/"
@@ -87,7 +87,7 @@ const Header = (props) => {
         </a>
 
         {/* <!-- Embedded Routes --> */}
-        <div className="flex text-gray-400 items-center justify-center flex-1">
+        <div className="flex text-gray-500 items-center justify-center flex-1">
           <h3
             onClick={() => history.push("/")}
             className={

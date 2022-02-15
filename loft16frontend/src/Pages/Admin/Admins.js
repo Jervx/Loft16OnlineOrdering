@@ -84,7 +84,7 @@ const Admins = () => {
                         })
                       );
                 }}
-                className="flex items-center text-gray-500 hover:text-gray-600 transition-colors transform border-2 border-cool-gray-200 border-dashed cursor-pointer rounded-xl hover:border-teal-300 group hover:bg-gray-100 dark:border-gray-700 dark:hover:border-transparent">
+                className="flex items-center text-gray-500 hover:text-gray-600 transition-colors transform border-2 border-cool-gray-200 border-dashed cursor-pointer rounded-xl hover:border-teal-300 group bg-gray-100 hover:bg-gray-200 dark:border-gray-700 dark:hover:border-transparent">
                   <div className="m-auto">
                     <VscAdd className="object-cover w-10 h-10 mx-auto  ring-cool-gray-400" />
 

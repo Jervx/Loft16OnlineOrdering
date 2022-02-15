@@ -17,13 +17,14 @@ const PublicContainer = ({toAuth}) => {
         <>
         <div>
                 <Header />
+                <div className='mt-24'>
                 <Switch>
                     <Route exact path='/productdetail/:prod_id' component={ProductView} />
                     <Route exact path='/products' render={(props) => <Products />} />
                     <Route exact path='/faqs' component={Faqs} />
                     <Route exact path='/' render={(props) => <Home />} />
                     <Route path="*" component={NotFound} />
-                </Switch>
+                </Switch></div>
         </div>
         <Footer />
         </>

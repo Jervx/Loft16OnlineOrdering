@@ -59,17 +59,18 @@ import { BsShieldShaded } from 'react-icons/bs'
           }]
     },
       { 
-        name: 'Settings & Accounts',
+        name: 'Account Management',
         routes: [
             {
                 name : "Admins",
                 path : "/admin/admins",
                 icon : BsShieldShaded,
-              },{
-                name : "Users",
-                path : "/admin/users",
-                icon : FaUserFriends,
               }
+            //   {
+            //     name : "Users",
+            //     path : "/admin/users",
+            //     icon : FaUserFriends,
+            //   }
         ]
       }
   ]

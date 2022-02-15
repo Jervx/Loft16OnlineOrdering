@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { useSelector } from "react-redux";
 import ProtectedLoader from "../../Components/ProtectedLoader";
-import { nShorter } from "../../Helpers/uitils";
+import { nShorter, numberWithCommas } from "../../Helpers/uitils";
 import API from "../../Helpers/api";
 
 
@@ -152,10 +152,12 @@ const Insights = () => {
                             </p>
                           </TableCell>
                           <TableCell>
-                            <p className="font-medium text-teal-600">
-                              {nShorter(product.generated_sale, 2)}
-                            </p>
-                          </TableCell>
+                          {/* <div className="flex text-orange-500 font-medium items-center h-full">
+                            <BsHeartFill className="text-red-400 mr-4" />
+                            {nShorter(product.likes, 2)}{" "}
+                          </div> */}
+                          <p><span className="font-quicksand">Php</span> {numberWithCommas(product.generated_sale)}</p>
+                        </TableCell>
                           <TableCell>
                             <div className="flex text-orange-500 font-medium items-center h-full">
                               <BsHeartFill className="text-red-400 mr-4" />

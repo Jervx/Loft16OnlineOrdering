@@ -1,9 +1,14 @@
 const mongoose = require('mongoose')
 
+// name
+// is_hot
+// description
+// variants
+
 const productSchema = new mongoose.Schema({
-    schema_v : { type : Number, default : 1, required : false },
+    schema_v : { type : Number, default : 1 },
     name : { type : String , unique : true , required : true},
-    categories : { type : [], required : true},
+    categories : { type : [], default : []},
     likes : { type : Number, default : 0},
     total_stock : { type : Number , default : 0},
     is_hot : { type : Boolean, default : false},

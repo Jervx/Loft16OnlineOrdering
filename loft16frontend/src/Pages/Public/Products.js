@@ -158,7 +158,7 @@ const Products = () => {
   };
 
   return (
-    <div className="h-screen">
+    <div className="">
       <div className="flex justify-center my-8">
         <div className="relative text-green-900 h-full md:w-3/12 mr-2  focus-within:text-green-700 ">
           <div className="absolute inset-y-0 flex items-center pl-2">

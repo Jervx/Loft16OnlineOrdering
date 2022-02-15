@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+var multer = require("multer");
+
+const { v4: uuidv4 } = require("uuid");
 
 const Orders = require("../../../models/Orders");
 
@@ -16,9 +19,322 @@ const Categories = require("../../../models/Categories");
 const User = require("../../../models/User");
 
 const { ehandler, checkObjectId } = require("../../../helper/utils");
-
 let ObjectId = require("mongoose").Types.ObjectId;
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, `./static/profile`);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${new Date().toISOString()}-${uuidv4()}-${file.originalname}`);
+  },
+});
+
+var upload = multer({ storage: storage, limits: { fileSize: 8388608 } });
+
+router.post(
+  "/uploadAdminProfile",
+  adminAuth,
+  upload.single("profile_picture", 5),
+  async (req, res) => {
+    try {
+      const { _id } = req.body;
+
+      let uploadInfo = req.file;
+
+      console.log(uploadInfo);
+
+      if (_id) {
+        const updateAdminData = await Admin.updateOne(
+          { _id },
+          {
+            $set: {
+              profile_picture: `https://192.168.1.5:3001/${uploadInfo.path}`,
+            },
+          }
+        );
+      }
+
+      res.status(200).json({
+        message: "ok!",
+        uploadInfo,
+      });
+    } catch (e) {
+      ehandler(e, res);
+    }
+  }
+);
+
+var productStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, `./static/product`);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${new Date().toISOString()}-${uuidv4()}-${file.originalname}`);
+  },
+});
+
+var productUpload = multer({
+  storage: productStorage,
+  limits: { fileSize: 8388608 },
+}).array("fileImages", 12);
+
+router.get("/getproductdetail/:id", adminAuth, async (req, res) => {
+  try {
+    const _id = req.params.id;
+
+    if (!_id)
+      return res.status(400).json({
+        err: 400,
+        description: "Required Data Missing",
+        solution: "Please input all required data",
+      });
+
+    const productData = await Product.findOne({
+      _id: new ObjectId(_id),
+      dat: null,
+    });
+
+    if (!productData)
+      return res.status(400).json({
+        err: 400,
+        description: "Product Not Found",
+        solution: "The product might be unavailable/deleted by the Admin",
+      });
+
+    res.status(200).json({
+      ok: "Found 👍",
+      productData: {
+        ...productData.toObject(),
+      },
+    });
+  } catch (err) {
+    return res.status(400).json({
+      err: 500,
+      description: "Internal Server Error",
+      solution:
+        "Sorry! Something's wrong with the server, please try again later or contact loft16 admin",
+    });
+  }
+});
+
+router.post( "/uploadProductImage", adminAuth, productUpload, async (req, res) => {
+    try {
+      const { _id, prod_Id } = req.body;
+
+      let newImages = [];
+
+      let filesSaved = Array.from(req.files);
+
+      for (let x = 0; x < filesSaved.length; x++)
+        newImages.push(`https://192.168.1.5:3001/${filesSaved[x].path}`);
+
+      const update = await Product.updateOne(
+        {
+          _id: new ObjectId(prod_Id),
+        },
+        {
+          $push: {
+            Images: { $each: newImages },
+          },
+          $set: {
+            uby: new ObjectId(_id),
+            uat: new Date(),
+          },
+        }
+      );
+
+      //https://192.168.1.5:3001/$
+      res.status(200).json({ message: "uploaded!" });
+    } catch (e) {
+      ehandler(e, res);
+    }
+  }
+);
+
+router.post("/updateProduct", adminAuth, async (req, res) => {
+  try {
+    const { mode, _id, prod_Id, simpleData, complexData } = req.body;
+
+    console.log(mode);
+
+    if (mode === 0) {
+
+      console.log("Creating")
+
+      const product = await Product.create({
+        ...simpleData,
+        cby : new ObjectId(_id)
+      });
+
+
+      complexData.newCategories.forEach(async (name) => {
+        const updateCat = await Categories.updateOne(
+          {
+            category_name: name,
+          },
+          {
+            $push: {
+              associated_products: new ObjectId(product._id),
+            },
+          }
+        );
+      });
+
+
+      const updateAdd = await Product.updateOne(
+        {
+          _id: product._id,
+        },
+        {
+          $set: {
+            ...simpleData,
+          },
+          $push: {
+            categories: {
+              $each: complexData.newCategories,
+            },
+            variants: complexData.newVariants,
+          },
+        }
+      );
+
+      const currentProductData = await Product.findOne(
+        { _id: product._id },
+        { variants: 1 }
+      );
+      let total_stock = 0;
+      currentProductData.variants.forEach((vari) => {
+        total_stock += Number.parseFloat(vari.stock);
+      });
+
+      const updateStock = await Product.updateOne(
+        {
+          _id: product._id,
+        },
+        {
+          $set: {
+            total_stock
+          },
+        }
+      );
+
+      return res.status(200).json(
+        product
+      )
+    } else if (mode === 1) {
+      const delCat = complexData.deletedCategories;
+
+      delCat.forEach(async (name) => {
+        const updateCat = await Categories.updateOne(
+          {
+            categoy_name: name,
+          },
+          {
+            $pull: {
+              associated_products: new ObjectId(prod_Id),
+            },
+          }
+        );
+      });
+
+      complexData.newCategories.forEach(async (name) => {
+        const updateCat = await Categories.updateOne(
+          {
+            category_name: name,
+          },
+          {
+            $push: {
+              associated_products: new ObjectId(prod_Id),
+            },
+          }
+        );
+      });
+
+      const updateDelete = await Product.updateOne(
+        {
+          _id: prod_Id,
+        },
+        {
+          $pull: {
+            Images: {
+              $in: complexData.deletedImages,
+            },
+            categories: {
+              $in: delCat,
+            },
+            variants: {
+              name: {
+                $in: complexData.deletedVariants,
+              },
+            },
+          },
+        }
+      );
+
+      const updateAdd = await Product.updateOne(
+        {
+          _id: prod_Id,
+        },
+        {
+          $set: {
+            ...simpleData,
+          },
+          $push: {
+            categories: {
+              $each: complexData.newCategories,
+            },
+            variants: complexData.newVariants,
+          },
+        }
+      );
+
+      const currentProductData = await Product.findOne(
+        { _id: prod_Id },
+        { variants: 1 }
+      );
+      let total_stock = 0;
+      currentProductData.variants.forEach((vari) => {
+        total_stock += Number.parseFloat(vari.stock);
+      });
+
+      const updateStock = await Product.updateOne(
+        {
+          _id: prod_Id,
+        },
+        {
+          $set: {
+            total_stock,
+            uat : new Date(),
+            uby : new ObjectId(_id)
+          },
+        }
+      );
+    }else if(mode === -1 ){
+        const data = await Product.findOne({ _id : prod_Id })
+
+        let cats = data.categories
+
+        cats.forEach( async (name)=>{
+            await Categories.updateOne({category_name : name}, {
+                $pull : {
+                    associated_products : new ObjectId(prod_Id)
+                }
+            })
+        })
+
+        const update = await Product.deleteOne({_id : prod_Id})
+    }
+
+    res.status(200).json({
+      message: "ok!",
+    });
+  } catch (e) {
+      ehandler(e,res)
+  }
+});
+
+// admin account creation &
 router.get("/mydetails/:id", adminAuth, async (req, res) => {
   let _id = req.params.id;
 
@@ -41,16 +357,6 @@ router.get("/mydetails/:id", adminAuth, async (req, res) => {
     adminData,
   });
 });
-
-// TODO: product page & actions
-router.post("/updateproducts", adminAuth, async (req, res) => {
-  try {
-  } catch (e) {
-    ehandler(e, res);
-  }
-});
-
-// admin account creation &
 
 // admin route pages data reqsts ---------------------------
 router.get("/insights", adminAuth, async (req, res) => {
@@ -822,7 +1128,21 @@ router.get("/completed", adminAuth, async (req, res) => {
   }
 });
 
-router.post("/updateCompleted", adminAuth, async (req, res) => {});
+router.post("/deleteCompleted", adminAuth, async (req, res) => {
+  try {
+    const { order_ID } = req.body;
+
+    const del = await Completed.deleteOne({ order_ID: new ObjectId(order_ID) });
+
+    console.log(del);
+    res.status(200).json({
+      message: "Ok",
+      del,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
 
 router.post("/searchCompleted", adminAuth, async (req, res) => {
   try {
@@ -947,24 +1267,35 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
   }
 });
 
-
-
 // user page & actions -----------------------------------
-router.get("/users", adminAuth, async(req,res)=>{
-    try{
-        const users = await User.find({},{ password : 0 })
+// router.get("/users", adminAuth, async (req, res) => {
+//   try {
+//     const users = await User.find({}, { password: 0 });
 
-        res.status(200).json({
-            message : 'ok!',
-            users
-        })
-    }catch(e){
-        ehandler(e,res)
-    }
-})
+//     res.status(200).json({
+//       message: "ok!",
+//       users,
+//     });
+//   } catch (e) {
+//     ehandler(e, res);
+//   }
+// });
 
-router.post("/uploadProfile", adminAuth, async(req,res)=> {
-    
-})
+// product page & actions --------------------------------
+
+router.get("/products", adminAuth, async (req, res) => {
+  try {
+    const products = await Product.find({});
+    const cat = await Categories.find({});
+
+    res.status(200).json({
+      message: "ok",
+      products,
+      cat,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
 
 module.exports = router;
