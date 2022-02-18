@@ -18,6 +18,7 @@ import Checkout from "../../Components/ModalComponent/Checkout";
 
 /* Axios API */
 import API from "../../Helpers/api";
+import { numberWithCommas } from "../../Helpers/uitils";
 import { Link } from "react-router-dom";
 
 const MyCart = () => {
@@ -231,12 +232,11 @@ const MyCart = () => {
                           </h1>
                           <div className="inline-flex items-center">
                             <span className="flex-grow flex flex-col">
-                              <p className="text-lg text-gray-600">
-                                PhP{" "}
+                              <p className=" text-gray-600">
+                                Php{" "}
                                 <span className="text-teal-700 font-medium">
-                                  {item.variant_price}
+                                  {numberWithCommas(item.variant_price)}
                                 </span>
-                                .
                               </p>
                             </span>
                             <p className="bg-gray-100 mt-2 rounded-lg ml-4 text-sm font-medium px-2 py-1">

@@ -1,7 +1,10 @@
 import axios from "axios";
+require("dotenv").config();
+
+const baseURL = process.env.REACT_APP_SERVERURL
 
 let API = axios.create({
-    baseURL : "https://192.168.1.5:3001",
+    baseURL : baseURL,
     withCredentials : true
 })
 

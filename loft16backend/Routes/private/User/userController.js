@@ -4,12 +4,51 @@ const bcrypt = require("bcryptjs");
 
 const mongoose = require("mongoose");
 let ObjectId = require("mongoose").Types.ObjectId;
-const { ehandler } = require("../../../helper/utils")
+const { ehandler } = require("../../../helper/utils");
 
 const User = require("../../../models/User");
 const auth = require("../../../middleware/auth");
 const Order = require("../../../models/Orders");
 const Pending_Order = require("../../../models/Pending_Order");
+const Product = require("../../../models/Product");
+const { v4: uuidv4 } = require("uuid");
+var multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, `./static/profile`);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${new Date().toISOString()}-${uuidv4()}-${file.originalname}`);
+  },
+});
+
+var upload = multer({ storage: storage, limits: { fileSize: 8388608 } });
+
+router.post( "/uploadProfile", auth, upload.single("profile_picture", 5), async (req, res) => {
+    try {
+      const { _id } = req.body;
+      let uploadInfo = req.file;
+      if (_id) {
+        const updateAdminData = await User.updateOne(
+          { _id },
+          {
+            $set: {
+              profile_picture: `https://192.168.1.5:3001/${uploadInfo.path}`,
+            },
+          }
+        );
+      }
+
+      res.status(200).json({
+        message: "ok!",
+        uploadInfo,
+      });
+    } catch (e) {
+      ehandler(e, res);
+    }
+  }
+);
 
 // 👌 TODO: Should update the total items & total cost
 router.post("/addToCart", auth, async (req, res) => {
@@ -49,7 +88,7 @@ router.post("/removeCancelled", auth, async (req, res) => {
       description: "Record removed",
     });
   } catch (e) {
-    ehandler(e,res)
+    ehandler(e, res);
   }
 });
 
@@ -73,7 +112,7 @@ router.post("/removeCompleted", auth, async (req, res) => {
       description: "Record removed",
     });
   } catch (e) {
-    ehandler(e,res)
+    ehandler(e, res);
   }
 });
 
@@ -127,7 +166,7 @@ router.post("/cancelOrder", auth, async (req, res) => {
       message: "Order Cancelled Successfuly",
     });
   } catch (err) {
-    ehandler(e,res)
+    ehandler(e, res);
   }
 });
 
@@ -186,7 +225,7 @@ router.post("/placeOrder", auth, async (req, res) => {
       message: "Order Placed!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -215,7 +254,7 @@ router.post("/mynumber", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -244,7 +283,7 @@ router.post("/mynumber", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -264,7 +303,7 @@ router.post("/mybasics", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -296,7 +335,7 @@ router.post("/mypassword", async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -316,7 +355,7 @@ router.post("/mytwofactorauth", async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -360,21 +399,22 @@ router.post("/myaddress", auth, async (req, res) => {
         { _id },
         { $set: { "shipping_address.default_address": -1 } }
       );
-    else
-        if(userData.shipping_address.default_address < 0)
-        await User.updateOne(
-            { _id },
-            { $set : {
-                "shipping_address.default_address" : 0
-            }}
-        )
+    else if (userData.shipping_address.default_address < 0)
+      await User.updateOne(
+        { _id },
+        {
+          $set: {
+            "shipping_address.default_address": 0,
+          },
+        }
+      );
 
     res.status(201).json({
       status: 201,
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -394,7 +434,7 @@ router.post("/changeAvatar", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -423,7 +463,7 @@ router.post("/myrecovery", auth, async (req, res) => {
       message: "Updated!",
     });
   } catch (err) {
-   ehandler(err,res)
+    ehandler(err, res);
   }
 });
 
@@ -446,7 +486,7 @@ router.post("/updatecart", auth, async (req, res) => {
       ...result,
     });
   } catch (e) {
-    ehandler(e,res)
+    ehandler(e, res);
   }
 });
 
@@ -523,6 +563,124 @@ router.get("/mycart/:_id", auth, async (req, res) => {
   // get user mycart
   const userCart = await User.findOne({ _id }, { _id: 0, cart: 1 }).lean();
   res.status(200).json(userCart);
+});
+
+router.post("/like", auth, async (req, res) => {
+  try {
+    const { _id, prod_Id, mode } = req.body;
+
+    if (mode === 0) {
+      const updateUser = await User.updateOne(
+        { _id },
+        {
+          $push: {
+            liked_products: new ObjectId(prod_Id),
+          },
+        }
+      );
+      const updateProduct = await Product.updateOne(
+        { _id: prod_Id },
+        {
+          $inc: {
+            likes: 1,
+          },
+        }
+      );
+      console.log(updateUser, "0");
+    } else {
+      const updateUser = await User.updateOne(
+        { _id },
+        {
+          $pull: {
+            liked_products: new ObjectId(prod_Id),
+          },
+        }
+      );
+      const updateProduct = await Product.updateOne(
+        { _id: prod_Id },
+        {
+          $inc: {
+            likes: -1,
+          },
+        }
+      );
+      console.log(updateUser, "1");
+    }
+
+    res.status(200).json({
+      message: "ok!",
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+router.post("/writeComment", auth, async (req, res) => {
+  try {
+    const { user_Id, prod_Id, comment_object } = req.body;
+
+    const writeComment = await Product.updateOne(
+      {
+        _id: prod_Id,
+      },
+      {
+        $push: {
+          ratings: comment_object,
+        },
+        $inc: {
+          n_ratings: comment_object.rating,
+          n_no_ratings: 1,
+        },
+      }
+    );
+
+    const updateUser = await User.updateOne(
+      {
+        _id: user_Id,
+      },
+      {
+        $pull: {
+          to_rate: new ObjectId(prod_Id),
+        },
+      }
+    );
+
+    res.status(200).json({
+      message: "ok!",
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+router.post("/orderDetails", auth, async (req, res) => {
+  try {
+    const { order_ID } = req.body;
+
+    const details = await Order.aggregate([
+      {
+        $match: { _id: new ObjectId(order_ID) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_ID",
+          foreignField: "_id",
+          as: "user_profile",
+        },
+      },
+      { $unwind: "$user_profile" },
+    ]);
+
+    console.log("FINDING", order_ID, details);
+
+    res.status(200).json({
+      message: "ok!",
+      details: details.length !== 0 ? details[0] : {},
+    });
+  } catch (err) {
+    ehandler(err, res);
+  }
 });
 
 module.exports = router;

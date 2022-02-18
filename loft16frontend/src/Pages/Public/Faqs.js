@@ -9,7 +9,7 @@ const Faqs = () => {
         </h2>
         <ul className="flex items-start gap-8 flex-wrap">
           <li className="w-full md:w-2/5">
-            <p className="text-lg font-medium leading-6 text-teal-600">
+            <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
               What data do loft 16 collect?
             </p>
             <p className="mt-2">
@@ -20,7 +20,7 @@ const Faqs = () => {
             </p>
           </li>
           <li className="w-full md:w-2/5">
-            <p className="text-lg font-medium leading-6 text-teal-600">
+            <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
               How many day's I can return a product?
             </p>
             <p className="mt-2">
@@ -32,7 +32,7 @@ const Faqs = () => {
             </p>
           </li>
           <li className="w-full md:w-2/5">
-            <p className="text-lg font-medium leading-6 text-teal-600">
+            <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
               What are mode of payment Loft 16 offers?
             </p>
             <p className="mt-2">
@@ -42,29 +42,19 @@ const Faqs = () => {
             </p>
           </li>
           <li className="w-full md:w-2/5">
-            <p className="text-justify text-lg font-medium leading-6 text-teal-600">
-              Can i upload my personal profile picture?
+            <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
+              Do Loft 16 have a physical store?
             </p>
             <p className="mt-2">
               <p className="text-justify text-base leading-6 text-gray-500">
-              For now, Loft 16 can't let you customize or upload your personal photo. But if you signed in via google, Loft 16 will use your google photo instead. On the other hand, if you've signed in manually, Loft 16 will give you a random pre-created artwork avatar. 
-              </p>
-            </p>
-          </li>
-          <li className="w-full md:w-2/5">
-            <p className="text-lg font-medium leading-6 text-teal-600">
-              Where can I find other Loft 16 Physical Store?
-            </p>
-            <p className="mt-2">
-              <p className="text-justify text-base leading-6 text-gray-500">
-                Because Loft 16 is a simple business, we only have 1 physical store located at Quezon City.
-                We are open weekdays from 8:00 AM to 8:00 PM. We are looking to build more branches in the future
+                Yes, but because Loft 16 is a simple business, we only have 1 physical store located at <span className="font-medium text-gray-800 italic">249, U.P. Town Center, 216 Katipunan Ave, Diliman, Quezon City</span>. We are located at <span className="italic font-medium text-gray-800">Phase 2 bldg. Look for Happy Pill store neare Mango</span>
+                <br /><br />We are open weekdays from 8:00 AM to 8:00 PM. We are looking to build more branches in the future
                  to further serve our dear customer.
                 </p>
             </p>
           </li>
           <li className="w-full md:w-2/5">
-            <p className="text-lg font-medium leading-6 text-teal-600">
+            <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
               How can I recover my account?
             </p>
             <p className="mt-2">

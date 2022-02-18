@@ -166,7 +166,7 @@ const Products = () => {
               </Label>
               <div className="relative w-full mr-3 text-green-900 h-full  focus-within:text-green-700 ">
                 <Input
-                  className=" rounded-lg border-1 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
+                  className=" rounded-lg border-1 bg-gray transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                   placeholder="Search By Name"
                   aria-label="New Number"
                   value={searchName}

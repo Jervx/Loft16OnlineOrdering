@@ -58,8 +58,8 @@ const ProductView = ({ _id, data, mode, onSave }) => {
   const [variants, setVariants] = useState([]);
   const [newVariants, setNewVariants] = useState([]);
   const [newVarName, setNewVarName] = useState("");
-  const [varPrice, setVarPrice] = useState("");
-  const [varStock, setVarStock] = useState("");
+  const [varPrice, setVarPrice] = useState(0);
+  const [varStock, setVarStock] = useState(0);
 
   const [description, setDescription] = useState("");
 
@@ -422,7 +422,11 @@ const ProductView = ({ _id, data, mode, onSave }) => {
                       aria-label="New Number"
                       value={varStock}
                       onChange={(e) => {
-                        setVarStock(e.target.value);
+                         if(e.target.value === "")
+                            setVarStock("")
+                         if(isNaN(Number.parseInt(e.target.value)))return
+                         let stock = Number.parseInt(e.target.value)
+                         setVarStock(stock)
                       }}
                     />
                   </div>

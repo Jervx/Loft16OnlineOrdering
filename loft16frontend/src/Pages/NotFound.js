@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter, useHistory } from 'react-router-dom'
 import { Button } from '@windmill/react-ui'
+import { getUrl } from "../Helpers/uitils"
 
 const NotFound = (props) => {
 
@@ -9,7 +10,7 @@ const NotFound = (props) => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-center items-center">
       <div className="m-auto text-center">
-        <img width="300px" alt='saly' src="https://cdn.discordapp.com/attachments/912411399458795593/920991183994507274/Saly-17.png"/>
+        <img width="300px" alt='saly' src={getUrl("/static/assets/notfound.png")}/>
         <p className="text-7xl defText-Col-2">404 </p>
         <p className="mt-2 defText-Col-2 font-medium">Sorry! But you went </p>
         <p className="mt-2 defText-Col-2">Looks Like We Don't Have That Page </p>

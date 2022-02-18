@@ -3,17 +3,22 @@ import React, { useEffect, useState } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import { ImTruck } from "react-icons/im";
 
-
 import Informative from "../../Components/Modal/Informative";
 import FullPageLoader from "../../Components/FullPageLoader";
 import HelperLabel from "../../Components/HelperLabel";
 import API from "../../Helpers/api";
 
+import { Button } from "@windmill/react-ui"
+
 import { useSelector, useDispatch } from "react-redux";
 import { signin, signout } from "../../Features/userSlice";
 import { openNotifier } from "../../Features/uiSlice";
 
+import { numberWithCommas, parseDate } from "../../Helpers/uitils";
+
 import { openAlertModal, openInputModal } from "../../Features/uiSlice";
+
+import ViewOrderDetails from "../../Components/ViewOrderDetails";
 
 const Orders = () => {
   const userData = useSelector((state) => state.user.userData);
@@ -114,7 +119,7 @@ const Orders = () => {
               />
             </div>
             <div className="container px-5 py-24 mx-auto">
-              <div className="flex flex-wrap -mx-4 -my-8 ">
+              <div className="flex flex-wrap -mx-4 -my-8">
                 {userData.pending_orders.length === 0 &&
                   userData.in_progress.length === 0 && (
                     <>
@@ -123,10 +128,156 @@ const Orders = () => {
                       </div>
                     </>
                   )}
+
+                {userData.in_progress.map((in_progress, idx) => (
+                  <div
+                    key={idx}
+                    
+                    class="py-8 px-4 mt-4 sm:w-full lg:w-1/3 relative overflow-hidden border border-gray-100 rounded-lg"
+                  >
+                    <span class="absolute inset-x-0 bottom-0 h-1  bg-gradient-to-r from-green-300 via-blue-500 to-green-400"></span>
+
+                    <div class="justify-between sm:flex">
+                      <div>
+                        <h5 class="text-base  text-gray-900">
+                          Order ID: {in_progress.order_ID}
+                        </h5>
+                        <p class="mt-1 text-xs font-medium text-gray-600">
+                          Chosen Courier : {in_progress.courier}
+                        </p>
+                        <p class="mt-1 text-xs font-medium text-gray-600">
+                          {" "}
+                          Status :{" "}
+                          {in_progress.order_status === 1
+                            ? "Approved & Processed"
+                            : "Shipped"}{" "}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="justify-between mt-4 sm:flex">
+                      <div>
+                        <h5 class="text-xl font-quicksand text-gray-900">
+                          Total: ₱{" "}
+                          <span className="font-medium">
+                            {numberWithCommas(in_progress.total_cost)}
+                          </span>
+                        </h5>
+                      </div>
+                    </div>
+
+                    <div class="mt-4 sm:pr-8">
+                      <p
+                        class={`text-sm ${
+                          in_progress.order_status === 1
+                            ? "text-blue-500"
+                            : "text-teal-500"
+                        }`}
+                      >
+                        {in_progress.order_status === 1
+                          ? `Your order was approved and processed. Your package is waiting for ${in_progress.courier} to pickup your order`
+                          : `Your order has been shipped by ${in_progress.courier}`}
+                      </p>
+                    </div>
+
+                    <Button
+                            onClick={() => {
+                                dispatch(
+                                  openInputModal({
+                                    title: "Checkout Details",
+                                    component: <ViewOrderDetails order_ID={in_progress.order_ID} />,
+                                    onAccept: () => {},
+                                    acceptBtnText: "Place Order",
+                                    cancelBtnText: "Cancel",
+                                  })
+                                );
+                              }}
+                            className="bg-teal-400 text-white w-full rounded-md mt-4"
+                          >
+                            View Details
+                          </Button>
+
+                    <dl class="flex mt-6">
+                      <div class="flex flex-col">
+                        <dt class="text-sm font-medium text-gray-600">
+                          Approved On
+                        </dt>
+                        <dd class="text-xs text-gray-500">
+                          {parseDate(in_progress.cat)}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                  //   <div
+                  //     key={idx}
+                  //     className="py-8 px-4 sm:w-full lg:w-1/3 relative"
+                  //   >
+                  //     <MdOutlineClose
+                  //       onClick={() => {
+                  //         dispatch(
+                  //           openAlertModal({
+                  //             component: <Informative />,
+                  //             data: {
+                  //               description: "Failed to cancel order",
+                  //               solution:
+                  //                 "This order is already accepted/processed/On The Way, you cannot cancel this anymore",
+                  //             },
+                  //           })
+                  //         );
+                  //       }}
+                  //       className="filter blur-xs absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
+                  //     />
+                  //     <div className="h-full flex items-start">
+                  //       <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
+                  //         <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
+                  //           {new Date(in_progress.cat).toLocaleString("en-us", {
+                  //             month: "short",
+                  //           })}
+                  //         </span>
+                  //         <span className="font-medium text-lg text-gray-800 title-font leading-none">
+                  //           {new Date(in_progress.cat).getDate()}
+                  //         </span>
+                  //       </div>
+                  //       <div className="flex-grow pl-6">
+                  //         <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
+                  //           OrderID : {in_progress.order_ID}
+                  //         </h2>
+                  //         <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
+                  //           Order Cost :{" "}
+                  //           <span className=" font-medium">
+                  //             {" "}
+                  //             ₱{" "}
+                  //             {in_progress.total_cost
+                  //               .toFixed(2)
+                  //               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                  //           </span>
+                  //         </h1>
+                  //         <div className="inline-flex items-center">
+                  //           <span className="flex-grow flex flex-col">
+                  //           <p className="flex items-center text-lg text-teal-700">
+                  //               <ImTruck className="w-5 h-5 mr-2" />{" "}
+                  //               <span className="text-teal-700 font-medium">
+                  //                 {in_progress.courier}
+                  //               </span>
+                  //             </p>
+                  //           </span>
+                  //         </div>
+                  //         <div className="flex">
+                  //           <p className="rounded-lg filter drop-shadow-md bg-blue-200 mt-2 px-5 py-2 text-xs">
+                  //             {in_progress.order_status === 1
+                  //               ? "Processing"
+                  //               : "Shipped"}
+                  //           </p>
+                  //         </div>
+                  //       </div>
+                  //     </div>
+                  //   </div>
+                ))}
                 {userData.pending_orders.map((pendings, idx) => (
                   <div
                     key={idx}
-                    className="py-8 px-4 sm:w-full lg:w-1/3 rounded-md relative"
+                    
+                    class="py-8 px-4 mt-4 sm:w-full lg:w-1/3 relative  overflow-hidden border border-gray-100 rounded-lg"
                   >
                     <MdOutlineClose
                       onClick={() => {
@@ -144,116 +295,132 @@ const Orders = () => {
                       }}
                       className="absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
                     />
-                    <div className="h-full flex items-start">
-                      <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
-                        <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
-                          {new Date(pendings.cat).toLocaleString("en-us", {
-                            month: "short",
-                          })}
-                        </span>
-                        <span className="font-medium text-lg text-gray-800 title-font leading-none">
-                          {new Date(pendings.cat).getDate()}
-                        </span>
-                      </div>
-                      <div className="flex-grow pl-6">
-                        <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
-                          OrderID : {pendings.order_ID}
-                        </h2>
-                        <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
-                          Order Cost :{" "}
-                          <span className=" font-medium">
-                            {" "}
-                            ₱{" "}
-                            {pendings.total_cost
-                              .toFixed(2)
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
-                          </span>
-                        </h1>
-                        <div className="inline-flex items-center">
-                          <span className="flex-grow flex flex-col">
-                            <p className="flex items-center text-lg text-teal-700">
-                              <ImTruck className="w-5 h-5 mr-2" />{" "}
-                              <span className="text-teal-700 font-medium">
-                                {pendings.courier}
-                              </span>
-                            </p>
-                          </span>
-                        </div>
-                        <div className="flex">
-                          <p className="rounded-lg filter drop-shadow-md bg-yellow-200 mt-2 px-5 py-2 text-xs">
-                            Waiting for admin approval
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    <span class="absolute inset-x-0 bottom-0 h-1  bg-gradient-to-r from-yellow-300 via-orange-500 to-red-100"></span>
 
-                {userData.in_progress.map((in_progress, idx) => (
-                  <div
-                    key={idx}
-                    className="py-8 px-4 sm:w-full lg:w-1/3 relative"
-                  >
-                    <MdOutlineClose
-                      onClick={() => {
-                        dispatch(
-                          openAlertModal({
-                            component: <Informative />,
-                            data: {
-                              description: "Failed to cancel order",
-                              solution:
-                                "This order is already accepted/processed/On The Way, you cannot cancel this anymore",
-                            },
-                          })
-                        );
-                      }}
-                      className="filter blur-xs absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
-                    />
-                    <div className="h-full flex items-start">
-                      <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
-                        <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
-                          {new Date(in_progress.cat).toLocaleString("en-us", {
-                            month: "short",
-                          })}
-                        </span>
-                        <span className="font-medium text-lg text-gray-800 title-font leading-none">
-                          {new Date(in_progress.cat).getDate()}
-                        </span>
-                      </div>
-                      <div className="flex-grow pl-6">
-                        <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
-                          OrderID : {in_progress.order_ID}
-                        </h2>
-                        <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
-                          Order Cost :{" "}
-                          <span className=" font-medium">
-                            {" "}
-                            ₱{" "}
-                            {in_progress.total_cost
-                              .toFixed(2)
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
-                          </span>
-                        </h1>
-                        <div className="inline-flex items-center">
-                          <span className="flex-grow flex flex-col">
-                          <p className="flex items-center text-lg text-teal-700">
-                              <ImTruck className="w-5 h-5 mr-2" />{" "}
-                              <span className="text-teal-700 font-medium">
-                                {in_progress.courier}
-                              </span>
-                            </p>
-                          </span>
-                        </div>
-                        <div className="flex">
-                          <p className="rounded-lg filter drop-shadow-md bg-blue-200 mt-2 px-5 py-2 text-xs">
-                            {in_progress.order_status === 1
-                              ? "Processing"
-                              : "Shipped"}
-                          </p>
-                        </div>
+                    <div class="justify-between sm:flex">
+                      <div>
+                        <h5 class="text-base  text-gray-900">
+                          Order ID: {pendings.order_ID}
+                        </h5>
+                        <p class="mt-1 text-xs font-medium text-gray-600">
+                          Chosen Courier : {pendings.courier}
+                        </p>
+                        <p class="mt-1 text-xs font-medium text-gray-600">
+                          {" "}
+                          Status : Pending{" "}
+                        </p>
                       </div>
                     </div>
+
+                    <div class="justify-between mt-4 sm:flex">
+                      <div>
+                        <h5 class="text-xl font-quicksand text-gray-900">
+                          Total: ₱{" "}
+                          <span className="font-medium">
+                            {numberWithCommas(pendings.total_cost)}
+                          </span>
+                        </h5>
+                      </div>
+                    </div>
+
+                    <div class="mt-4 sm:pr-8">
+                      <p class="text-sm text-yellow-500">
+                        This order is waiting for admin approval, this may take
+                        1-2 working days.. You can still cancel this
+                      </p>
+                    </div>
+
+                    <Button
+                            onClick={() => {
+                                dispatch(
+                                  openInputModal({
+                                    title: "Checkout Details",
+                                    component: <ViewOrderDetails order_ID={pendings.order_ID} />,
+                                    onAccept: () => {},
+                                    acceptBtnText: "Place Order",
+                                    cancelBtnText: "Cancel",
+                                  })
+                                );
+                              }}
+                            className="bg-teal-400 text-white w-full rounded-md mt-4"
+                          >
+                            View Details
+                          </Button>
+
+                    <dl class="flex mt-6">
+                      <div class="flex flex-col">
+                        <dt class="text-sm font-medium text-gray-600">
+                          Placed on
+                        </dt>
+                        <dd class="text-xs text-gray-500">
+                          {parseDate(pendings.cat)}
+                        </dd>
+                      </div>
+                    </dl>
                   </div>
+                  //   <div
+                  //     key={idx}
+                  //     className="py-8 px-4 sm:w-full lg:w-1/3 rounded-md relative"
+                  //   >
+                  //     <MdOutlineClose
+                  //       onClick={() => {
+                  //         dispatch(
+                  //           openNotifier({
+                  //             title: "Cancel Order",
+                  //             message: `Are you sure to cancel this order?`,
+                  //             onAccept: () => {
+                  //               cancelOrder(pendings, idx);
+                  //             },
+                  //             acceptBtnText: "Yes",
+                  //             cancelBtnText: "No",
+                  //           })
+                  //         );
+                  //       }}
+                  //       className="absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
+                  //     />
+                  //     <div className="h-full flex items-start">
+                  //       <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
+                  //         <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
+                  //           {new Date(pendings.cat).toLocaleString("en-us", {
+                  //             month: "short",
+                  //           })}
+                  //         </span>
+                  //         <span className="font-medium text-lg text-gray-800 title-font leading-none">
+                  //           {new Date(pendings.cat).getDate()}
+                  //         </span>
+                  //       </div>
+                  //       <div className="flex-grow pl-6">
+                  //         <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
+                  //           OrderID : {pendings.order_ID}
+                  //         </h2>
+                  //         <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
+                  //           Order Cost :{" "}
+                  //           <span className=" font-medium">
+                  //             {" "}
+                  //             ₱{" "}
+                  //             {pendings.total_cost
+                  //               .toFixed(2)
+                  //               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                  //           </span>
+                  //         </h1>
+                  //         <div className="inline-flex items-center">
+                  //           <span className="flex-grow flex flex-col">
+                  //             <p className="flex items-center text-lg text-teal-700">
+                  //               <ImTruck className="w-5 h-5 mr-2" />{" "}
+                  //               <span className="text-teal-700 font-medium">
+                  //                 {pendings.courier}
+                  //               </span>
+                  //             </p>
+                  //           </span>
+                  //         </div>
+                  //         <div className="flex">
+                  //           <p className="rounded-lg filter drop-shadow-md bg-yellow-200 mt-2 px-5 py-2 text-xs">
+                  //             Waiting for admin approval
+                  //           </p>
+                  //         </div>
+                  //       </div>
+                  //     </div>
+                  //   </div>
                 ))}
               </div>
             </div>

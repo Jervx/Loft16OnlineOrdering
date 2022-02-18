@@ -717,6 +717,7 @@ router.post("/updatePending", adminAuth, async (req, res) => {
             $inc: { "variants.$.stock": -item.qty, total_stock: -item.qty },
           }
         );
+
       });
 
       const updateInProgress = await InProgress.create({ ...record });
@@ -944,9 +945,12 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
         uby: new ObjectId(_id),
       });
 
+      let toRate = []
+
       const ITEMS = entry.order_detailed_version.items;
 
       ITEMS.forEach(async (item, idx) => {
+          toRate.push(new ObjectId(item.product_ID))
         const updateProduct = await Product.updateOne(
           {
             _id: item.product_ID,
@@ -974,12 +978,15 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
           },
           $push: {
             past_transactions: {
-              order_ID: new ObjectId(entry_sm.oder_ID),
+              order_ID: new ObjectId(entry.order_ID),
               n_items: entry.n_items,
               total_cost: entry.total_cost,
               courier: entry.courier.courier_name,
               cat: new Date(),
             },
+            to_rate : {
+                $each : toRate
+            }
           },
         }
       );

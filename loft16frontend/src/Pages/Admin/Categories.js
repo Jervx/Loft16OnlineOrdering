@@ -84,19 +84,6 @@ const Categories = () => {
     }
   };
 
-  const deleteCategory = async (_id, oldCategory, mode) => {
-    try {
-      const update = await API.post("/admin/updateCategories", {
-        _id,
-        category: {},
-        oldCategory,
-        mode,
-      });
-    } catch (e) {
-      catchHandler(e);
-    }
-  };
-
   const loadSomething = async () => {
     if (adminData) {
       try {
@@ -108,6 +95,20 @@ const Categories = () => {
         setSearching(false);
         setSearch('')
       } catch (e) {}
+    }
+  };
+
+  const deleteCategory = async (_id, oldCategory, mode) => {
+    try {
+      const update = await API.post("/admin/updateCategories", {
+        _id,
+        category: {},
+        oldCategory,
+        mode,
+      });
+      loadSomething();
+    } catch (e) {
+      catchHandler(e);
     }
   };
 
@@ -195,7 +196,7 @@ const Categories = () => {
               {categories.length} Search Result
             </p>
           )}
-          <section className="mx-4 body-font">
+          <section className="mx-4 body-font  pb-4">
             <TableContainer>
               <Table>
                 <TableHeader>

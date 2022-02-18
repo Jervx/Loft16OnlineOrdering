@@ -41,11 +41,8 @@ const AccountProfile = (props) => {
       ) : (
         <>
           <div className="mx-8 mt-24 mb-0 md:flex justify-center items-center">
-            <img
-              className="border-8 rounded-full w-2/12 h-2/12 md:w-1/12 md:h-1/12"
-              alt="pic"
-              src={ userData.profile_picture !== null ? userData.profile_picture : 'https://cdn.discordapp.com/attachments/912411399458795593/921097628446498887/36..04.jpg' }
-            />
+          <img class="object-cover mr-4 w-32 h-32 rounded-full ring-8 ring-pink-50" src={userData.profile_picture} alt="" />
+
             <div className="md:ml-8">
               <p className="text-xl md:text-4xl my-3 font-inter font-medium">
                 {userData.user_name}

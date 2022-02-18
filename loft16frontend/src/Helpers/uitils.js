@@ -1,3 +1,9 @@
+require("dotenv").config();
+
+const baseURL = process.env.REACT_APP_SERVERURL
+
+export const getUrl = (path) => { return `${baseURL}${path}` }
+
 export const nShorter = (num, digits) => {
   const lookup = [
     { value: 1, symbol: "" },

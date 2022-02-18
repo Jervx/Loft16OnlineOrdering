@@ -1,85 +1,103 @@
 import React from "react";
 
+import { getUrl } from "../Helpers/uitils"
+import { Link } from "react-router-dom"
+
 const Footer = () => {
+
   return (
-    <footer className="text-gray-600 body-font">
-      <div className="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
-        <a
-          className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
-          href="/"
-        >
-          Loft 16
-        </a>
-        <p className="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">
-          © 2022 Loft 16 —
+    <footer className="px-4 divide-y bg-gray-50 dark:bg-coolGray-800 dark:text-coolGray-100">
+      <div className="text-teal-800 container flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0">
+        <div className="lg:w-1/3">
           <a
-            href="https://twitter.com/knyttneve"
-            className="text-gray-600 ml-1"
             rel="noopener noreferrer"
-            target="_blank"
+            href="#"
+            className="flex justify-center space-x-3 lg:justify-start"
           >
-            @SIAA Group 9
-          </a>
-        </p>
-        <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
-          <a className="text-gray-500">
-            <svg
-              fill="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
+            <div className="flex items-center justify-center w-12 h-12 rounded-full dark:bg-violet-400">
+              <img class="object-cover rounded-full ring-8 ring-pink-50" src={getUrl('/static/assets/logo.jpg')} alt="" />
+            </div>
+            <a
+              className=" MoonTime defTextCOlorGreen lg:block ml-6 text-4xl font-bold text-gray-800 dark:text-gray-200"
+              href="/"
             >
-              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-            </svg>
+              Loft 16
+            </a>
           </a>
-          <a className="ml-3 text-gray-500">
-            <svg
-              fill="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
-            >
-              <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-            </svg>
-          </a>
-          <a className="ml-3 text-gray-500">
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
-            >
-              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
-            </svg>
-          </a>
-          <a className="ml-3 text-gray-500">
-            <svg
-              fill="currentColor"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="0"
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="none"
-                d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"
-              ></path>
-              <circle cx="4" cy="4" r="2" stroke="none"></circle>
-            </svg>
-          </a>
-        </span>
+        </div>
+        <div className="grid grid-cols-2 text-sm gap-x-3 gap-y-8 lg:w-2/3 sm:grid-cols-4">
+          <div className="space-y-3">
+            <h3 className="tracking-wide text-gray-800 uppercase dark:text-coolGray-50">
+              Navigation
+            </h3>
+            <ul className="space-y-1">
+              <li>
+                <Link to="/">
+                  Home
+                </Link>
+              </li>
+              <li>
+              <Link to="/products">
+                  Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/faqs">
+                  FAQs
+                </Link>
+              </li>
+              <li>
+                <Link to="/about">
+                  About
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <h3 className="tracking-wide  text-gray-800  uppercase dark:text-coolGray-50">
+              Company
+            </h3>
+            <ul className="space-y-1">
+              <li>
+                <a rel="noopener noreferrer" href="#">
+                  About
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <div className="uppercase  text-gray-800  dark:text-coolGray-50">Social media</div>
+            <div className="flex justify-start space-x-3">
+              <a
+                className="ml-3 text-gray-500"
+                href="https://www.instagram.com/loft__16/"
+                target="_blank"
+              >
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                >
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="text-teal-600 py-6 text-sm text-center dark:text-coolGray-400">
+        © 2016 Loft16. All rights reserved.
       </div>
     </footer>
+
+    // <footer className="text-gray-600 body-font">
+
+    // </footer>
   );
 };
 

@@ -22,7 +22,8 @@ import Header from "../../Components/Header";
 
 import { Button, Dropdown } from "@windmill/react-ui";
 import { BsFillTelephoneFill } from "react-icons/bs";
-import { MdEmail, MdOutlineClose } from "react-icons/md";
+import { MdFileUpload, MdEmail, MdOutlineClose, MdSave } from "react-icons/md";
+
 import { FaMapMarkerAlt, FaKey, FaEyeSlash, FaEye } from "react-icons/fa";
 import AddressCreator from "../../Components/ModalComponent/AddressCreator";
 
@@ -43,11 +44,17 @@ const AccountSetting = () => {
   const [newName, setNewName] = useState("");
   const userDataRaw = JSON.parse(localStorage.getItem("userData"));
 
+  const [profilePicture, setProfilePicture] = useState();
+  const [image, setImage] = useState();
+  const [fileName, setFileName] = useState("");
+
+
   const loadUserData = async () => {
     try {
       setLoading(true);
       const response = await API.get(`/user/mydetails/${userDataRaw._id}`);
       dispatch(signin(response.data.userData));
+      setProfilePicture(response.data.userData.profile_picture)
       setLoading(false);
       setNewUserName(response.data.userData.user_name);
       setNewName(response.data.userData.name);
@@ -76,6 +83,21 @@ const AccountSetting = () => {
       );
     }
   };
+
+  const changeImage = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("profile_picture", image);
+      formData.append("path", "profile");
+      formData.append("_id", userData._id);
+      const response = await API.post("/user/uploadProfile", formData);
+      loadUserData()
+      setFileName("")
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
 
   const notLoggedinModal = () => {
     dispatch(
@@ -177,13 +199,44 @@ const AccountSetting = () => {
 
             <div className="mt-8">
               <div className="flex my-8 items-center">
-                <img
-                  className="border-8 rounded-full w-2/12 h-2/12 mr-6 md:w-2/12 md:h-2/12"
-                  alt={userData.user_name}
-                  src={userData.profile_picture}
-                />
+                <img class="object-cover mr-4 w-32 h-32 rounded-full ring-8 ring-pink-50" src={profilePicture} alt="" />
                 <div className="mr-6" className="relative">
-                  <Button className="rounded-lg" onClick={() => avatarChoser()}>
+                  <div className="w-1/2 my-4">
+                    {fileName.length === 0 && (
+                      <label className="relative mt-20 mb-2 w-5/12 ">
+                        <input
+                          className="w-full opacity-0"
+                          type="file"
+                          accept="image/png, image/gif, image/jpeg"
+                          onChange={(e) => {
+                            setImage(e.target.files[0]);
+                            setFileName(e.target.files[0].name);
+                            setProfilePicture(
+                              URL.createObjectURL(e.target.files[0])
+                            );
+                          }}
+                        />
+                        <div className="transition text-white duration-150 w-full absolute top-0 z-10 px-4 py-2 text-sm border cursor-pointer bg-teal-500 border-dashed hover:border-transparent hover:bg-teal-600 hover:text-white flex items-center justify-center rounded-md">
+                          <MdFileUpload className="mr-5" />
+                          <span>Change Photo</span>
+                        </div>
+                      </label>
+                    )}
+                    {fileName.length !== 0 && (
+                      <div className="relative mt-20 my-2">
+                        <button
+                          onClick={() => {
+                            changeImage()
+                          }}
+                          className=" animate-pulse transition duration-150 w-full px-4 py-2 text-sm border cursor-pointer bg-teal-500 border-dashed hover:border-transparent hover:bg-teal-600 text-white flex items-center justify-center rounded-md"
+                        >
+                          <MdSave className="mr-5" />
+                          <span>Save</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {/* <Button className="rounded-lg" onClick={() => avatarChoser()}>
                     Change Avatar
                   </Button>
                   <Dropdown
@@ -199,7 +252,7 @@ const AccountSetting = () => {
                         </button>
                       </div>
                     </div>
-                  </Dropdown>
+                  </Dropdown> */}
                   <div>
                     <p className="text-md text-cool-gray-500 mt-2">
                       {userData.email_address}{" "}
