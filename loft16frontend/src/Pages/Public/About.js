@@ -1,14 +1,25 @@
 import React from "react";
 
 import { ImQuotesLeft, ImQuotesRight } from "react-icons/im";
+import { motion } from "framer-motion";
 
 const About = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="flex justify-center h-1/2 items-center">
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.75 }}
+        className="flex justify-center h-1/2 items-center"
+      >
         <p className="text-5xl NotoSerif text-teal-700 mt-14">Our History</p>
-      </section>
-      <section className="mx-32 mt-14">
+      </motion.section>
+      <motion.section
+        className="mx-32 mt-14"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.50, duration: 1.75 }}
+      >
         <div className="relative h-14">
           <ImQuotesLeft className="absolute top-8 left-0 h-9 w-9 text-pink-700" />
         </div>
@@ -43,7 +54,7 @@ const About = () => {
         <div className="relative">
           <ImQuotesRight className="absolute right-28 -bottom-3 h-9 w-9 text-pink-700" />
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

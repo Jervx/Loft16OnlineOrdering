@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-import { Avatar, Card, CardBody } from "@windmill/react-ui";
+import { Avatar, Card, CardBody, Button } from "@windmill/react-ui";
 import { numberWithCommas, parseDate } from "../Helpers/uitils";
 
 import { FaMapMarkerAlt, FaShoppingCart, FaTruckLoading } from "react-icons/fa";
 
 import FullPageLoader from "./FullPageLoader";
-import API from "../Helpers/api"
+import API from "../Helpers/api";
 
 const ViewOrderDetails = ({ order_ID }) => {
   const [order, setOrder] = useState();
@@ -23,7 +23,9 @@ const ViewOrderDetails = ({ order_ID }) => {
 
   useEffect(() => {
     loadSomething();
-  },[]);
+  }, []);
+
+  
 
   return loadingData ? (
     <FullPageLoader />
@@ -58,10 +60,7 @@ const ViewOrderDetails = ({ order_ID }) => {
           </div>
           <div className="flex items-center space-x-2 my-4 text-gray-50">
             <p>
-              This order{" "}
-              {order.order_status === 3
-                ? " was "
-                : " will be "}{" "}
+              This order {order.order_status === 3 ? " was " : " will be "}{" "}
               delivered by{" "}
               <span className="font-bold italic">
                 {order.courier.courier_name}
@@ -108,46 +107,31 @@ const ViewOrderDetails = ({ order_ID }) => {
           </div>
 
           <div>
-            <p className="text-gray-600 text-lg">
-              {order.address.address}
-            </p>
+            <p className="text-gray-600 text-lg">{order.address.address}</p>
             <div className="flex space-y-2 text-sm flex-wrap text-gray-600 mt-4">
               <div className=" ">
                 <p className="text-sm font-medium">
                   Postal :{" "}
-                  <span className="font-mono">
-                    {order.address.postal}
-                  </span>{" "}
+                  <span className="font-mono">{order.address.postal}</span>{" "}
                 </p>
                 <p className="text-sm font-medium">
                   Street :{" "}
-                  <span className="font-mono">
-                    {order.address.street}
-                  </span>{" "}
+                  <span className="font-mono">{order.address.street}</span>{" "}
                 </p>
                 <p className="text-sm font-medium">
                   Barangay :{" "}
-                  <span className="font-mono">
-                    {order.address.barangay}
-                  </span>{" "}
+                  <span className="font-mono">{order.address.barangay}</span>{" "}
                 </p>
                 <p className="text-sm font-medium">
-                  City :{" "}
-                  <span className="font-mono">
-                    {order.address.city}
-                  </span>{" "}
+                  City : <span className="font-mono">{order.address.city}</span>{" "}
                 </p>
                 <p className="text-sm font-medium">
                   Province :{" "}
-                  <span className="font-mono">
-                    {order.address.province}
-                  </span>{" "}
+                  <span className="font-mono">{order.address.province}</span>{" "}
                 </p>
                 <p className="text-sm font-medium">
                   Region :{" "}
-                  <span className="font-mono">
-                    {order.address.region}
-                  </span>{" "}
+                  <span className="font-mono">{order.address.region}</span>{" "}
                 </p>
               </div>
             </div>

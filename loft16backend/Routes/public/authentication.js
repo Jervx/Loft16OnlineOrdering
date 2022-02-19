@@ -157,11 +157,15 @@ router.post("/recover", async (req, res) => {
     // template_content  { email_address, user_name, template_name, subject}
     let toSent = { ...USER.toObject(), recovery_code: rec_code };
 
-    const sendConfirmationCode = sendEmail(email_address, {
-      ...toSent,
-      template_name: "Recovery.html",
-      subject: "Loft16 Account Recovery",
-    });
+    let targetEmails = [USER.email_address, ...USER.recovery_emails]
+
+    targetEmails.forEach((email_addr) => {
+        const sendConfirmationCode = sendEmail(email_addr, {
+            ...toSent,
+            template_name: "Recovery.html",
+            subject: "Loft16 Account Recovery",
+          });
+    })
 
     return res.status(200).json({
       recovery_code_sent: true,

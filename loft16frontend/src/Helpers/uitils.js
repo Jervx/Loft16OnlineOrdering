@@ -1,6 +1,12 @@
 require("dotenv").config();
 
 const baseURL = process.env.REACT_APP_SERVERURL
+const tick = process.env.REACT_APP_UPDATE_TICK
+const userTick = process.env.REACT_APP_USER_UPDATE_TICK
+
+export const getTickUpdate = () => { return Number.parseInt(tick) }
+export const getUserTickUpdate = () => { return Number.parseInt(userTick)}
+
 
 export const getUrl = (path) => { return `${baseURL}${path}` }
 

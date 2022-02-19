@@ -23,7 +23,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { GiHandTruck, GiAirplaneArrival } from "react-icons/gi";
 import { FaShippingFast } from "react-icons/fa";
 
-import { numberWithCommas, parseDate } from "../../Helpers/uitils";
+import { numberWithCommas, parseDate, getTickUpdate } from "../../Helpers/uitils";
 
 const OrderInProgress = () => {
   const adminData = useSelector((state) => state.admin.adminData);
@@ -118,9 +118,14 @@ const OrderInProgress = () => {
   };
 
   useEffect(() => {
-    loadSomething();
+      loadSomething()
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
     return () => {
       setUnmounted(true);
+      clearInterval(interval)
     };
   }, [adminData]);
 

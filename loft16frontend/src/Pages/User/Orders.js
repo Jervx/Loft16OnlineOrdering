@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { MdOutlineClose } from "react-icons/md";
-import { ImTruck } from "react-icons/im";
 
 import Informative from "../../Components/Modal/Informative";
 import FullPageLoader from "../../Components/FullPageLoader";
@@ -20,12 +19,17 @@ import { openAlertModal, openInputModal } from "../../Features/uiSlice";
 
 import ViewOrderDetails from "../../Components/ViewOrderDetails";
 
+import { motion } from "framer-motion"
+
+import { getUserTickUpdate } from "../../Helpers/uitils"
+
 const Orders = () => {
   const userData = useSelector((state) => state.user.userData);
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(true);
   const [pendingOrder, setPendingOrders] = useState();
+  const [unmounted, setUnmounted] = useState(false)
 
   const loadUserData = async () => {
     let _id = userData._id;
@@ -45,6 +49,7 @@ const Orders = () => {
     try {
       setLoading(true);
       const response = await API.get(`/user/mydetails/${_id}`);
+      if(unmounted) return
       dispatch(signin(response.data.userData));
       setPendingOrders(userData.pending_orders);
       setLoading(false);
@@ -99,14 +104,27 @@ const Orders = () => {
 
   useEffect(() => {
     loadUserData();
+    const interval = setInterval(() => {
+        loadUserData();
+      }, getUserTickUpdate());
+  
+      return () => {
+        clearInterval(interval);
+        setUnmounted(true)
+      };
   }, []);
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.75 }}>
       {loading ? (
         <FullPageLoader />
       ) : (
-        <>
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.75 }}>
           <p className="text-2xl text-center font-medium">Your Orders</p>
 
           <section className="text-gray-600 body-font mx-8">
@@ -208,70 +226,7 @@ const Orders = () => {
                       </div>
                     </dl>
                   </div>
-                  //   <div
-                  //     key={idx}
-                  //     className="py-8 px-4 sm:w-full lg:w-1/3 relative"
-                  //   >
-                  //     <MdOutlineClose
-                  //       onClick={() => {
-                  //         dispatch(
-                  //           openAlertModal({
-                  //             component: <Informative />,
-                  //             data: {
-                  //               description: "Failed to cancel order",
-                  //               solution:
-                  //                 "This order is already accepted/processed/On The Way, you cannot cancel this anymore",
-                  //             },
-                  //           })
-                  //         );
-                  //       }}
-                  //       className="filter blur-xs absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
-                  //     />
-                  //     <div className="h-full flex items-start">
-                  //       <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
-                  //         <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
-                  //           {new Date(in_progress.cat).toLocaleString("en-us", {
-                  //             month: "short",
-                  //           })}
-                  //         </span>
-                  //         <span className="font-medium text-lg text-gray-800 title-font leading-none">
-                  //           {new Date(in_progress.cat).getDate()}
-                  //         </span>
-                  //       </div>
-                  //       <div className="flex-grow pl-6">
-                  //         <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
-                  //           OrderID : {in_progress.order_ID}
-                  //         </h2>
-                  //         <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
-                  //           Order Cost :{" "}
-                  //           <span className=" font-medium">
-                  //             {" "}
-                  //             ₱{" "}
-                  //             {in_progress.total_cost
-                  //               .toFixed(2)
-                  //               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
-                  //           </span>
-                  //         </h1>
-                  //         <div className="inline-flex items-center">
-                  //           <span className="flex-grow flex flex-col">
-                  //           <p className="flex items-center text-lg text-teal-700">
-                  //               <ImTruck className="w-5 h-5 mr-2" />{" "}
-                  //               <span className="text-teal-700 font-medium">
-                  //                 {in_progress.courier}
-                  //               </span>
-                  //             </p>
-                  //           </span>
-                  //         </div>
-                  //         <div className="flex">
-                  //           <p className="rounded-lg filter drop-shadow-md bg-blue-200 mt-2 px-5 py-2 text-xs">
-                  //             {in_progress.order_status === 1
-                  //               ? "Processing"
-                  //               : "Shipped"}
-                  //           </p>
-                  //         </div>
-                  //       </div>
-                  //     </div>
-                  //   </div>
+                  
                 ))}
                 {userData.pending_orders.map((pendings, idx) => (
                   <div
@@ -358,76 +313,14 @@ const Orders = () => {
                       </div>
                     </dl>
                   </div>
-                  //   <div
-                  //     key={idx}
-                  //     className="py-8 px-4 sm:w-full lg:w-1/3 rounded-md relative"
-                  //   >
-                  //     <MdOutlineClose
-                  //       onClick={() => {
-                  //         dispatch(
-                  //           openNotifier({
-                  //             title: "Cancel Order",
-                  //             message: `Are you sure to cancel this order?`,
-                  //             onAccept: () => {
-                  //               cancelOrder(pendings, idx);
-                  //             },
-                  //             acceptBtnText: "Yes",
-                  //             cancelBtnText: "No",
-                  //           })
-                  //         );
-                  //       }}
-                  //       className="absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
-                  //     />
-                  //     <div className="h-full flex items-start">
-                  //       <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
-                  //         <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
-                  //           {new Date(pendings.cat).toLocaleString("en-us", {
-                  //             month: "short",
-                  //           })}
-                  //         </span>
-                  //         <span className="font-medium text-lg text-gray-800 title-font leading-none">
-                  //           {new Date(pendings.cat).getDate()}
-                  //         </span>
-                  //       </div>
-                  //       <div className="flex-grow pl-6">
-                  //         <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
-                  //           OrderID : {pendings.order_ID}
-                  //         </h2>
-                  //         <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
-                  //           Order Cost :{" "}
-                  //           <span className=" font-medium">
-                  //             {" "}
-                  //             ₱{" "}
-                  //             {pendings.total_cost
-                  //               .toFixed(2)
-                  //               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
-                  //           </span>
-                  //         </h1>
-                  //         <div className="inline-flex items-center">
-                  //           <span className="flex-grow flex flex-col">
-                  //             <p className="flex items-center text-lg text-teal-700">
-                  //               <ImTruck className="w-5 h-5 mr-2" />{" "}
-                  //               <span className="text-teal-700 font-medium">
-                  //                 {pendings.courier}
-                  //               </span>
-                  //             </p>
-                  //           </span>
-                  //         </div>
-                  //         <div className="flex">
-                  //           <p className="rounded-lg filter drop-shadow-md bg-yellow-200 mt-2 px-5 py-2 text-xs">
-                  //             Waiting for admin approval
-                  //           </p>
-                  //         </div>
-                  //       </div>
-                  //     </div>
-                  //   </div>
+                  
                 ))}
               </div>
             </div>
           </section>
-        </>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

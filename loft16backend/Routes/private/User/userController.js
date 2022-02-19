@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -13,6 +14,9 @@ const Pending_Order = require("../../../models/Pending_Order");
 const Product = require("../../../models/Product");
 const { v4: uuidv4 } = require("uuid");
 var multer = require("multer");
+
+const snooze = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -34,7 +38,7 @@ router.post( "/uploadProfile", auth, upload.single("profile_picture", 5), async 
           { _id },
           {
             $set: {
-              profile_picture: `https://192.168.1.5:3001/${uploadInfo.path}`,
+              profile_picture: `${process.env.SELFURL}/${uploadInfo.path}`,
             },
           }
         );
@@ -529,6 +533,7 @@ router.post("/removefromcart", auth, async (req, res) => {
 //getUserDetails
 router.get("/mydetails/:id", auth, async (req, res) => {
   let _id = req.params.id;
+  await snooze(1000)
   if (!_id)
     return res.status(400).json({
       err: 400,

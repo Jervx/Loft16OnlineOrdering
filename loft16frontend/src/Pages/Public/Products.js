@@ -14,6 +14,8 @@ import { setUserSearch, setData, setFilter } from "../../Features/appSlice";
 
 import API from "../../Helpers/api";
 
+import { motion } from "framer-motion";
+
 /* Icons */
 import { BsFillClockFill } from "react-icons/bs";
 import {
@@ -29,7 +31,7 @@ import { numberWithCommas } from "../../Helpers/uitils";
 const Products = (props) => {
   const dispatch = useDispatch();
   const appState = useSelector((state) => state.app.appState);
-  const history = props.history
+  const history = props.history;
 
   const [loading, setLoading] = useState(true);
   const [toShow, setToShow] = useState(false);
@@ -166,7 +168,12 @@ const Products = (props) => {
   };
 
   return (
-    <div className="min-h-screen">
+    <motion.div
+      className="min-h-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.75 }}
+    >
       <section class="bg-white dark:bg-gray-900">
         <div class="container px-6 py-8 mx-auto">
           <div class="lg:flex lg:-mx-2">
@@ -174,7 +181,13 @@ const Products = (props) => {
               <p className="text-2xl text-teal-700 mb-4 font-quicksand">
                 Categories
               </p>
-              <a href="#all" onClick={() => setFilterScope("all")} class={amIFilter2("all")} >All</a>
+              <a
+                href="#all"
+                onClick={() => setFilterScope("all")}
+                class={amIFilter2("all")}
+              >
+                All
+              </a>
               {categories.map((cat, idx) => (
                 <a
                   href={`#${cat.category_name}`}
@@ -298,7 +311,7 @@ const Products = (props) => {
               {toShow && !loading && appState.data.length === 0 ? (
                 <div className="w-full text-teal-800 h-6/12 flex flex-col items-center">
                   <p className=" font-medium">
-                    We can't find "{appState.userSearch}" in {scope} category
+                    No Product Matched
                   </p>
                   <GiWindpump className="mt-11 w-32 h-32 m-auto" />
                 </div>
@@ -310,14 +323,19 @@ const Products = (props) => {
               ) : (
                 <div class=" grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {appState.data.map((prod, idx) => (
-                    <div
+                    <motion.div
+                      className="card-container"
+                      initial={{ x:-1, opacity: 0 }}
+                      animate={{ x:0, opacity: 1 }}
+                     transition={{ delay : idx * 0.008, duration: 0.75 }}
                       key={idx}
                       onClick={() => {
-                        history.push(`/productdetail/${prod._id}`)
+                        history.push(`/productdetail/${prod._id}`);
                       }}
                       class="flex cursor-pointer font-quicksand flex-col items-center justify-center w-full max-w-lg mx-auto"
                     >
                       <img
+                      
                         class="object-cover w-full rounded-md h-72 xl:h-80"
                         src={prod.Images[0]}
                         alt="T-Shirt"
@@ -325,9 +343,10 @@ const Products = (props) => {
                       <h4 class="mt-2 text-lg font-medium text-gray-700 dark:text-gray-200">
                         {prod.name}
                       </h4>
-                      <p class="text-teal-800 text-lg">Php {numberWithCommas(prod.variants[0].price)}</p>
-
-                    </div>
+                      <p class="text-teal-800 text-lg">
+                        Php {numberWithCommas(prod.variants[0].price)}
+                      </p>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -335,7 +354,7 @@ const Products = (props) => {
           </div>
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 };
 

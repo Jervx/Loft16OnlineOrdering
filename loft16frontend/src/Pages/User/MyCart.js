@@ -21,6 +21,8 @@ import API from "../../Helpers/api";
 import { numberWithCommas } from "../../Helpers/uitils";
 import { Link } from "react-router-dom";
 
+import  { motion } from "framer-motion"
+
 const MyCart = () => {
   const userData = useSelector((state) => state.user.userData);
   const dispatch = useDispatch();
@@ -145,11 +147,18 @@ const MyCart = () => {
   }, []);
 
   return (
-    <div className="">
+    <motion.div className="min-h-64"
+        initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.75 }}
+      >
       {loading ? (
         <FullPageLoader />
       ) : (
-        <>
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.75 }}>
           <div className="flex justify-evenly">
             <Button
               disabled={userData.cart.total_items === 0}
@@ -263,9 +272,9 @@ const MyCart = () => {
               </div>
             </div>
           </section>
-        </>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

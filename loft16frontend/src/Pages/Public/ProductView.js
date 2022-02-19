@@ -33,6 +33,8 @@ import {
   BsFillClockFill,
 } from "react-icons/bs";
 
+import { motion } from "framer-motion"
+
 const ProductView = () => {
   const [loading, setLoading] = useState(true);
   const [productDetail, setProductDetail] = useState();
@@ -318,11 +320,15 @@ const ProductView = () => {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-screen">
       {loading ? (
         <FullPageLoader />
       ) : (
-        <section className="text-gray-600 body-font overflow-hidden">
+        <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.50 }}
+         className="text-gray-600 body-font overflow-hidden">
           <div className="container px-5 py-24 mx-auto">
             <div className="lg:w-4/5 mx-auto flex flex-wrap">
               {/* <img
@@ -697,7 +703,7 @@ const ProductView = () => {
               </div> */}
             </div>
           </div>
-        </section>
+        </motion.section>
       )}
     </div>
   );

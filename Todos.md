@@ -5,7 +5,7 @@
 ### TODO: PRODUCT
 - [x] Search & Filters
 - [x] Product Details Page & Functionality
-- [doing] Add to cart funcionality
+- [x] Add to cart funcionality
 
 ### TODO: User Cart | Orders | Arrived | Cancelled
 - [x] should request the data from backend
@@ -39,8 +39,8 @@
         add it on cart
 
 
-- [doing] User Order Detail View
-- [doing] Like an item ( add field on user model )
+- [x] User Order Detail View
+- [x] Like an item ( add field on user model )
         likes [{ product_ID, product_name, thumb }]
         
 
@@ -98,9 +98,9 @@
             ** Product Management **
 
 //TODO: Product Page MAJOR
-[] Product page
-    - getAllProduct
-    - updateProducts
+[x] Product page
+   [x] - getAllProduct
+   [x] - updateProducts
         mode 0 create, 1 update, -1 delete
             
 
@@ -126,7 +126,7 @@
              [x]   - getAllCompleted
                     if order_id provided find specific
                     if not return all
-                - deleteCompleted
+              [x]  - deleteCompleted
                     if order_id and mode -1 provided
                         then remove specific
                     if not remove all data
@@ -137,19 +137,19 @@
             mode 0 create, mode 1 update, mode -1 delete
 
 //TODO: Admin Page
-    - admins 
-        - getAllAdmin
-        - updateAdmin
+    [x]- admins 
+       [x] - getAllAdmin
+       [x] - updateAdmin
             id
             NOTE: if your role is not root, then you can't 
             mode 0 create, mode 1 update, mode -1 delete(Only Root)
         
 //TODO: User Page
-    - customers 
-        - getUser
-            - if email provided, then return specific
-            - if note return all
-        - updateUser
+   [x] - customers 
+        [x]- getUser
+          [x]  - if email provided, then return specific
+         [x]   - if note return all
+     [x]   - updateUser
             NOTE: You can only update password but not the info of the user
             mode 0 create,
             mode 1 update,

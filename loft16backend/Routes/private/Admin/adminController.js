@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -49,7 +50,7 @@ router.post(
           { _id },
           {
             $set: {
-              profile_picture: `https://192.168.1.5:3001/${uploadInfo.path}`,
+              profile_picture: `${process.env.SELFURL}/${uploadInfo.path}`,
             },
           }
         );
@@ -118,7 +119,11 @@ router.get("/getproductdetail/:id", adminAuth, async (req, res) => {
   }
 });
 
-router.post( "/uploadProductImage", adminAuth, productUpload, async (req, res) => {
+router.post(
+  "/uploadProductImage",
+  adminAuth,
+  productUpload,
+  async (req, res) => {
     try {
       const { _id, prod_Id } = req.body;
 
@@ -127,7 +132,7 @@ router.post( "/uploadProductImage", adminAuth, productUpload, async (req, res) =
       let filesSaved = Array.from(req.files);
 
       for (let x = 0; x < filesSaved.length; x++)
-        newImages.push(`https://192.168.1.5:3001/${filesSaved[x].path}`);
+        newImages.push(`${process.env.SELFURL}/${filesSaved[x].path}`);
 
       const update = await Product.updateOne(
         {
@@ -144,7 +149,6 @@ router.post( "/uploadProductImage", adminAuth, productUpload, async (req, res) =
         }
       );
 
-      //https://192.168.1.5:3001/$
       res.status(200).json({ message: "uploaded!" });
     } catch (e) {
       ehandler(e, res);
@@ -159,14 +163,12 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
     console.log(mode);
 
     if (mode === 0) {
-
-      console.log("Creating")
+      console.log("Creating");
 
       const product = await Product.create({
         ...simpleData,
-        cby : new ObjectId(_id)
+        cby: new ObjectId(_id),
       });
-
 
       complexData.newCategories.forEach(async (name) => {
         const updateCat = await Categories.updateOne(
@@ -180,7 +182,6 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
           }
         );
       });
-
 
       const updateAdd = await Product.updateOne(
         {
@@ -214,14 +215,12 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
         },
         {
           $set: {
-            total_stock
+            total_stock,
           },
         }
       );
 
-      return res.status(200).json(
-        product
-      )
+      return res.status(200).json(product);
     } else if (mode === 1) {
       const delCat = complexData.deletedCategories;
 
@@ -305,32 +304,35 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
         {
           $set: {
             total_stock,
-            uat : new Date(),
-            uby : new ObjectId(_id)
+            uat: new Date(),
+            uby: new ObjectId(_id),
           },
         }
       );
-    }else if(mode === -1 ){
-        const data = await Product.findOne({ _id : prod_Id })
+    } else if (mode === -1) {
+      const data = await Product.findOne({ _id: prod_Id });
 
-        let cats = data.categories
+      let cats = data.categories;
 
-        cats.forEach( async (name)=>{
-            await Categories.updateOne({category_name : name}, {
-                $pull : {
-                    associated_products : new ObjectId(prod_Id)
-                }
-            })
-        })
+      cats.forEach(async (name) => {
+        await Categories.updateOne(
+          { category_name: name },
+          {
+            $pull: {
+              associated_products: new ObjectId(prod_Id),
+            },
+          }
+        );
+      });
 
-        const update = await Product.deleteOne({_id : prod_Id})
+      const update = await Product.deleteOne({ _id: prod_Id });
     }
 
     res.status(200).json({
       message: "ok!",
     });
   } catch (e) {
-      ehandler(e,res)
+    ehandler(e, res);
   }
 });
 
@@ -359,18 +361,39 @@ router.get("/mydetails/:id", adminAuth, async (req, res) => {
 });
 
 // admin route pages data reqsts ---------------------------
-router.get("/insights", adminAuth, async (req, res) => {
+router.post("/insights", adminAuth, async (req, res) => {
   try {
+    const { year } = req.body;
+
     let topProducts = await Product.find(
       { generated_sale: { $gt: 0 } },
       { name: 1, likes: 1, generated_sale: 1, Images: 1, total_item_sold: 1 }
-    ).sort({ generated_sale: -1 });
+    ).sort({ generated_sale: -1 }).limit(15);
 
     let pendings = await Pendings.find({}).count();
     let inprogress = await InProgress.find({}).count();
     let completed = await Completed.find({}).count();
     let products = await Product.find({}).count();
     let available = await Product.find({ total_stock: { $gt: 0 } }).count();
+
+    let categories = await Categories.find({})
+  
+    console.log("Querying Year :", year)
+
+    let delivered = await Orders.find({
+      order_status: 3,
+      uat: {
+        $gte: new Date(`${year}-01-01`),
+        $lt: new Date(`${year + 1}-01-01`),
+      },
+    });
+    let cancelled = await Orders.find({
+      order_status: -1,
+      uat: {
+        $gte: new Date(`${year}-01-01`),
+        $lt: new Date(`${year + 1}-01-01`),
+      },
+    });
 
     res.status(200).json({
       msg: "ok!",
@@ -382,6 +405,9 @@ router.get("/insights", adminAuth, async (req, res) => {
         total_products: products,
         total_available_products: available,
       },
+      categories,
+      delivered,
+      cancelled,
     });
   } catch (err) {
     ehandler(err, res);
@@ -717,7 +743,6 @@ router.post("/updatePending", adminAuth, async (req, res) => {
             $inc: { "variants.$.stock": -item.qty, total_stock: -item.qty },
           }
         );
-
       });
 
       const updateInProgress = await InProgress.create({ ...record });
@@ -945,12 +970,12 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
         uby: new ObjectId(_id),
       });
 
-      let toRate = []
+      let toRate = [];
 
       const ITEMS = entry.order_detailed_version.items;
 
       ITEMS.forEach(async (item, idx) => {
-          toRate.push(new ObjectId(item.product_ID))
+        toRate.push(new ObjectId(item.product_ID));
         const updateProduct = await Product.updateOne(
           {
             _id: item.product_ID,
@@ -984,9 +1009,9 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
               courier: entry.courier.courier_name,
               cat: new Date(),
             },
-            to_rate : {
-                $each : toRate
-            }
+            to_rate: {
+              $each: toRate,
+            },
           },
         }
       );
@@ -999,6 +1024,20 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
           $set: {
             uat: new Date(),
             order_status: status,
+          },
+        }
+      );
+
+      const updateCourier = await Courier.updateOne(
+        {
+          courier_name: entry.order_detailed_version.courier.courier_name,
+        },
+        {
+          $inc: {
+            total_delivered_orders: 1,
+          },
+          $push: {
+            delivered_orders: new ObjectId(entry.order_detailed_version._id),
           },
         }
       );

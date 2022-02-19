@@ -1,13 +1,11 @@
 /* Deps */
 import React, { useEffect, useState } from "react";
 import {
-  Input,
   Dropdown,
   DropdownItem,
   Avatar,
-  Button,
 } from "@windmill/react-ui";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 /* Icons */
 import { AiOutlineUser } from "react-icons/ai";
@@ -17,14 +15,15 @@ import { MdOutlineLogout } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 
 /* userSlice */
-import { adminOut } from "../Features/adminSlice";
+import { adminOut, adminSign } from "../Features/adminSlice";
 import { openNotifier } from "../Features/uiSlice";
 
-import Loader from "../Components/Loader"
+import Loader from "../Components/Loader";
 
+import { openInputModal } from "../Features/uiSlice";
+import AdminProfile from "../Components/ModalComponent/Admin/AdminProfile";
 
-import {openInputModal} from "../Features/uiSlice"
-import AdminProfile from "../Components/ModalComponent/Admin/AdminProfile"
+import API from "../Helpers/api"
 
 const AdminHeader = (props) => {
   const { history } = props;
@@ -36,17 +35,27 @@ const AdminHeader = (props) => {
   const adminData = useSelector((state) => state.admin.adminData);
   const appState = useSelector((state) => state.app.appState);
 
+  const reloadAdminData = async () => {
+    try {
+      let savedAdmin = JSON.parse(localStorage.getItem("adminData"));
+      const adminResponse = await API.get(`/admin/mydetails/${savedAdmin._id}`);
+      dispatch(adminSign(adminResponse.data.adminData));
+    } catch (e) {}
+  };
+
   const signOut = () => {
     dispatch(adminOut());
     props.history.push("/auth/admin_signin");
   };
 
+  useEffect(()=>{
+    reloadAdminData()
+  },[])
 
   return (
     <header className="z-40 py-4 bg-white filter shadow-sm dark:bg-gray-800">
       <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
-        <div className="flex items-center">
-        </div>
+        <div className="flex items-center"></div>
 
         {/* User Avatar */}
         <ul className="flex items-center flex-shrink-0 space-x-6">
@@ -78,23 +87,28 @@ const AdminHeader = (props) => {
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}
             >
-                <h1 className="text-teal-700 mb-4 font-medium text-base">ADMIN</h1>
+              <h1 className="text-teal-700 mb-4 font-medium text-base">
+                ADMIN
+              </h1>
               <DropdownItem
                 className="dark:text-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-800 hover:text-green-600"
                 tag="a"
                 onClick={() => {
-                    dispatch(
-                      openInputModal({
-                        title: "",
-                        component: (
-                          <AdminProfile admin_id={adminData._id} />
-                        ),
-                        onAccept: () => {},
-                        acceptBtnText: "Save",
-                        cancelBtnText: "Cancel",
-                      })
-                    );
-                  }}
+                  dispatch(
+                    openInputModal({
+                      title: "",
+                      component: (
+                        <AdminProfile
+                          onUpdateSomething={reloadAdminData}
+                          admin_id={adminData._id}
+                        />
+                      ),
+                      onAccept: () => {},
+                      acceptBtnText: "Save",
+                      cancelBtnText: "Cancel",
+                    })
+                  );
+                }}
               >
                 {adminData ? (
                   <div className="flex items-center">
@@ -114,7 +128,7 @@ const AdminHeader = (props) => {
                   <></>
                 )}
               </DropdownItem>
-              
+
               <DropdownItem
                 className="text-gray-500  dark:text-gray-200 hover:text-orange-600"
                 onClick={() =>

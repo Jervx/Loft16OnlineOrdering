@@ -5,7 +5,7 @@ import { openInputModal, closeInputModal } from "../../Features/uiSlice";
 
 import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
-import { numberWithCommas, parseDate } from "../../Helpers/uitils";
+import { numberWithCommas, parseDate, getTickUpdate } from "../../Helpers/uitils";
 
 import { Avatar, Button, Dropdown, Input} from "@windmill/react-ui";
 import HelperLabel from "../../Components/HelperLabel";
@@ -42,7 +42,7 @@ const PendingOrders = () => {
       } catch (e) {}
     }
   };
-
+  
 
   const performSearch = async () => {
     try {
@@ -86,8 +86,14 @@ const PendingOrders = () => {
 
   useEffect(() => {
     loadSomething();
+
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
     return () => {
       setUnmounted(true);
+      clearInterval(interval)
     };
   }, [adminData]);
 
@@ -140,6 +146,10 @@ const PendingOrders = () => {
                 disabled={loadingData}
                 className="px-4 w-2/6 rounded-md h-full"
                 onClick={() => {
+                    if(search === "") {
+                        loadSomething()
+                        return
+                    }
                     performSearch()
                 }}
               >

@@ -1,5 +1,7 @@
 import React from "react";
 
+import { motion } from "framer-motion"
+
 const Faqs = () => {
   return (
     <div>
@@ -7,7 +9,11 @@ const Faqs = () => {
         <h2 className="text-3xl font-extrabold leading-9 border-b-2 border-gray-100 text-teal-600 mb-12">
           FAQs
         </h2>
-        <ul className="flex items-start gap-8 flex-wrap">
+        <motion.ul className="flex items-start gap-8 flex-wrap"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.75 }}
+        >
           <li className="w-full md:w-2/5">
             <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
               What data do loft 16 collect?
@@ -63,7 +69,7 @@ const Faqs = () => {
               </p>
             </p>
           </li>
-        </ul>
+        </motion.ul>
       </div>
     </div>
   );

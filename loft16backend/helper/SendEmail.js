@@ -28,7 +28,7 @@ const sendEmail = (userEmail, template_content) => {
 
     let mailOptions = {
         from: process.env.MASTEREMAIL,
-        to: email_address,
+        to: userEmail,
         subject,
         html: transTemplate(template_content)
     };

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ProtectedLoader from "../../Components/ProtectedLoader";
 
+import { motion } from "framer-motion";
+
 import { useSelector, useDispatch } from "react-redux";
 import { signin, signout } from "../../Features/userSlice";
 import {
@@ -48,13 +50,12 @@ const AccountSetting = () => {
   const [image, setImage] = useState();
   const [fileName, setFileName] = useState("");
 
-
   const loadUserData = async () => {
     try {
       setLoading(true);
       const response = await API.get(`/user/mydetails/${userDataRaw._id}`);
       dispatch(signin(response.data.userData));
-      setProfilePicture(response.data.userData.profile_picture)
+      setProfilePicture(response.data.userData.profile_picture);
       setLoading(false);
       setNewUserName(response.data.userData.user_name);
       setNewName(response.data.userData.name);
@@ -91,13 +92,12 @@ const AccountSetting = () => {
       formData.append("path", "profile");
       formData.append("_id", userData._id);
       const response = await API.post("/user/uploadProfile", formData);
-      loadUserData()
-      setFileName("")
+      loadUserData();
+      setFileName("");
     } catch (e) {
       console.log(e);
     }
   };
-
 
   const notLoggedinModal = () => {
     dispatch(
@@ -191,7 +191,12 @@ const AccountSetting = () => {
       {!userData ? (
         <ProtectedLoader />
       ) : (
-        <div className="mx-8 mt-8 mb-0 md:flex justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.75 }}
+          className="mx-8 mt-8 mb-0 md:flex justify-center items-center"
+        >
           <div className="w-full md:w-1/2">
             <h1 className="text-xl text-teal-700 font-medium">
               Account Settings
@@ -199,7 +204,11 @@ const AccountSetting = () => {
 
             <div className="mt-8">
               <div className="flex my-8 items-center">
-                <img class="object-cover mr-4 w-32 h-32 rounded-full ring-8 ring-pink-50" src={profilePicture} alt="" />
+                <img
+                  class="object-cover mr-4 w-32 h-32 rounded-full ring-8 ring-pink-50"
+                  src={profilePicture}
+                  alt=""
+                />
                 <div className="mr-6" className="relative">
                   <div className="w-1/2 my-4">
                     {fileName.length === 0 && (
@@ -226,7 +235,7 @@ const AccountSetting = () => {
                       <div className="relative mt-20 my-2">
                         <button
                           onClick={() => {
-                            changeImage()
+                            changeImage();
                           }}
                           className=" animate-pulse transition duration-150 w-full px-4 py-2 text-sm border cursor-pointer bg-teal-500 border-dashed hover:border-transparent hover:bg-teal-600 text-white flex items-center justify-center rounded-md"
                         >
@@ -471,7 +480,7 @@ const AccountSetting = () => {
                   Shipping Address
                 </p>
                 <Button
-                  className="rounded-lg w-4/12 md:w-2/12"
+                  className="rounded-lg w-4/12 md:w-4/12"
                   onClick={() => {
                     dispatch(
                       openInputModal({
@@ -677,7 +686,7 @@ const AccountSetting = () => {
               </Label>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
       <Footer />
     </div>

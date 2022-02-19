@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
 
-import { nShorter, numberWithCommas } from "../../Helpers/uitils";
+import { nShorter, getTickUpdate, numberWithCommas } from "../../Helpers/uitils";
 
 import { BsHeartFill, BsCollectionFill } from "react-icons/bs";
 import { MdOutlineCategory } from "react-icons/md";
@@ -106,9 +106,14 @@ const Products = () => {
   }
 
   useEffect(() => {
-    loadSomething();
+    loadSomething()
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
     return () => {
       setUnmounted(true);
+      clearInterval(interval)
     };
   }, [adminData]);
 

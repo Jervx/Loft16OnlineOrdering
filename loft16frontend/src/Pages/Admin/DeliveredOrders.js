@@ -24,7 +24,7 @@ import {
 import { RiTruckFill } from "react-icons/ri";
 import { BsThreeDotsVertical, BsFillTrashFill } from "react-icons/bs";
 
-import { numberWithCommas, parseDate } from "../../Helpers/uitils";
+import { numberWithCommas, parseDate, getTickUpdate } from "../../Helpers/uitils";
 
 const DeliveredOrders = () => {
   const adminData = useSelector((state) => state.admin.adminData);
@@ -79,9 +79,14 @@ const DeliveredOrders = () => {
   };
 
   useEffect(() => {
-    loadSomething();
+    loadSomething()
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
     return () => {
       setUnmounted(true);
+      clearInterval(interval)
     };
   }, [adminData]);
 

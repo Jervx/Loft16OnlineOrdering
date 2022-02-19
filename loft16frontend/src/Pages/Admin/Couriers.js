@@ -3,14 +3,14 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
-import { nShorter } from "../../Helpers/uitils";
+import { nShorter, getTickUpdate } from "../../Helpers/uitils";
 
-import { Card, CardBody, Button } from "@windmill/react-ui";
+import { Button } from "@windmill/react-ui";
 
-import { MdModeEditOutline, MdEmail } from "react-icons/md";
 import { RiCloseLine } from "react-icons/ri";
 import { FaTruckLoading } from "react-icons/fa";
 import { IoMdCall } from "react-icons/io";
+import { MdEmail } from "react-icons/md"
 
 import { useDispatch } from "react-redux";
 import {
@@ -108,9 +108,14 @@ const Couriers = () => {
   };
 
   useEffect(() => {
-    loadSomething();
+    loadSomething()
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
     return () => {
       setUnmounted(true);
+      clearInterval(interval)
     };
   }, [adminData]);
 

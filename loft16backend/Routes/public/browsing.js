@@ -8,7 +8,6 @@ const Categories = require("../../models/Categories")
 
 let ObjectId = require("mongoose").Types.ObjectId;
 
-const snooze = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 
 router.get("/gethotproducts", async (req, res) => {
@@ -27,7 +26,6 @@ router.get("/gethotproducts", async (req, res) => {
 router.post("/getproduct", async (req, res) => {
   const itemName = req.body.userSearch;
   const filters = req.body.filter;
-  await snooze(1500)
 
   let products = [];
 

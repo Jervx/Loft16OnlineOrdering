@@ -15,8 +15,9 @@ import AdminCreator from "../../Components/ModalComponent/Admin/AdminCreator";
 
 import { useDispatch } from "react-redux";
 import { openInputModal } from "../../Features/uiSlice";
+import { adminSign } from "../../Features/adminSlice"
 
-import { Button } from "@windmill/react-ui";
+import { getTickUpdate } from "../../Helpers/uitils"
 
 const Admins = () => {
   const adminData = useSelector((state) => state.admin.adminData);
@@ -26,28 +27,37 @@ const Admins = () => {
 
   const dispatch = useDispatch();
 
+
+
   const loadSomething = async () => {
     if (adminData) {
       try {
         setLoadingData(true)
-        console.log("Loading...")
         const response = await API.get("/admin/admins");
+        const adminResponse = await API.get(`/admin/mydetails/${adminData._id}`);
         if (unmounted) return;
+        dispatch(adminSign(adminResponse.data.adminData));
         setAdmin(response.data.admins);
         setLoadingData(false);
       } catch (e) {}
     }
-  };
+  }; 
 
   const getPermission = (_id) => {
       if(adminData.role === 'Root Admin') return false
       if(adminData._id !== _id) return true
   }
 
+
   useEffect(() => {
-    loadSomething();
+    loadSomething()
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
     return () => {
       setUnmounted(true);
+      clearInterval(interval)
     };
   }, [adminData]);
 
@@ -56,7 +66,7 @@ const Admins = () => {
       <div>
         <section className="bg-white dark:bg-gray-900">
           <div className="container h-screen px-6 py-10 mx-auto">
-            <h1 className="text-3xl font-semibold text-center text-gray-800 capitalize lg:text-4xl dark:text-white">
+            <h1 className="text-3xl  text-center text-gray-800 capitalize lg:text-4xl dark:text-white">
               Loft 16 Admins
             </h1>
 

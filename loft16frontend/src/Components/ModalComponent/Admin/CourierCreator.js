@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from "react";
 import HelperLabel from "../../HelperLabel";
-import Informative from "../../Modal/Informative";
-import { Input, Button } from "@windmill/react-ui";
+import ViewOrderDetails from "../../ViewOrderDetails";
+import {
+  Button,
+  Input,
+  Table,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+  TableContainer,
+} from "@windmill/react-ui";
 
 import { useDispatch } from "react-redux";
-import { closeInputModal, openAlertModal } from "../../../Features/uiSlice";
+import {
+  closeInputModal,
+  openAlertModal,
+  openInputModal,
+} from "../../../Features/uiSlice";
 
 import API from "../../../Helpers/api";
 
-const AddressCreator = ({ mode, gcourier, onSave, _id }) => {
+const CourierCreator = ({ mode, gcourier, onSave, _id }) => {
   const dispatch = useDispatch();
 
   const [courier_name, setCourierName] = useState("");
@@ -22,6 +35,8 @@ const AddressCreator = ({ mode, gcourier, onSave, _id }) => {
       setCourierContact(gcourier.courier_contact);
     }
   };
+
+  
 
   useEffect(() => {
     checkIfGCourier();
@@ -125,6 +140,49 @@ const AddressCreator = ({ mode, gcourier, onSave, _id }) => {
             }}
           />
         </div>
+        {mode === 1 && (
+          <div className="mt-8">
+            <p className="text-lg my-4">Order Delivered ({gcourier.delivered_orders.length})</p>
+            <TableContainer className="h-40 overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableCell>
+                      Order ID
+                    </TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {gcourier.delivered_orders.map((delivered, idx) => (
+                    <TableRow
+                      onClick={() => {
+                        dispatch(
+                          openInputModal({
+                            title: "Checkout Details",
+                            component: (
+                              <ViewOrderDetails
+                                order_ID={delivered}
+                              />
+                            ),
+                            onAccept: () => {},
+                            acceptBtnText: "Place Order",
+                            cancelBtnText: "Cancel",
+                          })
+                        );
+                      }}
+                      key={idx}
+                      className="cursor-pointer transition hover:bg-gray-100 duration-400"
+                    >
+                      <TableCell className="text-teal-900 ">
+                        {delivered}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+        )}
       </div>
       {courier_name.length === 0 ||
       courier_email.length === 0 ||
@@ -151,4 +209,4 @@ const AddressCreator = ({ mode, gcourier, onSave, _id }) => {
   );
 };
 
-export default AddressCreator;
+export default CourierCreator;

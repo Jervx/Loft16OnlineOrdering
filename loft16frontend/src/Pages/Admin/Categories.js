@@ -11,7 +11,7 @@ import ProtectedLoader from "../../Components/ProtectedLoader";
 import { RiCloseLine } from "react-icons/ri";
 
 import API from "../../Helpers/api";
-import { nShorter } from "../../Helpers/uitils";
+import { nShorter, getTickUpdate } from "../../Helpers/uitils";
 
 import {
   Button,
@@ -87,10 +87,10 @@ const Categories = () => {
   const loadSomething = async () => {
     if (adminData) {
       try {
-        setLoadingData(true)
         const response = await API.get("/admin/categories");
         if(unmounted) return
         setCategories(response.data.categories);
+        console.log("FALSED")
         setLoadingData(false);
         setSearching(false);
         setSearch('')
@@ -106,6 +106,7 @@ const Categories = () => {
         oldCategory,
         mode,
       });
+      setLoadingData(true)
       loadSomething();
     } catch (e) {
       catchHandler(e);
@@ -113,10 +114,15 @@ const Categories = () => {
   };
 
   useEffect(() => {
-    loadSomething();
-    return ()=>{
-        setUnmounted(true)
-    }
+    loadSomething()
+    const interval = setInterval(() => {
+        loadSomething();
+      }, getTickUpdate());
+    
+    return () => {
+      setUnmounted(true);
+      clearInterval(interval)
+    };
   }, [adminData]);
 
   return (

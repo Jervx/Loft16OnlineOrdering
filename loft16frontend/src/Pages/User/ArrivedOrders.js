@@ -16,7 +16,8 @@ import { openAlertModal, openInputModal } from "../../Features/uiSlice";
 
 import ViewOrderDetails from "../../Components/ViewOrderDetails";
 
-import { parseDate, numberWithCommas } from "../../Helpers/uitils";
+import { parseDate, numberWithCommas, getUserTickUpdate } from "../../Helpers/uitils";
+import { motion } from "framer-motion"
 
 const ArrivedOrders = () => {
   const userData = useSelector((state) => state.user.userData);
@@ -24,6 +25,7 @@ const ArrivedOrders = () => {
 
   const [loading, setLoading] = useState(true);
   const [pendingOrder, setPendingOrders] = useState();
+  const [unmounted, setUnmounted] = useState(false)
 
   const loadUserData = async () => {
     let _id = userData._id;
@@ -43,6 +45,7 @@ const ArrivedOrders = () => {
     try {
       setLoading(true);
       const response = await API.get(`/user/mydetails/${_id}`);
+      if(unmounted) return
       dispatch(signin(response.data.userData));
       setPendingOrders(userData.pending_orders);
       setLoading(false);
@@ -73,6 +76,14 @@ const ArrivedOrders = () => {
 
   useEffect(() => {
     loadUserData();
+    const interval = setInterval(() => {
+        loadUserData();
+      }, getUserTickUpdate());
+  
+      return () => {
+        clearInterval(interval);
+        setUnmounted(true)
+      };
   }, []);
 
   const removeCompleted = async (item) => {
@@ -108,11 +119,15 @@ const ArrivedOrders = () => {
   };
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.75 }}>
       {loading ? (
         <FullPageLoader />
       ) : (
-        <>
+        <motion.div initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.75 }}>
           <p className="text-2xl text-center font-medium">Arrived Orders</p>
           <section className="text-gray-600 body-font mx-8">
             <div className="container px-5 py-24 mx-auto">
@@ -211,78 +226,14 @@ const ArrivedOrders = () => {
                        </div>
                      </dl>
                    </div>
-                //   <div key={idx} className="py-8 px-4 lg:w-1/3 relative ">
-                //     <div className="h-full flex items-start">
-                //       <MdOutlineClose
-                //         onClick={() => {
-                //           dispatch(
-                //             openNotifier({
-                //               title: "Delete Completed/Arrived Record",
-                //               message: `Are you sure to delete this record?`,
-                //               onAccept: () => {
-                //                 removeCompleted(completed);
-                //               },
-                //               acceptBtnText: "Yes",
-                //               cancelBtnText: "No",
-                //             })
-                //           );
-                //         }}
-                //         className="absolute right-5 cursor-pointer  text-gray-400 hover:text-red-600 hover:shadow-2xl rounded-full"
-                //       />
-                //       <div className="w-12 flex-shrink-0 flex flex-col text-center leading-none">
-                //         <span className="text-gray-500 pb-2 mb-2 border-b-2 border-gray-200">
-                //           {new Date(completed.cat).toLocaleString("en-us", {
-                //             month: "short",
-                //           })}
-                //         </span>
-                //         <span className="font-medium text-lg text-gray-800 title-font leading-none">
-                //           {new Date(completed.cat).getDate()}
-                //         </span>
-                //       </div>
-                //       <div className="flex-grow pl-6">
-                //         <h2 className="tracking-widest text-sm title-font font-medium text-teal-500 mb-1">
-                //           OrderID : {completed.order_ID}
-                //         </h2>
-                //         <h1 className="mt-4 title-font text-xl text-gray-900 mb-3">
-                //           Order Cost :
-                //           <span className=" font-medium">
-                //             {" "}
-                //             ₱{" "}
-                //             {completed.total_cost
-                //               .toFixed(2)
-                //               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
-                //           </span>
-                //         </h1>
-                //         <div className="inline-flex items-center">
-                //           <span className="flex-grow flex flex-col">
-                //             <p className="text-lg text-gray-600">
-                //               Chosen Courier{" "}
-                //               <span className="text-teal-700 font-medium">
-                //                 {completed.courier}
-                //               </span>
-                //               .
-                //             </p>
-                //           </span>
-                //         </div>
-                //         <div className="w-full rounded-lg filter drop-shadow-md bg-teal-200 mt-2">
-                //           <p className="px-5 text-xs py-2">
-                //             This order was delivered on
-                //             <span className="font-medium">
-                //                 {" "}
-                //               {parseDate(completed.cat)}
-                //             </span>
-                //           </p>
-                //         </div>
-                //       </div>
-                //     </div>
-                //   </div>
+               
                 ))}
               </div>
             </div>
           </section>
-        </>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
