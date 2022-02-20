@@ -31,7 +31,8 @@ import { GiDna1 } from "react-icons/gi";
 import Loader from "../../admin/Loader";
 
 import { useDispatch } from "react-redux";
-import { closeInputModal } from "../../../Features/uiSlice";
+import { closeInputModal, openAlertModal } from "../../../Features/uiSlice";
+import Informative from "../../Modal/Informative"
 
 const ProductView = ({ _id, data, mode, onSave }) => {
   const dispatch = useDispatch();
@@ -99,7 +100,29 @@ const ProductView = ({ _id, data, mode, onSave }) => {
       const response = await API.post("/admin/uploadProductImage", fdata);
       setNewImages([]);
       return response.data;
-    } catch (e) {}
+    } catch (error) {
+        if (error.response){
+            dispatch(
+              openAlertModal({
+                component: <Informative />,
+                data: {
+                  description: error.response.data.description,
+                  solution: error.response.data.solution,
+                },
+              })
+            );
+            return
+          }
+          dispatch(
+            openAlertModal({
+              component: <Informative />,
+              data: {
+                description: "We can't reach the server",
+                solution: "Please try again later",
+              },
+            })
+          );
+    }
   };
 
   const save = async () => {
@@ -156,7 +179,29 @@ const ProductView = ({ _id, data, mode, onSave }) => {
       setDeletedVariants([]);
       setNewCategories([]);
       setNewVariants([]);
-    } catch (e) {}
+    } catch (error) {
+        if (error.response){
+            dispatch(
+              openAlertModal({
+                component: <Informative />,
+                data: {
+                  description: error.response.data.description,
+                  solution: error.response.data.solution,
+                },
+              })
+            );
+            return
+          }
+          dispatch(
+            openAlertModal({
+              component: <Informative />,
+              data: {
+                description: "We can't reach the server",
+                solution: "Please try again later",
+              },
+            })
+          );
+    }
   };
 
   useEffect(() => {

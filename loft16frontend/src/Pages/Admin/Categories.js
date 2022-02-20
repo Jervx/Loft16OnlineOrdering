@@ -305,7 +305,7 @@ const Categories = () => {
             <div>
               {!loadingData && !searching && categories.length === 0 && (
                 <p className="my-4 text-xs text-red-400 text-center">
-                  There's no categories
+                  There's no categories, please add before creating product
                 </p>
               )}
             </div>

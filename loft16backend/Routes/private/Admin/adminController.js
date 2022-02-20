@@ -163,7 +163,16 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
     console.log(mode);
 
     if (mode === 0) {
-      console.log("Creating");
+      const doesExist = await Product.findOne({
+          name : simpleData.name
+      })
+
+      if(doesExist) return res.status(401).json({
+        code : 401,
+        message : "Admin Conflict",
+        description : "Product with thesame name already exist",
+        solution : "Please use another product name"
+      })
 
       const product = await Product.create({
         ...simpleData,
@@ -222,6 +231,18 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
 
       return res.status(200).json(product);
     } else if (mode === 1) {
+
+        const doesExist = await Product.findOne({
+            name : simpleData.name
+        })
+  
+        if(doesExist) return res.status(401).json({
+          code : 401,
+          message : "Admin Conflict",
+          description : "Product with thesame name already exist",
+          solution : "Please use another product name"
+        })
+
       const delCat = complexData.deletedCategories;
 
       delCat.forEach(async (name) => {
@@ -586,7 +607,7 @@ router.post("/updateCategories", adminAuth, async (req, res) => {
           status: 409,
           message: "Category Name already taken",
           description: "Conflict",
-          solution: "think another category name",
+          solution: "Please choose another category name",
         });
 
       const update = await Categories.create({
@@ -1270,6 +1291,15 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
 
     if (mode === 0) {
       const hashedPassword = await bcrypt.hash(info.password, 10);
+      
+      const adminExist = await Admin.findOne({email_address : info.email_address})
+
+      if(adminExist) return res.status(401).json({
+          code : 401,
+          message : "Admin Conflict",
+          description : "Admin with that email address already exist",
+          solution : "Please use other email address"
+      })
 
       const adminData = await Admin.create({
         ...info,

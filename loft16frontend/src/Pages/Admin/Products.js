@@ -4,15 +4,25 @@ import { useSelector } from "react-redux";
 import ProtectedLoader from "../../Components/ProtectedLoader";
 import API from "../../Helpers/api";
 
-import { nShorter, getTickUpdate, numberWithCommas } from "../../Helpers/uitils";
+import {
+  nShorter,
+  getTickUpdate,
+  numberWithCommas,
+} from "../../Helpers/uitils";
 
 import { BsHeartFill, BsCollectionFill } from "react-icons/bs";
 import { MdOutlineCategory } from "react-icons/md";
-import { RiCloseLine } from "react-icons/ri"
+import { RiCloseLine } from "react-icons/ri";
 
-import { useDispatch } from "react-redux"
-import { openInputModal } from "../../Features/uiSlice"
-import ProductView from "../../Components/ModalComponent/Admin/ProductView"
+import { useDispatch } from "react-redux";
+import {
+  openInputModal,
+  openNotifier,
+  openAlertModal,
+} from "../../Features/uiSlice";
+import ProductView from "../../Components/ModalComponent/Admin/ProductView";
+import Informative from "../../Components/Modal/Informative";
+import HelperLabel from "../../Components/HelperLabel";
 
 import {
   Table,
@@ -29,7 +39,7 @@ import {
 } from "@windmill/react-ui";
 
 const Products = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const adminData = useSelector((state) => state.admin.adminData);
   const [loadingData, setLoadingData] = useState(true);
   const [unmounted, setUnmounted] = useState(false);
@@ -48,7 +58,6 @@ const Products = () => {
   const loadSomething = async () => {
     if (adminData) {
       try {
-        setLoadingData(true);
         const response = await API.get("/admin/products");
         if (unmounted) return;
         setCat(response.data.cat);
@@ -85,35 +94,55 @@ const Products = () => {
     }
 
     if (id !== "") {
-        data = data.filter((item) => item._id.includes(id));
-      }
-  
+      data = data.filter((item) => item._id.includes(id));
+    }
 
     return data;
   };
 
   const deleteProd = async (product) => {
-      try{
-        const res = await API.post("/admin/updateProduct", {
-            mode : -1,
-            prod_Id : product._id
-        })
-        loadSomething()
-        setLoadingData(false)
-      }catch(e){
-
+    try {
+      const res = await API.post("/admin/updateProduct", {
+        mode: -1,
+        prod_Id: product._id,
+      });
+      loadSomething();
+      setLoadingData(false);
+    } catch (error) {
+      if (error.response) {
+        dispatch(
+          openAlertModal({
+            component: <Informative />,
+            data: {
+              description: error.response.data.description,
+              solution: error.response.data.solution,
+            },
+          })
+        );
+        return;
       }
-  }
+      dispatch(
+        openAlertModal({
+          component: <Informative />,
+          data: {
+            description: "We can't reach the server",
+            solution: "Please try again later",
+          },
+        })
+      );
+    }
+  };
 
   useEffect(() => {
-    loadSomething()
+    setLoadingData(true);
+    loadSomething();
     const interval = setInterval(() => {
-        loadSomething();
-      }, getTickUpdate());
-    
+      loadSomething();
+    }, getTickUpdate());
+
     return () => {
       setUnmounted(true);
-      clearInterval(interval)
+      clearInterval(interval);
     };
   }, [adminData]);
 
@@ -126,6 +155,7 @@ const Products = () => {
           <h1 className="text-teal-900 mx-9 mt-14 font-medium text-3xl">
             Products
           </h1>
+
           <div className=" flex mx-9 my-8 space-x-4 items-center">
             <div className=" flex">
               <Label className="flex items-center w-full mr-3">
@@ -139,7 +169,9 @@ const Products = () => {
                       return;
                     }
                     setCategory(e.target.value);
-                    setProducts(getFiltered(e.target.value, stock, searchName, ''));
+                    setProducts(
+                      getFiltered(e.target.value, stock, searchName, "")
+                    );
                   }}
                 >
                   <option>All</option>
@@ -160,7 +192,7 @@ const Products = () => {
                     }
                     setStock(e.target.value);
                     setProducts(
-                      getFiltered(category, e.target.value, searchName, '')
+                      getFiltered(category, e.target.value, searchName, "")
                     );
                   }}
                 >
@@ -177,43 +209,61 @@ const Products = () => {
                   value={searchName}
                   onChange={(e) => {
                     setSearchName(e.target.value);
-                    setProducts(getFiltered(category, stock, e.target.value, ''))
+                    setProducts(
+                      getFiltered(category, stock, e.target.value, "")
+                    );
                   }}
                 />
               </div>
               <div className="relative w-full mr-3 text-green-900 h-full  focus-within:text-green-700 ">
                 <Input
-                  className=" rounded-lg border-1 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
+                  className=" rounded-lg border-1 bg-white transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
                   placeholder="Search By ID"
                   aria-label="New Number"
                   value={searchId}
                   onChange={(e) => {
                     setSearchId(e.target.value);
-                    setProducts(getFiltered(category, stock, searchName, e.target.value))
+                    setProducts(
+                      getFiltered(category, stock, searchName, e.target.value)
+                    );
                   }}
                 />
               </div>
             </div>
             <Button
               className="rounded-md "
-              disabled={loadingData}
+              disabled={loadingData || cat.length === 0}
               onClick={() => {
                 dispatch(
-                    openInputModal({
-                      title: "Prod",
-                      component: (
-                        <ProductView _id={adminData._id} mode={0} onSave={loadSomething} />
-                      ),
-                      onAccept: () => {},
-                      acceptBtnText: "Place Order",
-                      cancelBtnText: "Cancel",
-                    })
-                  );
-            }}
+                  openInputModal({
+                    title: "Prod",
+                    component: (
+                      <ProductView
+                        _id={adminData._id}
+                        mode={0}
+                        onSave={loadSomething}
+                      />
+                    ),
+                    onAccept: () => {},
+                    acceptBtnText: "Place Order",
+                    cancelBtnText: "Cancel",
+                  })
+                );
+              }}
             >
               New Product
             </Button>
           </div>
+          {cat.length === 0 && (
+            <div className="mt-8 mx-4">
+              <HelperLabel
+                isError={true}
+                msg={
+                  "There is no category, please create one before adding products"
+                }
+              />
+            </div>
+          )}
           <section className="mx-4 pb-4 mt-8 body-font">
             <TableContainer>
               <Table>
@@ -234,17 +284,22 @@ const Products = () => {
                     products.map((product, idx) => (
                       <TableRow
                         onClick={() => {
-                            dispatch(
-                                openInputModal({
-                                  title: "Prod",
-                                  component: (
-                                    <ProductView _id={adminData._id} data={product} mode={1} onSave={loadSomething} />
-                                  ),
-                                  onAccept: () => {},
-                                  acceptBtnText: "Place Order",
-                                  cancelBtnText: "Cancel",
-                                })
-                              );
+                          dispatch(
+                            openInputModal({
+                              title: "Prod",
+                              component: (
+                                <ProductView
+                                  _id={adminData._id}
+                                  data={product}
+                                  mode={1}
+                                  onSave={loadSomething}
+                                />
+                              ),
+                              onAccept: () => {},
+                              acceptBtnText: "Place Order",
+                              cancelBtnText: "Cancel",
+                            })
+                          );
                         }}
                         key={idx}
                         className="transition cursor-pointer hover:bg-gray-100 duration-400"
@@ -285,8 +340,15 @@ const Products = () => {
                           </p>
                         </TableCell>
                         <TableCell>
-                          <p className={`font-medium text-teal-600 ${product.variants.length === 0 && 'font-xs text-red-400'}`}>
-                            {product.variants.length === 0 ? 'No Price Specified' : numberWithCommas(product.variants[0].price)}
+                          <p
+                            className={`font-medium text-teal-600 ${
+                              product.variants.length === 0 &&
+                              "font-xs text-red-400"
+                            }`}
+                          >
+                            {product.variants.length === 0
+                              ? "No Price Specified"
+                              : numberWithCommas(product.variants[0].price)}
                           </p>
                         </TableCell>
 
@@ -314,16 +376,26 @@ const Products = () => {
                         </TableCell>
 
                         <TableCell>
-                        <div
-                          className="text-red-400 flex items-center"
-                          onClick={(e) => {
-                              e.stopPropagation()
-                              deleteProd(product)
-                        }}
-                        >
-                          <RiCloseLine />
-                        </div>
-                      </TableCell>
+                          <div
+                            className="text-red-400 flex items-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dispatch(
+                                openNotifier({
+                                  title: "Delete Product",
+                                  message: `You are about to remove this product forever, are you sure to remove this product?`,
+                                  onAccept: () => {
+                                    deleteProd(product);
+                                  },
+                                  acceptBtnText: "Yes, Remove It",
+                                  cancelBtnText: "Cancel",
+                                })
+                              );
+                            }}
+                          >
+                            <RiCloseLine />
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
 
@@ -361,6 +433,11 @@ const Products = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+            {!loadingData && products.length === 0 && (
+                <p className="my-4 text-xs text-red-400 text-center">
+                  There's no products
+                </p>
+              )}
           </section>
         </div>
       )}

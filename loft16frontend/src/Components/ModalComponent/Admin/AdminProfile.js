@@ -6,7 +6,8 @@ import ProtectedLoader from "../../../Components/ProtectedLoader";
 import { GoPrimitiveDot } from "react-icons/go";
 import { MdFileUpload, MdEmail, MdOutlineClose } from "react-icons/md";
 import { FaKey, FaEyeSlash, FaEye } from "react-icons/fa";
-import { BsFillTelephoneFill } from "react-icons/bs";
+import { BsFillTelephoneFill, BsFillShieldLockFill } from "react-icons/bs";
+import { IoShieldSharp } from "react-icons/io5";
 
 import {
   Button,
@@ -30,7 +31,6 @@ const AdminProfile = ({
 }) => {
   const dispatch = useDispatch();
 
-
   const [loadingData, setLoadingData] = useState(true);
   const [adminData, setAdminData] = useState();
   const [unmounted, setUnmounted] = useState(false);
@@ -40,6 +40,9 @@ const AdminProfile = ({
   const [hidden, setHidden] = useState(true);
   const [newNumber, setNewNumber] = useState("");
   const [newName, setNewName] = useState("");
+
+  const [role, setRole] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   const [image, setImage] = useState();
   const [fileName, setFileName] = useState("");
@@ -54,6 +57,7 @@ const AdminProfile = ({
       setAdminData(response.data.adminData);
       setNewName(response.data.adminData.name);
       setProfilePicture(response.data.adminData.profile_picture);
+      setRole(response.data.adminData.role);
       setLoadingData(false);
     } catch (e) {
       dispatch(
@@ -144,7 +148,7 @@ const AdminProfile = ({
                 />
               </div>
             </div>
-            { !uneditable ? (
+            {!uneditable ? (
               <>
                 {fileName.length === 0 && (
                   <label className="relative mt-20 mb-2 w-5/12 ">
@@ -181,7 +185,7 @@ const AdminProfile = ({
                 )}
               </>
             ) : (
-                <label className="relative mt-20 mb-2 w-5/12 "></label>
+              <label className="relative mt-20 mb-2 w-5/12 "></label>
             )}
             <h1 className="mt-3 font-quicksand text-3xl font-medium text-gray-700 capitalize dark:text-white">
               {adminData.name}
@@ -201,8 +205,76 @@ const AdminProfile = ({
               <span className="font-medium"> Actions</span>
             </p>
           </div>
-
           <hr className="my-6 mx-8 border-gray-200 dark:border-gray-700" />
+
+          {!uneditable && admin_id !== editor_id && (
+            <>
+              <div className="mt-4 flex items-center">
+                <div className="w-full">
+                  <label className="text-gray-700 dark:text-gray-200">
+                    Update Role
+                  </label>
+                  <input
+                    type="text"
+                    value={role}
+                    disabled={true}
+                    className="block w-full px-2 py-1 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-teal-400 focus:ring-teal-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    setIsOpen(true);
+                  }}
+                  className="mt-6 ml-1 px-2 py-1 w-2/6 text-white hover:bg-teal-400 block  bg-teal-500 border border-gray-50 rounded-md dark:text-white focus:border-teal-500 focus:ring-opacity-40 dark:focus:ring-opacity-40 focus:ring-teal-300 dark:focus:ring-teal-400 focus:ring dark:bg-gray-800 focus:outline-none"
+                >
+                  Choose Role
+                </button>
+                <div className="relative right-14 mx-2 my-auto h-full">
+                  <Dropdown
+                    align="right"
+                    isOpen={isOpen}
+                    onClose={() => {
+                      setIsOpen(false);
+                    }}
+                  >
+                    <DropdownItem
+                      onClick={() => {
+                        setIsOpen(false);
+                        setRole("Admin");
+                        updateAdmin(1, {
+                          ...adminData,
+                          role: "Admin",
+                        });
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <IoShieldSharp className="mr-5" />
+                        <span>Admin</span>
+                      </div>
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        setIsOpen(false);
+                        setRole("Root Admin");
+                        updateAdmin(1, {
+                          ...adminData,
+                          role: "Root Admin",
+                        });
+                      }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <BsFillShieldLockFill className="mr-5" />
+                        <span>Root Admin</span>
+                      </div>
+                    </DropdownItem>
+                  </Dropdown>
+                </div>
+                <hr className="my-6 border-gray-200 dark:border-gray-700" />
+              </div>
+              <hr className="my-6 border-gray-200 dark:border-gray-700" />
+            </>
+          )}
+
           {uneditable && (
             <>
               <HelperLabel
@@ -221,7 +293,7 @@ const AdminProfile = ({
           )}
           <div className=" border-b-2 pb-4 my-4">
             <div>
-              <div className="w-full px-4">
+              <div className="w-full ">
                 <label className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-200">
                   Name
                 </label>

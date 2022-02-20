@@ -6,7 +6,8 @@ import { Dropdown, DropdownItem, Button } from "@windmill/react-ui";
 import { IoShieldSharp } from "react-icons/io5";
 import { BsFillShieldLockFill } from "react-icons/bs";
 
-import {closeInputModal} from "../../../Features/uiSlice"
+import {closeInputModal, openAlertModal} from "../../../Features/uiSlice"
+import Informative from "../../Modal/Informative"
 import {useDispatch} from "react-redux"
 
 import HelperLabel from "../../HelperLabel";
@@ -36,8 +37,28 @@ const AdminCreator = ({ onUpdateSomething, editor_id }) => {
 
         onUpdateSomething()
         dispatch(closeInputModal())
-    }catch(e){
-        console.log(e)
+    }catch(error){
+        if (error.response){
+            dispatch(
+              openAlertModal({
+                component: <Informative />,
+                data: {
+                  description: error.response.data.description,
+                  solution: error.response.data.solution,
+                },
+              })
+            );
+            return
+          }
+          dispatch(
+            openAlertModal({
+              component: <Informative />,
+              data: {
+                description: "We can't reach the server",
+                solution: "Please try again later",
+              },
+            })
+          );
     }
   }
 
