@@ -9,6 +9,8 @@ import {
 } from "../../Helpers/uitils";
 import API from "../../Helpers/api";
 
+import HelperLabel from "../../Components/HelperLabel";
+
 import {
   Table,
   TableContainer,
@@ -126,7 +128,7 @@ const Insights = () => {
   const loadInsightsData = async () => {
     if (adminData) {
       try {
-        console.log("Querying :", year)
+        console.log("Querying :", year);
         const response = await API.post("/admin/insights", {
           year,
         });
@@ -140,7 +142,7 @@ const Insights = () => {
   };
 
   useEffect(() => {
-    setYear(new Date().getFullYear())
+    setYear(new Date().getFullYear());
     loadInsightsData();
     const interval = setInterval(() => {
       loadInsightsData();
@@ -222,10 +224,18 @@ const Insights = () => {
             </div>
 
             <div className="my-9 mx-9">
-              <h1 className="text-teal-900 my-8 font-medium text-xl">
+              <h1 className="text-teal-900 mt-8 font-medium text-xl">
                 Product Ranking (Top 10)
               </h1>
-              <TableContainer className="h-1/2 overflow-y-auto">
+              <HelperLabel
+                bg={"bg-gray-100"}
+                txtbg={"text-teal-700"}
+                isError={false}
+                  msg={
+                    `This shows the most bought products(All Time)`
+                  }
+                />
+              <TableContainer className="h-1/2 mt-9 overflow-y-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -312,11 +322,20 @@ const Insights = () => {
             </div>
 
             <div className="my-9 mx-9 border-t-2 bg-white rounded-md">
-                <div className="w-full mx-8 mt-8">
-                  <h1 className="text-teal-900 my-2 font-medium text-xl">
-                    Order Statistics
-                  </h1>
-                  {false && <div class="w-full mt-8 flex items-center">
+              <div className="w-full mx-8 mt-8">
+                <h1 className="text-teal-900 my-2 font-medium text-xl">
+                  Order Statistics
+                </h1>
+                <HelperLabel
+                bg={"bg-gray-100"}
+                txtbg={"text-teal-700"}
+                isError={false}
+                  msg={
+                    `This line graph shows how many successful orders & cancelled orders per month in current year (${new Date().getFullYear()})`
+                  }
+                />
+                {false && (
+                  <div class="w-full mt-8 flex items-center">
                     <Input
                       type="text"
                       placeholder="Year"
@@ -337,16 +356,17 @@ const Insights = () => {
                     >
                       Load
                     </Button>
-                  </div>}
-                </div>
-                <div
-                  className={`${
-                    reloadingData && "animate-pulse"
-                  } w-full px-4 my-8 h-full bg-gray`}
-                >
-                  <Line data={orderStat}/>
-                </div>
+                  </div>
+                )}
               </div>
+              <div
+                className={`${
+                  reloadingData && "animate-pulse"
+                } w-full px-4 my-8 h-full bg-gray`}
+              >
+                <Line data={orderStat} />
+              </div>
+            </div>
           </section>
         </div>
       )}

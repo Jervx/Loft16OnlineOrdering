@@ -61,60 +61,6 @@ const generateToken = (user_data) => {
   });
 };
 
-// reissue new token
-router.post("/renewToken", async (req, res) => {
-  const { userId, email_address, user_name } = req.body;
-  const auth_iss = req.cookies.auth_iss;
-
-  // make sure that loft will only reissue a new access token if auth issuer is itself
-  if (auth_iss === process.env.GIssuer) {
-    return res.status(401).json({
-      err: 401,
-      description: "The issued token by google was expired or gone!",
-      solution: "Try signing in again manually or via google Single Sign On",
-    });
-  }
-
-  const UserRefreshToken = await Refresh_Token.findOne({
-    user_ID: new ObjectId(userId),
-  });
-
-  if (!UserRefreshToken)
-    return res.status(403).json({
-      err: 403,
-      description: "Looks like you are not authorized",
-      solution: "Please Login",
-    });
-
-  jwt.verify(
-    UserRefreshToken.refresh_token,
-    process.env.JWT_RFSH,
-    async (err, user) => {
-      if (err)
-        return res.sendStatus(403).json({
-          err: 403,
-          description: "Looks like theres a problem giving you authorization",
-          solution: "This might not be your error, try again later",
-        });
-
-      const token = generateToken({ user_name, email_address });
-      let USER = await User.findOne({ email_address }).lean();
-
-      res.cookie("access_token", token, {
-        ...loftCookieConifg,
-        maxAge: createCookieExpiration(process.env.COOKIE_EXP),
-      });
-      res.status(200).json({
-        code: 200,
-        description: "Got a new token!",
-        userData: {
-          ...USER,
-        },
-      });
-    }
-  );
-});
-
 router.post("/recover", async (req, res) => {
   const { email_address, newPassword, recovery_code } = req.body;
 
@@ -417,10 +363,6 @@ router.post("/signin", async (req, res) => {
     _id: USER._id,
   });
 
-  const refresh = jwt.sign(
-    { email_address, user_name: USER.user_name, _id: USER._id },
-    process.env.JWT_RFSH
-  );
 
   const USER2 = await ACCOUNT.findOne(
     { email_address },
@@ -429,10 +371,7 @@ router.post("/signin", async (req, res) => {
 
   // Create a session Refresh Token for attaining new access token
   // should be destroyed on logout - @hjerbe
-  await Refresh_Token.create({
-    user_ID: USER2._id,
-    refresh_token: refresh,
-  });
+
 
   // set authorization via cookie & httponly secure desu
   res.cookie(admin ? "admin_access_token" : "access_token", token, {
@@ -581,10 +520,6 @@ router.post("/signup", async (req, res) => {
     });
 
     const token = generateToken({ user_name, email_address });
-    const refresh = jwt.sign(
-      { user_name, email_address },
-      process.env.JWT_RFSH
-    );
 
     // set authorization via cookie & httponly
     res.cookie("access_token", token, {
@@ -596,11 +531,6 @@ router.post("/signup", async (req, res) => {
       maxAge: createCookieExpiration(process.env.COOKIE_EXP),
     });
 
-    // Create a session Refresh Token for attaining new access token
-    await Refresh_Token.create({
-      user_ID: user._id,
-      refresh_token: refresh,
-    });
 
     //final return of response
     return res.status(201).json({
