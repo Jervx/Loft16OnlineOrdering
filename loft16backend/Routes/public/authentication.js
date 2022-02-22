@@ -12,7 +12,6 @@ const GAuthVerify = require("../../helper/GAuthVerify");
 /* Models */
 const User = require("../../models/User");
 const Email_Confirmation = require("../../models/email_confirmation");
-const Refresh_Token = require("../../models/Refresh_Token");
 const TwoFactorAuth = require("../../models/TwoFactorAuth");
 const RecoveryCode = require("../../models/RecoveryCode");
 const Admin = require("../../models/Admin");
