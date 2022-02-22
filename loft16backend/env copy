@@ -1,0 +1,29 @@
+MONGO_URI="mongodb://127.0.0.1:27017/loft"
+MONGO_URI2="mongodb+srv://loftsiaa:loftsiaa@loftcluster.kqzw0.mongodb.net/loft?retryWrites=true&w=majority"
+
+MONGO_USR=loftsiaa
+MONGO_PSS=loftsiaa
+
+PORT="3001"
+
+SELFURL="https://192.168.1.5:3001"
+
+ALLOWEDURL="https://127.0.0.1:3000 https://localhost:3000 https://127.0.0.1:3000 https://localhost:3000 https://192.168.1.100:3000"
+ALLOWEDURL_PROD="http://127.0.0.1:3000 http://localhost:3000 http://127.0.0.1:3000 http://localhost:3000 http://192.168.1.100:3000"
+
+MASTEREMAIL = loft16siaa@gmail.com
+MASTERPASS = system.out.println
+
+hero=_helloworld1234
+
+JWT_SCRT = abcdefg
+JWT_RFSH = gfedcba
+JWT_ISSUER =loft16
+
+GCLIENTID="878595322259-0qr43vmjnkr9f6l4k89tdiv1plo2dl1j.apps.googleusercontent.com"
+GIssuer=accounts.google.com
+
+JWT_EXP_TIME = '12h'
+COOKIE_EXP=12
+
+EML_CONF_EXP_DRTN=10
