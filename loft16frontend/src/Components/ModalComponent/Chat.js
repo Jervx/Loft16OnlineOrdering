@@ -113,7 +113,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
           <div key={idx}>
             <div
               className={`flex  ${
-                message.type === 0 ? "justify-end" : "items-end"
+                message.type === 0 ? "justify-end items-end" : "items-end"
               }`}
             >
               <div

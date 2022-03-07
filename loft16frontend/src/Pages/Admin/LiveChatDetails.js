@@ -86,7 +86,7 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
                     {idx === 0 ? (
                       <>
                         <p
-                          className="absolute font-medium text-gray-500 -top-10"
+                          className="absolute font-medium text-gray-500 -top-7"
                           style={{ fontSize: "0.7rem" }}
                         >
                           {msg.type === 1 ? (
@@ -97,20 +97,26 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
                         </p>
                       </>
                     ) : (
+                        <>
+                    {messages[idx - 1].type !== msg.type ? (
                       <>
-                        {messages[idx - 1].type !== msg.type ? (
-                          <>
-                            <p
-                              className="absolute font-medium text-gray-500 -top-7"
-                              style={{ fontSize: "0.7rem" }}
-                            >
-                              {msg.type === 1 ? "You" : <>{profile_info.name}</>}
-                            </p>
-                          </>
-                        ) : (
-                          <></>
-                        )}
+                        <p
+                          className="absolute font-medium text-gray-500 -top-7"
+                          style={{ fontSize: "0.7rem" }}
+                        >
+                          {msg.type === 1 ? (
+                            "You"
+                          ) : (
+                            <>
+                              {profile_info.user_name}
+                            </>
+                          )}
+                        </p>
                       </>
+                    ) : (
+                      <></>
+                    )}
+                  </>
                     )}
                   </div>
                   <img
