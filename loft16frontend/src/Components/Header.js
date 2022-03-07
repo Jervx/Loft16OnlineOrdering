@@ -16,6 +16,7 @@ import { BsGearFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { ImCart } from "react-icons/im";
 import { MdOutlineLogout, MdQuestionAnswer } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
+import { IoChatbubblesSharp } from "react-icons/io5";
 
 /*redux */
 import { useSelector, useDispatch } from "react-redux";
@@ -24,6 +25,9 @@ import { setUserSearch, setData } from "../Features/appSlice";
 /* userSlice */
 import { signout } from "../Features/userSlice";
 import { openNotifier } from "../Features/uiSlice";
+import { openInputModal } from "../Features/uiSlice";
+
+import Chat from "../Components/ModalComponent/Chat";
 
 import API from "../Helpers/api";
 
@@ -75,7 +79,6 @@ const Header = (props) => {
   };
 
   useEffect(() => {}, []);
-
 
   return (
     <header className="HHeader fixed bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg top-0 w-full z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800 border-b-2 border-gray-200 md:px-6">
@@ -260,6 +263,40 @@ const Header = (props) => {
               >
                 <GoPackage className="w-5 h-5 mr-5 " aria-hidden="true" />
                 <span className=" font-normal">Orders</span>
+              </DropdownItem>
+              <DropdownItem
+                tag="a"
+                onClick={() => {
+                  dispatch(
+                    openInputModal({
+                      title: "Chat",
+                      component: (
+                        <Chat
+                          userId={_cur_user.userData._id}
+                          yourProfilePicture={
+                            _cur_user.userData.profile_picture
+                          }
+                          profile_info = {
+                              {
+                                profile_picture : _cur_user.userData.profile_picture,
+                                user_name : _cur_user.userData.user_name
+                              }
+                          }
+                        />
+                      ),
+                      onAccept: () => {},
+                      acceptBtnText: "Send",
+                      cancelBtnText: "Cancel",
+                    })
+                  );
+                }}
+                className="dark:text-gray-200 text-gray-500 hover:text-green-600"
+              >
+                <IoChatbubblesSharp
+                  className="w-5 h-5 mr-5 "
+                  aria-hidden="true"
+                />
+                <span className=" font-normal">Chat Admin</span>
               </DropdownItem>
               <DropdownItem
                 className="text-gray-500  dark:text-gray-200 hover:text-orange-600"

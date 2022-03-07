@@ -13,7 +13,7 @@ import {
   MdCategory,
 } from "react-icons/md";
 import { FaTruckLoading, FaUserFriends } from "react-icons/fa";
-import { BsShieldShaded } from "react-icons/bs";
+import { BsShieldShaded, BsFillChatFill } from "react-icons/bs";
 
 const adminRoutes = [
   {
@@ -43,6 +43,11 @@ const adminRoutes = [
         name: "Products",
         path: "/admin/products",
         icon: MdOutlineShoppingBag,
+      },
+      {
+        name: "Chat",
+        path: "/admin/chat",
+        icon: BsFillChatFill,
       },
     ],
   },

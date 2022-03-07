@@ -96,3 +96,23 @@
 .google_signin:hover{
     background-color: rgb(247, 247, 247);
 }
+
+/* Chat */
+
+.scrollbar-w-2::-webkit-scrollbar {
+    width: 0.6rem;
+    height: 0.25rem;
+  }
+  
+  .scrollbar-track-blue-lighter::-webkit-scrollbar-track {
+    background-color: rgba(247, 250, 252, 1);
+  }
+  
+  .scrollbar-thumb-blue::-webkit-scrollbar-thumb {
+    background-color: rgb(88, 89, 90);
+  }
+  
+  .scrollbar-thumb-rounded::-webkit-scrollbar-thumb {
+    border-radius: 0.25rem;
+    background-color: rgba(10, 68, 78, 0.212);
+  }

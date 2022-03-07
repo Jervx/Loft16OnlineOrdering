@@ -1,13 +1,14 @@
 const jwt = require("jsonwebtoken");
 const config = process.env;
 const GAuthVerify = require('../helper/GAuthVerify')
+const snooze = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 
 const verifyToken = async (req, res, next) => {
   let token = req.cookies.access_token
   let client_id = req.cookies.client_id
   let auth_iss = req.cookies.auth_iss
-
+  
   //console.log("--------COOKIES USER AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
   if(auth_iss)
     if(auth_iss === process.env.GIssuer){

@@ -1,21 +1,24 @@
-const windmill = require('@windmill/react-ui/config')
+const windmill = require("@windmill/react-ui/config");
 
-module.exports =  windmill({
-  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html', './node_modules/tw-elements/dist/js/**/*.js'],
+module.exports = windmill({
+  purge: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./public/index.html",
+    "./node_modules/tw-elements/dist/js/**/*.js",
+  ],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
-        blur : {
-            xs : '1px'
-        }
+      blur: {
+        xs: "1px",
+      },
     },
   },
   variants: {
-    extend: {
-        
-    },
+    extend: {},
   },
+  content: ['./src/**/*.{html,js}', './node_modules/tw-elements/dist/js/**/*.js'],
   plugins: [
     require('tw-elements/dist/plugin')
-  ],
-})
+  ]
+});

@@ -13,10 +13,12 @@ const Order = require("../../../models/Orders");
 const Pending_Order = require("../../../models/Pending_Order");
 const Product = require("../../../models/Product");
 const { v4: uuidv4 } = require("uuid");
+const Chat = require("../../../models/Chat");
+const Message = require("../../../models/Chat");
+
 var multer = require("multer");
 
 const snooze = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -29,7 +31,11 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage, limits: { fileSize: 8388608 } });
 
-router.post( "/uploadProfile", auth, upload.single("profile_picture", 5), async (req, res) => {
+router.post(
+  "/uploadProfile",
+  auth,
+  upload.single("profile_picture", 5),
+  async (req, res) => {
     try {
       const { _id } = req.body;
       let uploadInfo = req.file;
@@ -54,7 +60,6 @@ router.post( "/uploadProfile", auth, upload.single("profile_picture", 5), async 
   }
 );
 
-// 👌 TODO: Should update the total items & total cost
 router.post("/addToCart", auth, async (req, res) => {
   let { _id, item } = req.body;
   _id = mongoose.Types.ObjectId(_id);
@@ -74,6 +79,54 @@ router.post("/addToCart", auth, async (req, res) => {
     description: "Item added to cart",
     ...result,
   });
+});
+
+router.post("/getChat", auth, async (req, res) => {
+  try {
+    const { _id, profile_info } = req.body;
+
+    let conversation = await Chat.findOneAndUpdate(
+      { user_id : _id },
+      { user_id : _id , profile_info },
+      { new: true, upsert: true }
+    );
+
+    res.status(200).json({
+      conversation,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+router.post("/sendMessage", auth, async (req, res) => {
+  try {
+    const { _id, profile_info ,message } = req.body;
+
+    const sendMessage = await Chat.updateOne(
+      { user_id : _id },
+      {
+        $set : {
+            profile_info : profile_info,
+            hasNewMessage : true
+        },
+        $push : {
+          messages: message
+        }
+      }
+    );
+
+    const conversation = await Chat.findOne(
+        { user_id : _id }
+      );
+
+    res.status(201).json({
+      message: "sent",
+      conversation
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
 });
 
 router.post("/removeCancelled", auth, async (req, res) => {
@@ -533,7 +586,7 @@ router.post("/removefromcart", auth, async (req, res) => {
 //getUserDetails
 router.get("/mydetails/:id", auth, async (req, res) => {
   let _id = req.params.id;
-  await snooze(1000)
+  await snooze(1000);
   if (!_id)
     return res.status(400).json({
       err: 400,

@@ -3,10 +3,11 @@ require("dotenv").config();
 const baseURL = process.env.REACT_APP_SERVERURL
 const tick = process.env.REACT_APP_UPDATE_TICK
 const userTick = process.env.REACT_APP_USER_UPDATE_TICK
+const chatTick = process.env.REACT_APP_CHAT_TICK
 
 export const getTickUpdate = () => { return Number.parseInt(tick) }
 export const getUserTickUpdate = () => { return Number.parseInt(userTick)}
-
+export const getChatTick = () => { return Number.parseInt(chatTick)}
 
 export const getUrl = (path) => { return `${baseURL}${path}` }
 
@@ -46,3 +47,15 @@ export const parseDate = (date) => {
 
   return wordDate
 };
+
+
+export const parseDateTime = (date) => {
+    let thisDate = new Date(date);
+  
+    let wordDate = `${thisDate.toLocaleString("en-us", {
+      month: "short",
+    })}  ${thisDate.getDate()},  ${thisDate.getFullYear()} at ${thisDate.toLocaleString('en-US', { hour: 'numeric', minute : '2-digit' , hour12: true })}`;
+  
+    return wordDate
+  };
+  

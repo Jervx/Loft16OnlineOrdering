@@ -18,6 +18,7 @@ const Completed = require("../../../models/Completed_Orders");
 const Pendings = require("../../../models/Pending_Order");
 const Categories = require("../../../models/Categories");
 const User = require("../../../models/User");
+const Chat = require("../../../models/Chat");
 
 const { ehandler, checkObjectId } = require("../../../helper/utils");
 let ObjectId = require("mongoose").Types.ObjectId;
@@ -164,15 +165,16 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
 
     if (mode === 0) {
       const doesExist = await Product.findOne({
-          name : simpleData.name
-      })
+        name: simpleData.name,
+      });
 
-      if(doesExist) return res.status(401).json({
-        code : 401,
-        message : "Admin Conflict",
-        description : "Product with thesame name already exist",
-        solution : "Please use another product name"
-      })
+      if (doesExist)
+        return res.status(401).json({
+          code: 401,
+          message: "Admin Conflict",
+          description: "Product with thesame name already exist",
+          solution: "Please use another product name",
+        });
 
       const product = await Product.create({
         ...simpleData,
@@ -231,17 +233,17 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
 
       return res.status(200).json(product);
     } else if (mode === 1) {
+      const doesExist = await Product.findOne({
+        name: simpleData.name,
+      });
 
-        const doesExist = await Product.findOne({
-            name : simpleData.name
-        })
-  
-        if(doesExist) return res.status(401).json({
-          code : 401,
-          message : "Admin Conflict",
-          description : "Product with thesame name already exist",
-          solution : "Please use another product name"
-        })
+      if (doesExist)
+        return res.status(401).json({
+          code: 401,
+          message: "Admin Conflict",
+          description: "Product with thesame name already exist",
+          solution: "Please use another product name",
+        });
 
       const delCat = complexData.deletedCategories;
 
@@ -357,6 +359,78 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
   }
 });
 
+// Chats
+router.get("/getChat", adminAuth, async (req, res) => {
+  try {
+    const conversations = await Chat.find({
+      messages: { $not: { $size: 0 } },
+    }).sort({ hasNewMessage: -1 });
+
+    res.status(200).json({
+      conversations,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
+router.post("/seenConversation", adminAuth, async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    const seen = await Chat.updateOne(
+      { user_id },
+      {
+        $set: {
+          hasNewMessage: false,
+        },
+      }
+    );
+
+    res.status(200).json({
+      message: "ok",
+    });
+  } catch (e) {}
+});
+
+router.post("/deleteConversation", adminAuth, async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    const seen = await Chat.deleteOne({ user_id });
+
+    res.status(200).json({
+      message: "ok, deleted",
+    });
+  } catch (e) {}
+});
+
+router.post("/sendMessage", adminAuth, async (req, res) => {
+  try {
+    const { _id, message } = req.body;
+
+    console.log(message, _id)
+
+    const sendMessage = await Chat.updateOne(
+      { user_id: _id },
+      {
+        $push: {
+          messages: message,
+        },
+      }
+    );
+
+    const conversation = await Chat.findOne({ user_id: _id });
+
+    res.status(201).json({
+      message: "sent",
+      conversation,
+    });
+  } catch (e) {
+    ehandler(e, res);
+  }
+});
+
 // admin account creation &
 router.get("/mydetails/:id", adminAuth, async (req, res) => {
   let _id = req.params.id;
@@ -389,7 +463,9 @@ router.post("/insights", adminAuth, async (req, res) => {
     let topProducts = await Product.find(
       { generated_sale: { $gt: 0 } },
       { name: 1, likes: 1, generated_sale: 1, Images: 1, total_item_sold: 1 }
-    ).sort({ generated_sale: -1 }).limit(15);
+    )
+      .sort({ generated_sale: -1 })
+      .limit(15);
 
     let pendings = await Pendings.find({}).count();
     let inprogress = await InProgress.find({}).count();
@@ -397,9 +473,9 @@ router.post("/insights", adminAuth, async (req, res) => {
     let products = await Product.find({}).count();
     let available = await Product.find({ total_stock: { $gt: 0 } }).count();
 
-    let categories = await Categories.find({})
-  
-    console.log("Querying Year :", year)
+    let categories = await Categories.find({});
+
+    console.log("Querying Year :", year);
 
     let delivered = await Orders.find({
       order_status: 3,
@@ -1291,15 +1367,18 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
 
     if (mode === 0) {
       const hashedPassword = await bcrypt.hash(info.password, 10);
-      
-      const adminExist = await Admin.findOne({email_address : info.email_address})
 
-      if(adminExist) return res.status(401).json({
-          code : 401,
-          message : "Admin Conflict",
-          description : "Admin with that email address already exist",
-          solution : "Please use other email address"
-      })
+      const adminExist = await Admin.findOne({
+        email_address: info.email_address,
+      });
+
+      if (adminExist)
+        return res.status(401).json({
+          code: 401,
+          message: "Admin Conflict",
+          description: "Admin with that email address already exist",
+          solution: "Please use other email address",
+        });
 
       const adminData = await Admin.create({
         ...info,

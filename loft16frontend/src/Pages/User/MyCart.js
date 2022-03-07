@@ -11,7 +11,6 @@ import { MdOutlineClose } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { signin, signout } from "../../Features/userSlice";
 import { openNotifier } from "../../Features/uiSlice";
-import { setCheckOut } from "../../Features/appSlice";
 
 import FullPageLoader from "../../Components/FullPageLoader";
 import Checkout from "../../Components/ModalComponent/Checkout";
@@ -168,6 +167,7 @@ const MyCart = () => {
               Checkout
             </Button>
           </div>
+          
           <div className="flex justify-evenly items-center defText-Col-2">
             {userData.cart.total_items === 0 ? (
               <></>

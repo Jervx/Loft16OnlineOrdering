@@ -135,6 +135,7 @@ const AdminProfile = ({
       {loadingData && <ProtectedLoader />}
       {!loadingData && (
         <div className="mt-4 px-4">
+          
           <div className="flex flex-col items-center">
             <div
               className="relative w-full h-48 bg-no-repeat bg-cover "
