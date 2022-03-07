@@ -26,10 +26,12 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
         _id: userId,
         profile_info,
       });
+
+      if(conversations.length === conversations.data.conversation) return
       setConversation(conversations.data.conversation);
       setLoadingData(false);
 
-      scrollDown();
+      
     } catch (e) {}
   };
 

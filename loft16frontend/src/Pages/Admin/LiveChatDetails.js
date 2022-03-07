@@ -47,6 +47,7 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
       });
       setSending(false);
       setWriteMsg("");
+      scrollDown()
     } catch (e) {}
   };
 

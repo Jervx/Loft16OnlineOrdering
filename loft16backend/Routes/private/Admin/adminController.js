@@ -44,7 +44,6 @@ router.post(
 
       let uploadInfo = req.file;
 
-      console.log(uploadInfo);
 
       if (_id) {
         const updateAdminData = await Admin.updateOne(
@@ -161,7 +160,6 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
   try {
     const { mode, _id, prod_Id, simpleData, complexData } = req.body;
 
-    console.log(mode);
 
     if (mode === 0) {
       const doesExist = await Product.findOne({
@@ -364,7 +362,7 @@ router.get("/getChat", adminAuth, async (req, res) => {
   try {
     const conversations = await Chat.find({
       messages: { $not: { $size: 0 } },
-    }).sort({ hasNewMessage: -1 });
+    });
 
     res.status(200).json({
       conversations,
@@ -409,13 +407,16 @@ router.post("/sendMessage", adminAuth, async (req, res) => {
   try {
     const { _id, message } = req.body;
 
-    console.log(message, _id)
 
     const sendMessage = await Chat.updateOne(
       { user_id: _id },
       {
         $push: {
           messages: message,
+        },
+        $set: {
+          hasNewMessage: false,
+          hasAdminReply: true,
         },
       }
     );
@@ -475,7 +476,6 @@ router.post("/insights", adminAuth, async (req, res) => {
 
     let categories = await Categories.find({});
 
-    console.log("Querying Year :", year);
 
     let delivered = await Orders.find({
       order_status: 3,
@@ -670,7 +670,6 @@ router.post("/updateCategories", adminAuth, async (req, res) => {
     let description = "";
     let solution = "";
 
-    console.log(category, oldCategory, mode);
 
     //  mode 0 create, mode 1 update, mode -1 delete
     if (mode === 0) {
@@ -1157,14 +1156,7 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
         }
       );
 
-      console.log(
-        updateUser,
-        "Setting status to ",
-        status,
-        entry.user_ID,
-        entry.order_ID
-      );
-
+   
       const updateOrder = await Orders.updateOne(
         {
           _id: entry.order_ID,
@@ -1277,7 +1269,6 @@ router.post("/deleteCompleted", adminAuth, async (req, res) => {
 
     const del = await Completed.deleteOne({ order_ID: new ObjectId(order_ID) });
 
-    console.log(del);
     res.status(200).json({
       message: "Ok",
       del,
@@ -1391,7 +1382,6 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
       let additional = {};
 
       if (isChangedPass) {
-        console.log("Password Changing");
         additional.password = await bcrypt.hash(info.password, 10);
       }
 
