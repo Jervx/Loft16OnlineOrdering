@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
 
 import { parseDateTime } from "../../Helpers/uitils";
-import API from "../../Helpers/api"
+import API from "../../Helpers/api";
 import { RiMessage3Fill, RiSendPlaneFill } from "react-icons/ri";
 import { AiOutlineLoading, AiFillDelete } from "react-icons/ai";
 import { Textarea } from "@windmill/react-ui";
+import { useDispatch } from "react-redux";
+import { openInputModal } from "../../Features/uiSlice";
+
+import AdminProfile from "../../Components/ModalComponent/Admin/AdminProfile";
+
 
 const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
-    const [writeMsg, setWriteMsg] = useState("");
-    const [sending, setSending] = useState(false);
+  const dispatch = useDispatch();
+
+  const [writeMsg, setWriteMsg] = useState("");
+  const [sending, setSending] = useState(false);
   const [unmounted, setUnmounted] = useState(false);
 
   const scrollDown = () => {
@@ -16,14 +23,20 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
     elem.scrollTop = elem.scrollHeight;
   };
 
+  const getPermission = (_id) => {
+    if (adminData.role === "Root Admin") return false;
+    if (adminData._id !== _id) return true;
+  };
 
   const send = async () => {
+    setSending(true);
     try {
       const response = await API.post("/admin/sendMessage", {
         _id: userId,
         message: {
           type: 1,
           profile: {
+            _id : adminData._id,
             name: adminData.name,
             profile: adminData.profile_picture,
             role: adminData.role,
@@ -32,14 +45,12 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
           cat: new Date(),
         },
       });
-
-      setWriteMsg('')
+      setSending(false);
+      setWriteMsg("");
     } catch (e) {}
   };
 
-
   useEffect(() => {
-    scrollDown();
     return () => {
       setUnmounted(true);
     };
@@ -90,46 +101,64 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
                           style={{ fontSize: "0.7rem" }}
                         >
                           {msg.type === 1 ? (
-                            "You"
+                            "Admin"
                           ) : (
                             <>{profile_info.user_name}</>
                           )}
                         </p>
                       </>
                     ) : (
-                        <>
-                    {messages[idx - 1].type !== msg.type ? (
                       <>
-                        <p
-                          className="absolute font-medium text-gray-500 -top-7"
-                          style={{ fontSize: "0.7rem" }}
-                        >
-                          {msg.type === 1 ? (
-                            "You"
-                          ) : (
-                            <>
-                              {profile_info.user_name}
-                            </>
-                          )}
-                        </p>
+                        {messages[idx - 1].type !== msg.type ? (
+                          <>
+                            <p
+                              className="absolute font-medium text-gray-500 -top-7"
+                              style={{ fontSize: "0.7rem" }}
+                            >
+                              {msg.type === 1 ? (
+                                <>Admin</>
+                              ) : (
+                                <>{profile_info.user_name}</>
+                              )}
+                            </p>
+                          </>
+                        ) : (
+                          <></>
+                        )}
                       </>
-                    ) : (
-                      <></>
-                    )}
-                  </>
                     )}
                   </div>
                   <img
                     src={
                       msg.type === 1
-                        ? adminData.profile_picture
+                        ? msg.profile.profile
                         : profile_info.profile_picture
                     }
                     alt="My profile"
-                    className="w-6 h-6 rounded-full order-1"
+                    className={`w-6 h-6 rounded-full order-1 ${msg.type === 1 && 'cursor-pointer'}`}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={msg.type === 1 ? "You" : profile_info.user_name}
+                    title={msg.type === 1 ? msg.profile.name : profile_info.user_name}
+                    onClick={() => {
+                        if(msg.type === 0)return
+
+                        dispatch(
+                          openInputModal({
+                            title: "",
+                            component: (
+                              <AdminProfile
+                                onUpdateSomething={()=>{}}
+                                editor_id={adminData._id}
+                                admin_id={msg.profile._id}
+                                uneditable={getPermission(adminData._id)}
+                              />
+                            ),
+                            onAccept: () => {},
+                            acceptBtnText: "Save",
+                            cancelBtnText: "Cancel",
+                          })
+                        );
+                      }}
                   />
                 </div>
               </div>
@@ -144,7 +173,7 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
       </div>
       <div className="mx-4 flex flex-row  items-center  border-t border-gray-200 pt-4">
         <Textarea
-          disabled={sending }
+          disabled={sending}
           className={`border rounded-2xl border-transparent w-full focus:outline-none text-sm flex items-center scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch ${
             sending && "animate-pulse"
           }`}
@@ -161,10 +190,10 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
         />
         <div>
           <button
-            disabled={writeMsg.length === 0 || sending }
+            disabled={writeMsg.length === 0 || sending}
             onClick={() => send()}
             className={`ml-3 flex items-center justify-center h-10 w-10 mr-2 rounded-full bg-gray-200 hover:bg-gray-300 text-indigo-800 focus:outline-none ${
-              writeMsg.length === 0 || sending 
+              writeMsg.length === 0 || sending
                 ? "opacity-60 cursor-not-allowed"
                 : ""
             }`}

@@ -95,7 +95,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
 
       <div
         id="messages"
-        className="pt-8 flex flex-col space-y-3 p-3 overflow-y-auto h-full md:h-64 md:max-h-80 scrollbar-thumb- scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+        className="pt-8 flex flex-col space-y-3 p-3 overflow-y-auto h-full md:h-96 md:max-h-96 scrollbar-thumb- scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
       >
         {loadingData ? (
           <Loader />
@@ -142,8 +142,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
                         "You"
                       ) : (
                         <>
-                          {message.profile.name}
-                          <span className="">({message.profile.role})</span>
+                          Admin
                         </>
                       )}
                     </p>
@@ -160,8 +159,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
                             "You"
                           ) : (
                             <>
-                              {message.profile.name}
-                              <span className="">({message.profile.role})</span>
+                              Admin
                             </>
                           )}
                         </p>
@@ -182,7 +180,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
                 className="w-6 h-6 rounded-full order-1"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
-                title={message.type === 0 ? "You" : message.profile.name}
+                title={message.type === 0 ? "You" : message.profile.name + ` (${message.profile.role}) `}
               />
             </div>
           </div>
