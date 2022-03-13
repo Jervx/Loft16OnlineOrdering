@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { openAlertModal } from "../../Features/uiSlice";
+import { openAlertModal, closeInputModal } from "../../Features/uiSlice";
 import { signin } from "../../Features/userSlice";
 
 import { useParams } from "react-router-dom";
@@ -206,7 +206,7 @@ const ProductView = () => {
     var currentDate = new Date().toJSON().slice(0, 10);
     var from = new Date(date1);
     var basis = new Date(date1);
-    var to = new Date(basis.setMonth(basis.getMonth() + 6));
+    var to = new Date(basis.setMonth(basis.getMonth() + 2));
 
     var check = new Date(currentDate);
 
@@ -316,8 +316,9 @@ const ProductView = () => {
   };
 
   useEffect(() => {
+    dispatch(closeInputModal({}))
     loadProductData(prod_id);
-  }, []);
+  }, [prod_id]);
 
   return (
     <div className="min-h-screen">

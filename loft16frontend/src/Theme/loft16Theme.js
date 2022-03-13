@@ -55,6 +55,17 @@ const myTheme = {
     checkbox:
       "text-teal-600 form-checkbox focus:border-teal-400 focus:outline-none focus:ring focus:ring-teal-300 focus:ring-offset-0 rounded dark:focus:ring-gray-300",
   },
+  dropdownItem: {
+    base: 'mb-2 last:mb-0',
+  },
+  dropdown: {
+    base:
+      'absolute bg-white bg-opacity-90 filter backdrop-filter backdrop-blur-lg w-56 p-2 mt-2 text-gray-600 border border-gray-100 rounded-lg shadow-md min-w-max-content dark:text-gray-300 dark:border-gray-700 dark:bg-gray-700',
+    align: {
+      left: 'left-0',
+      right: 'right-0',
+    },
+  },
 };
 
 export default myTheme;

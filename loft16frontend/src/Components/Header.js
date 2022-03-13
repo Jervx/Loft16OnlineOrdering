@@ -12,7 +12,7 @@ import { withRouter, Link, useLocation } from "react-router-dom";
 /* Icons */
 import { BiSearch } from "react-icons/bi";
 import { AiFillFire, AiFillShopping, AiOutlineUser } from "react-icons/ai";
-import { BsGearFill, BsFillInfoCircleFill } from "react-icons/bs";
+import { BsGearFill, BsHeartFill, BsFillInfoCircleFill } from "react-icons/bs";
 import { ImCart } from "react-icons/im";
 import { MdOutlineLogout, MdQuestionAnswer } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
@@ -28,6 +28,7 @@ import { openNotifier } from "../Features/uiSlice";
 import { openInputModal } from "../Features/uiSlice";
 
 import Chat from "../Components/ModalComponent/Chat";
+import Favorites from "../Components/ModalComponent/Favorites"
 
 import API from "../Helpers/api";
 
@@ -215,7 +216,7 @@ const Header = (props) => {
               </button>
             )}
             <Dropdown
-              className="custom_shadow p-5"
+              className="backdrop-filter backdrop-blur-lg p-5"
               align="right"
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}
@@ -254,6 +255,7 @@ const Header = (props) => {
                 <BsGearFill className="w-5 h-5 mr-5" aria-hidden="true" />
                 <span className=" font-normal">Settings</span>
               </DropdownItem>
+
               <DropdownItem
                 tag="a"
                 onClick={() => {
@@ -261,9 +263,10 @@ const Header = (props) => {
                 }}
                 className="dark:text-gray-200 text-gray-500 hover:text-green-600"
               >
-                <GoPackage className="w-5 h-5 mr-5 " aria-hidden="true" />
+                <GoPackage className="w-5 h-5 mr-5 text-orange-700" aria-hidden="true" />
                 <span className=" font-normal">Orders</span>
               </DropdownItem>
+
               <DropdownItem
                 tag="a"
                 onClick={() => {
@@ -293,11 +296,36 @@ const Header = (props) => {
                 className="dark:text-gray-200 text-gray-500 hover:text-green-600"
               >
                 <IoChatbubblesSharp
-                  className="w-5 h-5 mr-5 "
+                  className="w-5 h-5 mr-5 text-blue-400"
                   aria-hidden="true"
                 />
                 <span className=" font-normal">Chat Admin</span>
               </DropdownItem>
+
+              <DropdownItem
+                tag="a"
+                onClick={() => {
+                  dispatch(
+                    openInputModal({
+                      title: "Liked Products",
+                      component: (
+                        <Favorites _id={_cur_user.userData._id} />
+                      ),
+                      onAccept: () => {},
+                      acceptBtnText: "Send",
+                      cancelBtnText: "Cancel",
+                    })
+                  );
+                }}
+                className="dark:text-gray-200 text-gray-500 hover:text-green-600"
+              >
+                <BsHeartFill
+                  className="w-5 h-5 mr-5 text-red-400"
+                  aria-hidden="true"
+                />
+                <span className=" font-normal">Liked Products</span>
+              </DropdownItem>
+
               <DropdownItem
                 className="text-gray-500  dark:text-gray-200 hover:text-orange-600"
                 onClick={() =>

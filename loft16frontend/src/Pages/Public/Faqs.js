@@ -69,6 +69,16 @@ const Faqs = () => {
               </p>
             </p>
           </li>
+          <li className="w-full md:w-2/5">
+            <p className="text-xl font-medium leading-6 text-teal-800 mb-4">
+              How can you contact us?
+            </p>
+            <p className="mt-2">
+              <p className="text-justify text-base leading-6 text-gray-500">
+                You can email us on <span className="italic font-inter text-gray-700">loft16siaa@gmail.com</span>. If you have an account here, you can chat us directly. On <span className="italic font-inter text-gray-700">{"navigation > your profile picture dropdown > Chat admin "}</span>
+              </p>
+            </p>
+          </li>
         </motion.ul>
       </div>
     </div>
