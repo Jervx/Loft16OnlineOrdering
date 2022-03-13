@@ -5,6 +5,77 @@ const Admin = require("../models/Admin");
 
 const snooze = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * <div
+        id="messages"
+        className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue h-64 max-h-80 scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+      >
+        { conversation === [] && (
+          <p className="text-gray-400 text-center py-8 text-xs">
+            no conversation
+          </p>
+        )}
+
+        
+
+        <div>
+          <div className="flex items-end justify-end">
+            <div
+              className="relative flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title={parseDateTime(new Date())}
+            >
+              <div className="cursor-default">
+                <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-500 text-white ">
+                  Tangina mo! Gago ka!
+                </span>
+              </div>
+              <p
+                className="absolute font-medium text-gray-500 -bottom-5"
+                style={{ fontSize: "0.7rem" }}
+              >
+                You
+              </p>
+            </div>
+            <img
+              src={yourProfilePicture}
+              alt="My profile"
+              className="w-6 h-6 rounded-full order-2"
+            />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-end">
+            <div
+              className=" relative flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title={parseDateTime(new Date())}
+            >
+              <div className="cursor-default">
+                <span className="px-4 py-2 cursor-none rounded-lg inline-block rounded-bl-none bg-gray-100 text-gray-600">
+                  Tang Ina mo!
+                </span>
+              </div>
+              <p
+                className="absolute font-medium text-gray-500 -bottom-5"
+                style={{ fontSize: "0.7rem" }}
+              >
+                Jervx<span className="">(Admin)</span>
+              </p>
+            </div>
+            <img
+              src="https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144"
+              alt="My profile"
+              className="w-6 h-6 rounded-full order-1"
+            />
+          </div>
+        </div>
+      </div>
+ */
+
 const verifyAdminToken = async (req, res, next) => {
   let token = req.cookies.admin_access_token;
   let client_id = req.cookies.client_id;

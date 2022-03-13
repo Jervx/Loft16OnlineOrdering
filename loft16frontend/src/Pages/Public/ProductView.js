@@ -406,13 +406,14 @@ const ProductView = () => {
                     ))}
                   </div>
                   <div>
-                    <Badge
+                    {productDetail.is_hot && <Badge
                       type="danger"
                       className="py-2 mx-1 px-4 flex items-center"
                     >
                       <HiFire className="text-orange-600 h-4 w-4 mr-2" />
-                      Top 1 Hot Product
+                      Hot Product
                     </Badge>
+                    }
                     {chechkIsNew(productDetail.cat) ? (
                       <Badge
                         type="success"

@@ -275,7 +275,6 @@ const Home = (props) => {
               <div className="relative space-y-4">
                 <div className="flex items-end justify-center lg:justify-start space-x-4">
                   <motion.img 
-                    whileHover={{ scale: 1.2, rotateX : 15, rotateY : 21 , rotateZ : 24 }}
                     className="rounded-lg shadow-lg w-32 md:w-56"
                     width="200"
                     src={getUrl('/static/assets/furnit.jpeg')}

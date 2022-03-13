@@ -8,6 +8,8 @@ const verifyToken = async (req, res, next) => {
   let token = req.cookies.access_token
   let client_id = req.cookies.client_id
   let auth_iss = req.cookies.auth_iss
+
+  //await snooze(5000)
   
   //console.log("--------COOKIES USER AUTH CHECK----------\n", token+"\n---\n", client_id+"\n----\n", auth_iss)
   if(auth_iss)

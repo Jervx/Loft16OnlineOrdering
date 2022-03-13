@@ -60,6 +60,20 @@ router.post(
   }
 );
 
+router.get("/getMyCart/:id", auth, async(req,res) => {
+    try{
+        const _id = req.params.id
+        const myLikes = await User.findOne({ _id }, { _id : 0, liked_products : 1})
+        const prods = await Product.find({ _id : { $in : [...myLikes.liked_products] }})
+        res.status(200).json({
+            prod_ids : myLikes ,
+            liked_products : prods
+        })
+    }catch(e){
+        ehandler(e,res)
+    }
+})
+
 router.post("/addToCart", auth, async (req, res) => {
   let { _id, item } = req.body;
   _id = mongoose.Types.ObjectId(_id);

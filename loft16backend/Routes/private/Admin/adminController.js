@@ -235,7 +235,9 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
         name: simpleData.name,
       });
 
-      if (doesExist)
+      console.log(doesExist._id, prod_Id, typeof(doesExist._id), typeof(prod_Id), doesExist._id.equals(new ObjectId(prod_Id)))
+
+      if (doesExist && !doesExist._id.equals(new ObjectId(prod_Id)))
         return res.status(401).json({
           code: 401,
           message: "Admin Conflict",

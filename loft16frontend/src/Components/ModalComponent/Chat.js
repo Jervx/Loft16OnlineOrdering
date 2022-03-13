@@ -191,7 +191,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
 
       <div className="relative flex flex-row  items-center  bottom-0 my-2 w-full border-t border-gray-200 pt-4">
         <Textarea
-          disabled={sending || loadingData}
+          disabled={loadingData}
           className={`border rounded-2xl border-transparent w-full focus:outline-none text-sm flex items-center scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch ${
             sending && "animate-pulse"
           }`}
@@ -199,6 +199,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
           rows={3}
           value={writeMsg}
           onChange={(e) => {
+            if(sending) return
             setWriteMsg(e.target.value);
           }}
           onKeyDown={(e)=>{

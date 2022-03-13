@@ -172,9 +172,9 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
           </div>
         </div>
       </div>
-      <div className="mx-4 flex flex-row  items-center  border-t border-gray-200 pt-4">
+      <div className="relative mx-4 flex flex-row  items-center  border-t  border-gray-200 pt-4">
         <Textarea
-          disabled={sending}
+         
           className={`border rounded-2xl border-transparent w-full focus:outline-none text-sm flex items-center scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch ${
             sending && "animate-pulse"
           }`}
@@ -182,6 +182,7 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
           rows={3}
           value={writeMsg}
           onChange={(e) => {
+            if(sending) return
             setWriteMsg(e.target.value);
           }}
           onKeyDown={(e) => {
@@ -208,7 +209,7 @@ const LiveChatDetails = ({ userId, messages, profile_info, adminData }) => {
         </div>
         {sending && (
           <p
-            className="absolute -bottom-8 animate-pulse"
+            className="absolute text-xs -top-2 animate-pulse"
             style={{ fontSize: "0.8rem" }}
           >
             Sending..
