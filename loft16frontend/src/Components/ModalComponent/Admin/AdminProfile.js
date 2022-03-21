@@ -116,7 +116,6 @@ const AdminProfile = ({
       formData.append("profile_picture", image);
       formData.append("path", "profile");
       formData.append("_id", adminData._id);
-      console.log(formData);
       const response = await API.post("/admin/uploadAdminProfile", formData);
       setFileName("");
       onUpdateSomething();

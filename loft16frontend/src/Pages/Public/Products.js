@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
-import { Badge, Input, Dropdown, Label, Button } from "@windmill/react-ui";
+import { Input, Dropdown, Label, Button } from "@windmill/react-ui";
 
 import { BiSearch } from "react-icons/bi";
 import { BsFilter } from "react-icons/bs";
+import { MdCategory } from "react-icons/md";
 
 import FullPageLoader from "../../Components/ProtectedLoader";
-import ProtectedLoader from "../../Components/ProtectedLoader";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setUserSearch, setData, setFilter } from "../../Features/appSlice";
@@ -39,6 +39,7 @@ const Products = (props) => {
   const [FilterOpen, setFilterOpen] = useState(false);
   const [vlby, setvlby] = useState(0);
   const [srtby, setsrtby] = useState(0);
+  const [mobTogCat, setMobTogCat] = useState(false);
 
   const [categories, setCategories] = useState([]);
 
@@ -117,7 +118,6 @@ const Products = (props) => {
 
   const getCategories = async () => {
     try {
-      console.log("Req");
       const response = await API.get("/browse/getCategories");
       setCategories(response.data.categories);
     } catch (err) {}
@@ -174,17 +174,17 @@ const Products = (props) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.75 }}
     >
-      <section class="bg-white dark:bg-gray-900">
-        <div class="container px-6 py-8 mx-auto">
-          <div class="lg:flex lg:-mx-2">
-            <div class="space-y-3 lg:w-1/5 lg:px-2 lg:space-y-4">
+      <section className="bg-white dark:bg-gray-900">
+        <div className="container px-6 py-8 mx-auto">
+          <div className="lg:flex lg:-mx-2">
+            <div className="hidden lg:block space-y-3 lg:w-1/5 lg:px-2 lg:space-y-4">
               <p className="text-2xl text-teal-700 mb-4 font-quicksand">
                 Categories
               </p>
               <a
                 href="#all"
                 onClick={() => setFilterScope("all")}
-                class={amIFilter2("all")}
+                className={amIFilter2("all")}
               >
                 All
               </a>
@@ -193,14 +193,14 @@ const Products = (props) => {
                   href={`#${cat.category_name}`}
                   key={idx}
                   onClick={() => setFilterScope(cat.category_name)}
-                  class={amIFilter2(cat.category_name)}
+                  className={amIFilter2(cat.category_name)}
                 >
                   {cat.category_name}
                 </a>
               ))}
             </div>
-            <div class="mt-6 lg:mt-0 lg:px-2 lg:w-4/5 ">
-              <div className="flex justify-center mt-2 mb-8">
+            <div className="mt-6 lg:mt-0 lg:px-2 lg:w-4/5 ">
+              <div className="lg:hidden flex justify-center mt-2 mb-8">
                 <div className="relative text-green-900 h-full md:w-6/12 mr-2  focus-within:text-green-700 ">
                   <div className="absolute inset-y-0 flex items-center pl-2">
                     <BiSearch className="w-4 h-4" aria-hidden="true" />
@@ -216,7 +216,64 @@ const Products = (props) => {
                     onKeyDown={onSearchEnter}
                   />
                 </div>
-                <div className="relative">
+              </div>
+              <div className="flex justify-center mt-2 mb-8">
+                <div className=" lg:hidden relative">
+                  <Dropdown
+                    className="custom_shadow p-5 z-10"
+                    isOpen={mobTogCat}
+                    onClose={() => setMobTogCat(false)}
+                  >
+                    <div className="space-y-2">
+                      <p className="text-2xl text-teal-700 mb-4 font-quicksand">
+                        Categories
+                      </p>
+                      <a
+                        href="#all"
+                        onClick={() => setFilterScope("all")}
+                        className={amIFilter2("all")}
+                      >
+                        All
+                      </a>
+                      {categories.map((cat, idx) => (
+                        <a
+                          href={`#${cat.category_name}`}
+                          key={idx}
+                          onClick={() => setFilterScope(cat.category_name)}
+                          className={amIFilter2(cat.category_name)}
+                        >
+                          {cat.category_name}
+                        </a>
+                      ))}
+                    </div>
+                  </Dropdown>
+                  <Button
+                    onClick={() => {
+                      setMobTogCat(true);
+                    }}
+                    icon={MdCategory}
+                    style={{ background: "rgb(240,240,240)" }}
+                    className="text-gray-700 mr-2 rounded-sm"
+                  >
+                    Categories
+                  </Button>
+                </div>
+                <div className="hidden lg:block relative text-green-900 h-full md:w-6/12 mr-2  focus-within:text-green-700 ">
+                  <div className="absolute inset-y-0 flex items-center pl-2">
+                    <BiSearch className="w-4 h-4" aria-hidden="true" />
+                  </div>
+                  <Input
+                    className="pl-8 rounded-lg border-0 bg-gray-100 transition duration-500 text-gray-400 hover:text-gray-700 focus:text-gray-700"
+                    placeholder=""
+                    aria-label="Search"
+                    value={appState.userSearch}
+                    onChange={(e) => {
+                      typing(e);
+                    }}
+                    onKeyDown={onSearchEnter}
+                  />
+                </div>
+                <div className=" relative">
                   <Dropdown
                     className="custom_shadow p-5"
                     isOpen={FilterOpen}
@@ -302,17 +359,16 @@ const Products = (props) => {
                   </Button>
                 </div>
               </div>
-              <div class="flex items-center justify-between text-sm tracking-widest uppercase ">
-                <p class="text-gray-500 dark:text-gray-300">
+
+              <div className="flex items-center justify-between text-sm tracking-widest uppercase ">
+                <p className="text-gray-500 dark:text-gray-300">
                   {appState.data.length} Items
                 </p>
-                <div class="flex items-center"></div>
+                <div className="flex items-center"></div>
               </div>
               {toShow && !loading && appState.data.length === 0 ? (
                 <div className="w-full text-teal-800 h-6/12 flex flex-col items-center">
-                  <p className=" font-medium">
-                    No Product Matched
-                  </p>
+                  <p className=" font-medium">No Product Matched</p>
                   <GiWindpump className="mt-11 w-32 h-32 m-auto" />
                 </div>
               ) : (
@@ -321,29 +377,28 @@ const Products = (props) => {
               {loading ? (
                 <FullPageLoader />
               ) : (
-                <div class=" grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className=" grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {appState.data.map((prod, idx) => (
                     <motion.div
                       className="card-container"
-                      initial={{ x:-1, opacity: 0 }}
-                      animate={{ x:0, opacity: 1 }}
-                     transition={{ delay : idx * 0.008, duration: 0.75 }}
+                      initial={{ x: -1, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: idx * 0.008, duration: 0.75 }}
                       key={idx}
                       onClick={() => {
                         history.push(`/productdetail/${prod._id}`);
                       }}
-                      class="flex cursor-pointer font-quicksand flex-col items-center justify-center w-full max-w-lg mx-auto"
+                      className="flex cursor-pointer font-quicksand flex-col items-center justify-center w-full max-w-lg mx-auto"
                     >
                       <img
-                      
-                        class="object-cover w-full rounded-md h-72 xl:h-80"
+                        className="object-cover w-full rounded-md h-72 xl:h-80"
                         src={prod.Images[0]}
                         alt="T-Shirt"
                       />
-                      <h4 class="mt-2 text-lg font-medium text-gray-700 dark:text-gray-200">
+                      <h4 className="mt-2 text-lg font-medium text-gray-700 dark:text-gray-200">
                         {prod.name}
                       </h4>
-                      <p class="text-teal-800 text-lg">
+                      <p className="text-teal-800 text-lg">
                         Php {numberWithCommas(prod.variants[0].price)}
                       </p>
                     </motion.div>

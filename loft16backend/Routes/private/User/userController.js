@@ -658,7 +658,6 @@ router.post("/like", auth, async (req, res) => {
           },
         }
       );
-      console.log(updateUser, "0");
     } else {
       const updateUser = await User.updateOne(
         { _id },
@@ -676,7 +675,6 @@ router.post("/like", auth, async (req, res) => {
           },
         }
       );
-      console.log(updateUser, "1");
     }
 
     res.status(200).json({
@@ -743,8 +741,6 @@ router.post("/orderDetails", auth, async (req, res) => {
       },
       { $unwind: "$user_profile" },
     ]);
-
-    console.log("FINDING", order_ID, details);
 
     res.status(200).json({
       message: "ok!",

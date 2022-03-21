@@ -203,16 +203,16 @@ const AccountSetting = () => {
             </h1>
 
             <div className="mt-8">
-              <div className="flex my-8 items-center">
+              <div className="flex flex-col md:flex-row justify-center my-8 items-center">
                 <img
                   class="object-cover mr-4 w-32 h-32 rounded-full ring-8 ring-pink-50"
                   src={profilePicture}
                   alt=""
                 />
-                <div className="mr-6" className="relative">
+                <div className="mr-6 relative">
                   <div className="w-1/2 my-4">
                     {fileName.length === 0 && (
-                      <label className="relative mt-20 mb-2 w-5/12 ">
+                      <label className="relative mt-20 mb-2 w-full md:w-5/12 ">
                         <input
                           className="w-full opacity-0"
                           type="file"
@@ -225,7 +225,7 @@ const AccountSetting = () => {
                             );
                           }}
                         />
-                        <div className="transition text-white duration-150 w-full absolute top-0 z-10 px-4 py-2 text-sm border cursor-pointer bg-teal-500 border-dashed hover:border-transparent hover:bg-teal-600 hover:text-white flex items-center justify-center rounded-md">
+                        <div className="transition text-white duration-150 w-full md:absolute top-0 z-10 px-4 py-2 text-sm border cursor-pointer bg-teal-500 border-dashed hover:border-transparent hover:bg-teal-600 hover:text-white flex items-center justify-center rounded-md">
                           <MdFileUpload className="mr-5" />
                           <span>Change Photo</span>
                         </div>

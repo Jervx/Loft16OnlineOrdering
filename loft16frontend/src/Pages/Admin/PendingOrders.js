@@ -38,7 +38,6 @@ const PendingOrders = () => {
         setPendings(response.data.pendings);
         setLoadingData(false);
         setSpecificUpdate(-1);
-        console.log("Reset & Reloaded");
       } catch (e) {}
     }
   };

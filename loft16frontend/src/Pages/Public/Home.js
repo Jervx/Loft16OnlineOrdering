@@ -309,21 +309,21 @@ const Home = (props) => {
 
       <div className=" w-full h-screen flex items-center font-quicksand">
         <aside className="w-full mx-8 overflow-hidden h-5/6 text-gray-300 bg-gray-900 rounded-xl lg:flex">
-          <div className="w-1/2 p-12 text-center sm:p-16 lg:p-24 lg:text-left flex items-center">
+          <div className="w-full lg:w-1/2 p-12 text-center sm:p-16 lg:p-24 lg:text-left flex items-center">
             <div className="max-w-xl mx-auto lg:ml-0">
               <p className="mt-2 text-2xl text-white sm:text-3xl">
                 {" "}
                 <span className=" font-bold "></span>
               </p>
 
-              <p className="hidden lg:mt-4 lg:block leading-8 text-xl text-justify italic">
+              <p className="order-3 lg:mt-4 lg:block leading-8 text-xl text-justify italic">
                 <span className="text-3xl font-bold">" </span>Way back in 2020,
                 me and my friend started a small company and we rent a small
                 unit for our startup company office. Loft 16 help us to decide
                 what accessories may fill the emptyness of our small company
                 office.<span className="text-3xl font-bold"> "</span>
               </p>
-              <p className="mt-8 text-xl text-gray-100">
+              <p className=" mt-8 text-xl text-gray-100">
                 {" "}
                 - Mr. Andrei Castro (Co-Founder of Lisa IT Tech)
               </p>

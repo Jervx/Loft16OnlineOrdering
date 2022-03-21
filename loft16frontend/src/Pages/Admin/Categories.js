@@ -90,7 +90,6 @@ const Categories = () => {
         const response = await API.get("/admin/categories");
         if(unmounted) return
         setCategories(response.data.categories);
-        console.log("FALSED")
         setLoadingData(false);
         setSearching(false);
         setSearch('')

@@ -68,7 +68,6 @@ const RegistrationConfirm = (props) => {
       ...authRegisterState,
     })
       .then((res) => {
-        console.log(res);
         dispatch(closeInputModal());
         dispatch(closeAlertModal());
         dispatch(signin(res.data.userData));

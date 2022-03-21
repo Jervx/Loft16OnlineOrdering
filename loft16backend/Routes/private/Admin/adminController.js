@@ -235,7 +235,7 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
         name: simpleData.name,
       });
 
-      console.log(doesExist._id, prod_Id, typeof(doesExist._id), typeof(prod_Id), doesExist._id.equals(new ObjectId(prod_Id)))
+      //console.log(doesExist._id, prod_Id, typeof(doesExist._id), typeof(prod_Id), doesExist._id.equals(new ObjectId(prod_Id)))
 
       if (doesExist && !doesExist._id.equals(new ObjectId(prod_Id)))
         return res.status(401).json({

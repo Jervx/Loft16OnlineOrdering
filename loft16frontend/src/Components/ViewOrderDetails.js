@@ -7,8 +7,10 @@ import { FaMapMarkerAlt, FaShoppingCart, FaTruckLoading } from "react-icons/fa";
 
 import FullPageLoader from "./FullPageLoader";
 import API from "../Helpers/api";
+import { useHistory } from "react-router-dom";
 
 const ViewOrderDetails = ({ order_ID }) => {
+  const history = useHistory()
   const [order, setOrder] = useState();
   const [loadingData, setLoadingData] = useState(true);
 
@@ -147,7 +149,7 @@ const ViewOrderDetails = ({ order_ID }) => {
           </div>
           <div className="my-8">
             {order.items.map((item, idx) => (
-              <Card key={idx} className="relative flex h-24 my-4 ">
+              <Card key={idx} onClick={()=>history.push(`/productdetail/${item.product_ID}`)} className="cursor-pointer relative flex h-24 my-4 ">
                 <img
                   className="object-cover w-1/4"
                   src={item.thumb}

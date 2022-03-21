@@ -48,7 +48,6 @@ const DeliveredOrders = () => {
         const response = await API.get("/admin/completed");
         if (unmounted) return;
         setDelivered(response.data.completed);
-        console.log("Loaded");
         setChosenIdx(-1);
         setSpecificUpdate(-1);
         setLoadingData(false);

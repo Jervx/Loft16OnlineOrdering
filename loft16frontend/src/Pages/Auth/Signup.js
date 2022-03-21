@@ -226,7 +226,6 @@ const Signup = (props) => {
 
   /* G One Tap */
   const GOnFailure = async (res) => {
-    console.log(res);
   };
 
   const options = {
@@ -238,7 +237,6 @@ const Signup = (props) => {
 
   googleOneTap(options, async (res) => {
     // Send response to server
-    console.log(res);
     try {
       //dispatch save logindata
       dispatch(openLoader({ state: true, message: "checking.." }));

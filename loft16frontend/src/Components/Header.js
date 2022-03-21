@@ -85,7 +85,7 @@ const Header = (props) => {
     <header className="HHeader fixed bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg top-0 w-full z-40 py-3 bg-whie shadow-bottom dark:bg-gray-800 border-b-2 border-gray-200 md:px-6">
       <div className=" container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
         <a
-          className=" MoonTime defTextCOlorGreen lg:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
+          className="hidden MoonTime defTextCOlorGreen md:block ml-6 text-2xl font-bold text-gray-800 dark:text-gray-200"
           href="/"
         >
           Loft 16
@@ -97,7 +97,7 @@ const Header = (props) => {
             onClick={() => history.push("/")}
             className={
               (useLocation().pathname === "/" ? "text-red-500" : "") +
-              " cursor-pointer text-sm flex hover:text-red-500 items-center py-2 mx-4"
+              " cursor-pointer text-sm flex hover:text-red-500 items-center py-2 mx-1 md:mx-4"
             }
           >
             <AiFillFire className="w-6 h-6 pr-2" aria-hidden="true" />
@@ -109,7 +109,7 @@ const Header = (props) => {
             onClick={() => history.push("/products")}
             className={
               (useLocation().pathname === "/products" ? "text-red-500" : "") +
-              " cursor-pointer text-sm flex hover:text-red-500 items-center mx-4"
+              " cursor-pointer text-sm flex hover:text-red-500 items-center mx-1 md:mx-4"
             }
           >
             <AiFillShopping className="w-6 h-6 pr-2" aria-hidden="true" />
@@ -121,7 +121,7 @@ const Header = (props) => {
             onClick={() => history.push("/faqs")}
             className={
               (useLocation().pathname === "/faqs" ? "text-red-500" : "") +
-              " cursor-pointer text-sm flex hover:text-red-500 items-center mx-4"
+              " cursor-pointer text-sm flex hover:text-red-500 items-center mx-1 md:mx-4"
             }
           >
             <MdQuestionAnswer className="w-6 h-6 pr-2" aria-hidden="true" />
@@ -138,7 +138,7 @@ const Header = (props) => {
           >
             <BsFillInfoCircleFill className="w-6 h-6 pr-2" aria-hidden="true" />
             <p className="hidden md:block transition duration-200 ease-linear">
-              About Us
+              About
             </p>
           </h3>
         </div>

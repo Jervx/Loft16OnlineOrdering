@@ -10,7 +10,6 @@ Dead But usefull
     import GoogleOneTapLogin from 'react-google-one-tap-login';
 
     const GOneSuccess = (res) => {
-    console.log("ONE TAP",res)
     }
 
     <GoogleOneTapLogin onError={(error) => console.log(error)} onSuccess={GOneSuccess} googleAccountConfigs={{ client_id:CLID }} />

@@ -7,7 +7,6 @@ export const adminSlice = createSlice({
     adminSign: (state, action) => {
       state.hasAdmin = true
       state.adminData = action.payload
-      console.log("From admin slice", action.payload, action)
     },
     adminOut: (state) => {
       state.hasAdmin = false

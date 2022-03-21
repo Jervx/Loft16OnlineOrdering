@@ -99,7 +99,6 @@ const SignAdmin = (props) => {
       dispatch(closeLoader());
 
       const adminData = response.data.userData;
-      console.log("signin before dispatch",adminData)
       dispatch(adminSign(adminData));
       dispatch(cleanSignInCredential());
       localStorage.setItem("adminData", JSON.stringify(adminData));
@@ -193,7 +192,6 @@ const SignAdmin = (props) => {
 
   /* G One Tap */
   const GOnFailure = async (res) => {
-    console.log(res)
   };
 
   

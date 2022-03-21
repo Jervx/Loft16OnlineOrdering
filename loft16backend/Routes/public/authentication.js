@@ -410,8 +410,6 @@ router.post("/signup", async (req, res) => {
     confirmation_code,
   } = req.body;
 
-  console.log("VIA GOOGLE", password);
-
   ///////////// for via google ///////////////
   try {
     if ((client_id, access_token)) {

@@ -483,7 +483,6 @@ const ProductView = () => {
                         key={idx}
                         onClick={() => {
                           setSelectedVariant(variant);
-                          console.log(variant, idx, "Set");
                         }}
                         className={selectVariant(variant)}
                       >
@@ -542,18 +541,20 @@ const ProductView = () => {
             <>
               {_cur_user.to_rate.includes(productDetail._id) && (
                 <div className="w-full bg-pink-50 px-4 py-7 rounded-md border-dashed border-gray-200 shadow-md border">
-                  <div className="flex justify-evenly items-center px-8">
-                    <p className="text-left  font-quicksand py-8 text-3xl leading-9">
-                      You successfully purchased this product <br></br>Would you
-                      like to rate & comment about this product?
-                    </p>
-                    <img
-                      class="rounded-lg w-24 mx-auto md:w-32"
-                      height="34"
-                      src="https://192.168.1.5:3001/static/assets/comment.png"
-                      alt="1"
-                    />
-                  </div>
+                  {
+                      !commentUpload && <div className="flex justify-evenly items-center px-8">
+                      <p className="text-left  font-quicksand py-8 text-3xl leading-9">
+                        You successfully purchased this product <br></br>Would you
+                        like to rate & comment about this product?
+                      </p>
+                      <img
+                        class="rounded-lg w-24 mx-auto md:w-32"
+                        height="34"
+                        src="https://192.168.1.5:3001/static/assets/comment.png"
+                        alt="1"
+                      />
+                    </div>
+                  }
                   {!commentUpload ? (
                     <>
                       <p className="text-center font-medium py-4 text-xs text-teal-600">

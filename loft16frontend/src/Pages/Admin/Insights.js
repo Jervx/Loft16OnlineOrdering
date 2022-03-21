@@ -128,7 +128,6 @@ const Insights = () => {
   const loadInsightsData = async () => {
     if (adminData) {
       try {
-        console.log("Querying :", year);
         const response = await API.post("/admin/insights", {
           year,
         });
