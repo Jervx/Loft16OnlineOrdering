@@ -97,7 +97,7 @@ const Chat = ({ userId, profile_info, yourProfilePicture }) => {
 
       <div
         id="messages"
-        className="pt-8 flex flex-col space-y-3 p-3 overflow-y-auto h-full md:h-96 md:max-h-96 scrollbar-thumb- scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+        className="pt-8 flex flex-col space-y-3 p-3 overflow-y-auto max-h-96 scrollbar-thumb- scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
       >
         {loadingData ? (
           <Loader />
