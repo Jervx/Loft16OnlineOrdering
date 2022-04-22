@@ -1,39 +1,82 @@
-## About Loft16OnlineOrdering
+# Welcome To Loft 16 Developers Guide
 
-There are a lot of ecommerce website out there to help business easily reach their customers. But this software is built specifically for Loft 16. This guide will help future developers for improving the site.
+## Introduction
+There are a lot of ecommerce website out there to help business easily reach their customers. But this software is built specifically for Loft 16. This guide will provide the current developers the enough knowledge about the system help them in improving the site.
 
 <hr>
 
-## Built With
+
+
+## System Design
+
+
+### Use Case Diagram
+
+This show the summarized **flow of events** in Loft16 website between the **user, system**, & the **admin**.
+
+![Use Case Diagram](./images/usecasediagram.png)
+
+
+
+### Data Flow Diagram (Logical & Physical)
+
+This show both **Logical & Physical** data flow diagram for improvement of future developers.
+
+![dfd](./images/loftdfd.png)
+
+
+### Context Flow Diagram
+
+This shows the interaction between the **customer** and the **admin** using loft’16 ordering system.
+
+![cfd](./images/cfd.png)
+
+### Entity Relationship Diagram
+Although MongoDb is **not** a relational,tabular database, we still provide a visualization of how the **Collections** and **Documents** relate to each others.
+
+![cfd](./images/erd.png)
+
+### Architecture
+Loft16 uses **client server architecture**
+
+![architecture](./images/architecture.png)
+
+## Technologies
 
 This project is build using the following technology.
 
-Front End
-
 - [React.js](https://reactjs.org/)
-
-Back End
-
 - [Nodejs](https://nodejs.org/en/about/)
 - [Mongoose](https://mongoosejs.com/)
-
-UI
-
 - [Tailwind](https://tailwindcss.com/)
 - [Windmill UI](https://windmillui.com/react-ui)
 - [Flowbite](https://flowbite.com/)
 
 
-## Getting Started
+## Repository
 
 To run Loft 16 localy, we need to install required dependencies. Then we need to run Loft 16 backend & Front end
 
-### Prerequisites
+## Deployment
 
-Make sure you have NPM, Node installed in your system.
+### Frontend & Backend
+Both **Front End & Back End** where deployed to **Heroku**. Please ask the Loft16 Heroku credential from the **Loft16 Admin** or **Loft16 IT Personel**.
 
+### Database Deployment
+The loft16 database is using **MongoDB** and it is deployed via **MongoDb Atlas**
+
+The string bellow is the connection for the database. Ask the password from the **Loft16 Admin** or **Loft16 IT Personel**
+
+```Mongo URI
+mongodb+srv://loftsiaa:<password>@loftcluster.kqzw0.mongodb.net/loft?retryWrites=true&w=majority
+```
+
+## Requirements
+
+Make sure you have **NPM**, **Node** installed in your system, **MongoDb Community Edition (Optional)** for local development.
 
 ## Installation
+If you are a **developer** who is hired to **improve**, **fix bugs**, or **add features** to this website, follow the instructions bellow. 
 
 _Below is the process of setting up the front end and server._
 
@@ -115,3 +158,4 @@ Admin Page
 Thesame from user page but append /admin on last part of URL
 
     ex: https://192.168.1.2:3000/admin
+

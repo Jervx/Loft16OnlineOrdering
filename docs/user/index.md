@@ -1,9 +1,10 @@
 
 # Welcome To Loft 16 User Guide
 
-Learn more about how to perform actions using Loft16 Online Ordering System
+## Introduction
+Learn more about how to use Loft16 Online Ordering System for your shopping & transactions.
 
-## How to register an account
+## Register an account
 To register/signup a new account, you can register/sign up via your **google account** or via **manual signup**:
 
 ### Via Google
@@ -51,7 +52,7 @@ To login/signin to your account, follow these steps:
 5. **Step 5** Once you successfully logged in, you will be redirected to the Loft16 Home page. From this page you can place new order, review your recent products and change or add basic information/details on your account. You can also chat the Admin for your concerns.
 
 
-## How to recover my password
+## Recover password
 
 To recover your password, follow these instruction:
 
@@ -80,7 +81,7 @@ To edit your profile account make sure that you are already **logged in**, then 
 3. **Step 3** Once you edit your account, there are other fields that are **saved automatically** and there are fields that have **save button** in order to save changes.
 
 
-## How do I place an order?
+## Placing an order?
 To place a new order, follow these steps:
 1. **Step 1** From the Home page, click the ‘See Products’ button or click the ‘Products’ on the menu bar. This will direct you to the ‘Product Page’.
 
@@ -98,7 +99,7 @@ To place a new order, follow these steps:
 4. **Step 4** To add each product to the cart click ‘Add to Cart’ button. Repeat the process for each product you wish to add to your order.
 
 
-## How to check Cart & Transactions
+## Check Cart & Transactions
 1. **Step 1** In the top right navigation menu, you can click **Cart Icon** or you can click any of these. It will direct you to your profile overview page.
 
     ![Orders](./images/myorders.png)
@@ -117,7 +118,7 @@ To place a new order, follow these steps:
     **Note**: You can only cancel your orders if the status is **Pending**
 
 
-## How can I reach Loft 16 Admin
+## Reach Loft 16 Admin
 
 ### Via Instagram
 Loft 16 Only have Instagram and you can contact us there.
@@ -127,3 +128,10 @@ Loft 16 have a built in chat system to make sure that the customer can interact 
 
 ### Via Physical Sotre
 you can visit our physical store located at **249, U.P. Town Center, 216 Katipunan Ave, Diliman, Quezon City**. We are located at Phase 2 bldg. Look for **Happy Pill store** neare Mango. We are open weekdays from **8:00 AM** to **8:00 PM**.
+
+
+## Delete my account
+
+**Unfortunately**, we have not included this feature to make sure that if your account get **hijacked** by a **hacker**, you will not loose all of your data incase they tried to **delete** your account. 
+
+But you can file a **delete account request** by emailing us on **Loft16siaa@gmail.com** or you can chat with our **admins** directly on the **built in chat system** on the website. Though admin cannot delete a user, they can verify your identity and pass the deletion request to the **IT personel** of loft 16, they are the only one who can **hard delete** any account in our store.
