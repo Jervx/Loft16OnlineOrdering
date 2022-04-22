@@ -8,6 +8,7 @@ var multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 
 const Orders = require("../../../models/Orders");
+const sendEmail = require("../../../helper/SendEmail");
 
 const adminAuth = require("../../../middleware/adminAuth");
 const Courier = require("../../../models/Courier");
@@ -36,14 +37,12 @@ var upload = multer({ storage: storage, limits: { fileSize: 8388608 } });
 
 router.post(
   "/uploadAdminProfile",
-  adminAuth,
   upload.single("profile_picture", 5),
   async (req, res) => {
     try {
       const { _id } = req.body;
 
       let uploadInfo = req.file;
-
 
       if (_id) {
         const updateAdminData = await Admin.updateOne(
@@ -80,7 +79,20 @@ var productUpload = multer({
   limits: { fileSize: 8388608 },
 }).array("fileImages", 12);
 
-router.get("/getproductdetail/:id", adminAuth, async (req, res) => {
+router.post("/cli/addProduct", async (req, res) => {
+  console.log("CREATING", req.body);
+  try {
+    const creation = await Product.insertMany(req.body.create);
+    res.status(201).json({
+      message: "Created, noice!",
+      creation,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+router.post("/getproductdetail/:id", adminAuth, async (req, res) => {
   try {
     const _id = req.params.id;
 
@@ -119,47 +131,41 @@ router.get("/getproductdetail/:id", adminAuth, async (req, res) => {
   }
 });
 
-router.post(
-  "/uploadProductImage",
-  adminAuth,
-  productUpload,
-  async (req, res) => {
-    try {
-      const { _id, prod_Id } = req.body;
+router.post("/uploadProductImage", productUpload, async (req, res) => {
+  try {
+    const { _id, prod_Id } = req.body;
 
-      let newImages = [];
+    let newImages = [];
 
-      let filesSaved = Array.from(req.files);
+    let filesSaved = Array.from(req.files);
 
-      for (let x = 0; x < filesSaved.length; x++)
-        newImages.push(`${process.env.SELFURL}/${filesSaved[x].path}`);
+    for (let x = 0; x < filesSaved.length; x++)
+      newImages.push(`${process.env.SELFURL}/${filesSaved[x].path}`);
 
-      const update = await Product.updateOne(
-        {
-          _id: new ObjectId(prod_Id),
+    const update = await Product.updateOne(
+      {
+        _id: new ObjectId(prod_Id),
+      },
+      {
+        $push: {
+          Images: { $each: newImages },
         },
-        {
-          $push: {
-            Images: { $each: newImages },
-          },
-          $set: {
-            uby: new ObjectId(_id),
-            uat: new Date(),
-          },
-        }
-      );
+        $set: {
+          uby: new ObjectId(_id),
+          uat: new Date(),
+        },
+      }
+    );
 
-      res.status(200).json({ message: "uploaded!" });
-    } catch (e) {
-      ehandler(e, res);
-    }
+    res.status(200).json({ message: "uploaded!" });
+  } catch (e) {
+    ehandler(e, res);
   }
-);
+});
 
 router.post("/updateProduct", adminAuth, async (req, res) => {
   try {
     const { mode, _id, prod_Id, simpleData, complexData } = req.body;
-
 
     if (mode === 0) {
       const doesExist = await Product.findOne({
@@ -360,7 +366,7 @@ router.post("/updateProduct", adminAuth, async (req, res) => {
 });
 
 // Chats
-router.get("/getChat", adminAuth, async (req, res) => {
+router.post("/getChat", adminAuth, async (req, res) => {
   try {
     const conversations = await Chat.find({
       messages: { $not: { $size: 0 } },
@@ -409,7 +415,6 @@ router.post("/sendMessage", adminAuth, async (req, res) => {
   try {
     const { _id, message } = req.body;
 
-
     const sendMessage = await Chat.updateOne(
       { user_id: _id },
       {
@@ -435,7 +440,7 @@ router.post("/sendMessage", adminAuth, async (req, res) => {
 });
 
 // admin account creation &
-router.get("/mydetails/:id", adminAuth, async (req, res) => {
+router.post("/mydetails/:id", adminAuth, async (req, res) => {
   let _id = req.params.id;
 
   if (!_id)
@@ -478,7 +483,6 @@ router.post("/insights", adminAuth, async (req, res) => {
 
     let categories = await Categories.find({});
 
-
     let delivered = await Orders.find({
       order_status: 3,
       uat: {
@@ -514,7 +518,7 @@ router.post("/insights", adminAuth, async (req, res) => {
 });
 
 // couriers page & actions ---------------------------
-router.get("/couriers", adminAuth, async (req, res) => {
+router.post("/couriers", adminAuth, async (req, res) => {
   try {
     const couriers = await Courier.find({ dat: null });
 
@@ -535,6 +539,8 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
 
     //  mode 0 create, mode 1 update, mode -1 delete
     if (mode === 0) {
+      console.log("Creating Courier");
+      console.log(_id, courier, oldCourier, mode);
       const nameAlreadyExist = await Courier.findOne({
         courier_name: courier.courier_name,
       });
@@ -561,11 +567,13 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
       message = "Updated";
       status = 201;
     } else if (mode === 1) {
+      console.log("Updating Courier");
+      console.log(_id, courier, oldCourier, mode);
       const nameAlreadyExist = await Courier.findOne({
         courier_name: courier.courier_name,
       });
       const doesCurrentRecordExist = await Courier.findOne({
-        _id: oldCourier._id,
+        _id: new ObjectId(oldCourier._id),
       });
 
       if (!doesCurrentRecordExist) {
@@ -597,7 +605,7 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
 
       const update = await Courier.updateOne(
         {
-          ...oldCourier,
+          _id: new ObjectId(oldCourier._id),
         },
         {
           $set: {
@@ -608,9 +616,11 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
         }
       );
 
-      message = "Updated";
+      message = update;
       status = 201;
     } else if (mode === -1) {
+      console.log("Deleting Courier");
+      console.log(_id, courier, oldCourier, mode);
       const update = await Courier.deleteOne({
         _id: oldCourier._id,
       });
@@ -634,7 +644,7 @@ router.post("/updateCourier", adminAuth, async (req, res) => {
 });
 
 // categories page & actions ---------------------------
-router.get("/categories", adminAuth, async (req, res) => {
+router.post("/categories", adminAuth, async (req, res) => {
   try {
     const categories = await Categories.find({});
 
@@ -671,7 +681,6 @@ router.post("/updateCategories", adminAuth, async (req, res) => {
     let message = "";
     let description = "";
     let solution = "";
-
 
     //  mode 0 create, mode 1 update, mode -1 delete
     if (mode === 0) {
@@ -768,7 +777,7 @@ router.post("/updateCategories", adminAuth, async (req, res) => {
 });
 
 // pending page & actions ---------------------------
-router.get("/pendings", adminAuth, async (req, res) => {
+router.post("/pendings", adminAuth, async (req, res) => {
   try {
     let pendings = [];
 
@@ -886,6 +895,19 @@ router.post("/updatePending", adminAuth, async (req, res) => {
         }
       );
 
+      // TODO: Email
+      const userData = await User.findOne({
+        _id: doesExist.user_ID,
+      });
+
+      let toSent = { ...userData, order_ID: doesExist.order_ID };
+
+      const sendUpdate = await sendEmail(userData.email_address, {
+        ...toSent,
+        template_name: "OrderApproved.html",
+        subject: "Your order was approved",
+      });
+
       // remove record from pening collection
       const updatePending = await Pendings.deleteOne({
         order_ID: entry.order_ID,
@@ -954,6 +976,18 @@ router.post("/updatePending", adminAuth, async (req, res) => {
       );
     }
 
+    const userData = await User.findOne({
+      _id: doesExist.user_ID,
+    });
+
+    let toSent = { ...userData, order_ID: doesExist.order_ID, reason };
+
+    const sendUpdate = await sendEmail(userData.email_address, {
+      ...toSent,
+      template_name: "OrderCancelled.html",
+      subject: "Sorry, your order was cancelled",
+    });
+
     res.status(200).json({
       message: "ok!",
     });
@@ -1010,7 +1044,7 @@ router.post("/searchPendingOrders", adminAuth, async (req, res) => {
 });
 
 // in progress page & actions ---------------------------
-router.get("/inProgress", adminAuth, async (req, res) => {
+router.post("/inProgress", adminAuth, async (req, res) => {
   try {
     let inProgress = [];
 
@@ -1143,6 +1177,18 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
       const deleteEntry = await InProgress.deleteOne({
         order_ID: entry_sm.order_ID,
       });
+
+      const userData = await User.findOne({
+        _id: PRESENT.user_ID,
+      });
+
+      let toSent = { ...userData, order_ID: PRESENT.order_ID };
+
+      const sendUpdate = await sendEmail(userData.email_address, {
+        ...toSent,
+        template_name: "OrderThankyou.html",
+        subject: "Your Order Is Complete",
+      });
     } else {
       // update user in_progress order status to status
 
@@ -1158,7 +1204,6 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
         }
       );
 
-   
       const updateOrder = await Orders.updateOne(
         {
           _id: entry.order_ID,
@@ -1171,6 +1216,20 @@ router.post("/updateInProgress", adminAuth, async (req, res) => {
           },
         }
       );
+    }
+
+    if (status === 2) {
+      const userData = await User.findOne({
+        _id: PRESENT.user_ID,
+      });
+
+      let toSent = { ...userData, order_ID: PRESENT.order_ID, courier_name : PRESENT.courier.courier_name };
+
+      const sendUpdate = await sendEmail(userData.email_address, {
+        ...toSent,
+        template_name: "OrderShipped.html",
+        subject: "Your order has been shipped, please wait for your courier update",
+      });
     }
 
     res.status(201).json({
@@ -1230,7 +1289,7 @@ router.post("/searchInProgress", adminAuth, async (req, res) => {
 
 // completed orders page & actions ----------------------
 
-router.get("/completed", adminAuth, async (req, res) => {
+router.post("/completed", adminAuth, async (req, res) => {
   try {
     let completed = [];
 
@@ -1324,7 +1383,7 @@ router.post("/searchCompleted", adminAuth, async (req, res) => {
 });
 
 // admins page & actions ---------------------------------
-router.get("/admins", adminAuth, async (req, res) => {
+router.post("/admins", adminAuth, async (req, res) => {
   try {
     const admins = await Admin.find({});
 
@@ -1430,7 +1489,7 @@ router.post("/updateAdmin", adminAuth, async (req, res) => {
 
 // product page & actions --------------------------------
 
-router.get("/products", adminAuth, async (req, res) => {
+router.post("/products", adminAuth, async (req, res) => {
   try {
     const products = await Product.find({});
     const cat = await Categories.find({});

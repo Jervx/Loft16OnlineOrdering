@@ -25,7 +25,8 @@ const sendEmail = require("../../helper/SendEmail");
 let ObjectId = require("mongoose").Types.ObjectId;
 
 /* CONFIG */
-const loftCookieConifg = { httpOnly: true, secure: true, SameSite: "none" };
+const HAS_SSL = process.env.HAS_SSL
+const loftCookieConifg = HAS_SSL === true ? { httpOnly: true, secure: true, SameSite: "None" } : { httpOnly: true, SameSite: "Lax" };
 
 //generate loft confirmation code
 let generateCode = () => {
@@ -187,6 +188,8 @@ router.post("/signin", async (req, res) => {
     twoFactCode,
   } = req.body;
 
+  console.log("SIGNIN LOGS: ", req.body)
+
   const ACCOUNT = admin ? Admin : User;
   const USER = await ACCOUNT.findOne({ email_address }).lean();
 
@@ -231,7 +234,7 @@ router.post("/signin", async (req, res) => {
           email_address: userEmail,
           password: genPass,
           template_name: "YourPassword.html",
-          subject: "Loft16 Sign Up Email Confirmation",
+          subject: "Loft16 Sign Up Generated Password",
         });
       }
 
@@ -249,6 +252,11 @@ router.post("/signin", async (req, res) => {
         { password: 0 }
       ).lean();
 
+      let AUTHS = {}
+
+      if(admin) AUTHS.admin_access_token = access_token
+      else AUTHS.access_token = access_token
+
       //include flag to response
       return res.status(200).json({
         code: 200,
@@ -257,6 +265,9 @@ router.post("/signin", async (req, res) => {
         GUserInfo,
         userData: { ...userData2, login_count: userData.login_count + 1 },
         flag,
+        client_id,
+        ...AUTHS,
+        auth_iss : GUserInfo.iss
       });
     } catch (err) {
       return res.status(400).json({
@@ -368,24 +379,24 @@ router.post("/signin", async (req, res) => {
     { password: 0 }
   ).lean();
 
-  // Create a session Refresh Token for attaining new access token
-  // should be destroyed on logout - @hjerbe
-
 
   // set authorization via cookie & httponly secure desu
-  res.cookie(admin ? "admin_access_token" : "access_token", token, {
-    ...loftCookieConifg,
-    maxAge: createCookieExpiration(process.env.COOKIE_EXP),
-  });
-  res.cookie("auth_iss", process.env.JWT_ISSUER, {
-    ...loftCookieConifg,
-    maxAge: createCookieExpiration(process.env.COOKIE_EXP),
-  });
+  res.cookie(admin ? "admin_access_token" : "access_token", token, { ...loftCookieConifg, maxAge: createCookieExpiration(process.env.COOKIE_EXP), });
+  res.cookie("auth_iss", process.env.JWT_ISSUER, {...loftCookieConifg, maxAge: createCookieExpiration(process.env.COOKIE_EXP), });
 
   const loginCount = await ACCOUNT.updateOne(
     { _id: USER._id },
     { $inc: { login_count: 1 } }
   );
+
+  let AUTHS = {}
+
+  if(admin) AUTHS.admin_access_token = token
+  else AUTHS.access_token = token
+
+  AUTHS.auth_iss = process.env.JWT_ISSUER
+
+  console.log("SENDING AUTH", AUTHS)
 
   return res.status(200).json({
     code: 200,
@@ -395,6 +406,7 @@ router.post("/signin", async (req, res) => {
       ...USER2,
       login_count: USER.login_count + 1,
     },
+    ...AUTHS
   });
 });
 

@@ -20,17 +20,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
-app.use((req, res, next) => {
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Credentials', true);
+//     res.header('Access-Control-Allow-Origin', req.headers.origin);
+//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+//     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+//     next();
+//   });
+
+  app.use((req, res, next) => {
     const allowedOrigins = process.env.ALLOWEDURL.split(' ');
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin))
         res.setHeader('Access-Control-Allow-Origin', origin);
     //res.header('Access-Control-Allow-Origin', "https://192.168.1.100:3000");
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
   });
-
 
 //Routes
 const authenticationRoute = require('./Routes/public/authentication')

@@ -33,7 +33,6 @@ var upload = multer({ storage: storage, limits: { fileSize: 8388608 } });
 
 router.post(
   "/uploadProfile",
-  auth,
   upload.single("profile_picture", 5),
   async (req, res) => {
     try {
@@ -60,7 +59,7 @@ router.post(
   }
 );
 
-router.get("/getMyCart/:id", auth, async(req,res) => {
+router.post("/getLiked/:id", auth, async(req,res) => {
     try{
         const _id = req.params.id
         const myLikes = await User.findOne({ _id }, { _id : 0, liked_products : 1})
@@ -148,9 +147,9 @@ router.post("/removeCancelled", auth, async (req, res) => {
     const { _id, cancelled } = req.body;
 
     const removedRecord = await User.updateOne(
-      { _id },
+      { _id : new ObjectId(_id) },
       {
-        $pull: { cancelled: { order_ID: cancelled.order_ID } },
+        $pull: { cancelled: { order_ID: new ObjectId(cancelled.order_ID) } },
       }
     );
 
@@ -598,7 +597,7 @@ router.post("/removefromcart", auth, async (req, res) => {
 });
 
 //getUserDetails
-router.get("/mydetails/:id", auth, async (req, res) => {
+router.post("/mydetails/:id", auth, async (req, res) => {
   let _id = req.params.id;
   await snooze(1000);
   if (!_id)
@@ -622,7 +621,7 @@ router.get("/mydetails/:id", auth, async (req, res) => {
 });
 
 //getUserCart
-router.get("/mycart/:_id", auth, async (req, res) => {
+router.post("/mycart/:_id", auth, async (req, res) => {
   let _id = req.params._id;
   // if id is null return 400
   if (!_id)
