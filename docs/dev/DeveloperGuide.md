@@ -67,7 +67,7 @@ The loft16 database is using **MongoDB** and it is deployed via **MongoDb Atlas*
 
 The string bellow is the connection for the database. Ask the password from the **Loft16 Admin** or **Loft16 IT Personel**
 
-```Mongo URI
+```
 mongodb+srv://loftsiaa:<password>@loftcluster.kqzw0.mongodb.net/loft?retryWrites=true&w=majority
 ```
 

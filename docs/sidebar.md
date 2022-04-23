@@ -1,0 +1,7 @@
+- [Documentation](./)
+- [User Guide](./user/UserGuide)
+- [Admin Guide](./admin/AdminGuide)
+- [Developers Docs](./dev/DeveloperGuide)
+- **Links**
+- [Loft16](https://loft16front.herokuapp.com/Customer)
+- [Loft16 Admin](https://loft16front.herokuapp.com/admin)
