@@ -1,6 +1,6 @@
-# Welcome To Loft 16 User Manual & Documentation
+# Welcome To Loft 16 Manual & Documentation
 
-Loft16 has implemented an online ordering system that aims to improve their product & services. These documentation will also help user, admin, & future developers in using the website.
+Loft16 has implemented an online ordering system that aims to improve their product & services. These documentation will help user, admin, & future developers to fully understand the site in terms of browsing, management, & development.
 
 ## Choose Manual
 <section class="text-gray-600 body-font">
